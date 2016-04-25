@@ -1,0 +1,53 @@
+{
+  "name": "iterable-query",
+  "version": "0.1.0",
+  "description": "Query library for ES6 iterables.",
+  "main": "./out/lib/query.js",
+  "typings": "./out/lib/query.d.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-istanbul": "^0.10.3",
+    "gulp-mocha": "^2.2.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-typescript": "^2.12.1",
+    "gulp-util": "^3.0.7",
+    "merge2": "^1.0.1",
+    "mocha": "^2.4.5",
+    "source-map-support": "^0.4.0",
+    "typescript": "^1.9.0-dev.20160330"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/tsc.cmd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rbuckton/queryjs.git"
+  },
+  "keywords": [
+    "query",
+    "iterator",
+    "iterable",
+    "zip",
+    "map",
+    "filter",
+    "reduce",
+    "order",
+    "hierarchy"
+  ],
+  "author": "Ron Buckton (rbuckton@outlook.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/rbuckton/queryjs/issues"
+  },
+  "homepage": "https://github.com/rbuckton/queryjs",
+  "files": [
+    "query.js",
+    "query.d.ts",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "stripInternal": true,
+        "declaration": true,
+        "experimentalDecorators": true
+    },
+    "exclude": [
+        "typings/browser.d.ts",
+        "typings/browser"
+    ]
+}

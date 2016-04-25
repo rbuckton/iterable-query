@@ -1,30 +1,54 @@
-QueryJS
-=======
+# iterable-query - Query API for JavaScript (ES6) Iterables
 
-Query API over JavaScript (ES6) Iterators
+```ts
+// TypeScript
+import { Query } from "iterable-query";
+
+// JavaScript (CommonJS)
+var Query = require("iterable-query").Query;
+
+var q = Query
+  .from(books)
+  .filter(book => book.author === "Alice")
+  .groupBy(book => book.releaseYear);
+```
+
+**iterable-query** is a library that provides a query API for ES6 iterables, adding numerous operations found in other
+languages like Haskell, Scala, and C# (.NET).
+
+## Installing
+For the latest version:
+
+```cmd
+npm install iterable-query
+```
+
+## Documentation
+
+* [API Reference](docs/iterable-query.md)
 
 ## Examples
 ### Filtering
-```js
+```ts
 var gen = function*() {
-  yield 1
-  yield 2
-  yield 3
-}
+  yield 1;
+  yield 2;
+  yield 3;
+};
 
 var evens = Query
-  .from(gen)
+  .from(gen())
   .filter(i => i % 2 === 0);
-  
+
 var odds = Query
-  .from(gen)
-  .filter(i => i % 2 === 1);
+  .from(gen())
+  .where(i => i % 2 === 1); // alias for `filter`
 ```
 
 ### Sorting
-```js
+```ts
 var books = [
-  { id: 1, title: "QueryJS a query API for JavaScript", author: "Vance, David" },
+  { id: 1, title: "QueryJS a query API for JavaScript", author: "Smith, David" },
   { id: 2, title: "Iterators and You", author: "Smith, Bob" },
   { id: 3, title: "All the Queries", author: "Smith, Frank" }
 ]
@@ -33,18 +57,18 @@ var ordered = Query
   .from(books)
   .orderBy(book => book.title)
   .thenBy(book => book.author);
-  
+
 var result = [...ordered];
 ```
 
 ### Grouping
-```js
+```ts
 var groups = [
   { id: 1, name: "Admin" },
   { id: 2, name: "Standard User" }
 ];
 var users = [
-  { id: 1, name: "Bob", groupId: 2 }, 
+  { id: 1, name: "Bob", groupId: 2 },
   { id: 2, name: "Alice", groupId: 1 },
   { id: 3, name: "Tom", groupId: 2 }
 ];
@@ -52,7 +76,7 @@ var users = [
 var usersByGroup = Query
   .from(groups)
   .groupJoin(users, group => group.id, user => user.id);
-  
+
 for (var groupUsers of usersByGroup) {
   print(groupUsers.key);
   print('======');
@@ -62,186 +86,27 @@ for (var groupUsers of usersByGroup) {
 }
 ```
 
-## API Reference
-
+### Hierarchies
 ```ts
-interface Iterator<T> extends Iterable<T> {
-  next(): { value?: T, done: boolean };
-}
+let doc = Query
+  .hierarchy<Node>(document.body, {
+    parent(node: Node) { return node.parentNode; },
+    children(node: Node) { return node.childNodes; }
+  });
 
-interface Iterable<T> {
-  [Symbol.iterator](): Iterator<T>;
-}
+// disable all buttons
+doc
+  .descendants()
+  .where((node: Node): node is HTMLButtonElement => node.type === "BUTTON")
+  .forEach(node => {
+    node.disabled = true;
+  });
 
-interface GeneratorFunction<T> {
-  (): Iterator<T>;
-}
-
-interface Grouping<TKey, TValue> extends Query<TValue> {
-  key: TKey;
-}
-
-interface Lookup<TKey, TValue> extends Query<Grouping<TKey, TValue>> {
-  has(key: TKey): boolean;
-  get(key: TKey): Query<TValue>;
-  applyResultSelector<TResult>(selector: (key: TKey, values: Query<TValue>) => TResult): Query<TResult>;
-}
-
-class Query<T> extends Iterable<T> {
-  /**
-   *  Initializes a new Query
-   *  @param source - An object that implements the iterator protocol (has a callable System.iterator property)
-   */
-  constructor(source: Iterable<T>);
-
-  /**
-   *  Initializes a new Query
-   *  @param source - A generator function
-   */
-  constructor(source: GeneratorFunction<T>);
-
-  /**
-   *  Initializes a new Query
-   *  @param source - An object that implements the iterator protocol (has a callable System.iterator property)
-   *  @returns The source if it is a Query instance, otherwise a new Query for the source
-   */
-  static from(source: Iterator<T>);
-
-  /**
-   *  Initializes a new Query
-   *  @param source - A generator function
-   *  @returns The source if it is a Query instance, otherwise a new Query for the source
-   */
-  static from(source: GeneratorFunction<T>);
-
-  static empty<T>(): Query<T>;
-  
-  static once<T>(value: T): Query<T>;
-  
-  static repeat<T>(value: T, count: number): Query<T>;
-  
-  static range(start: number, end: number): Query<number>;
-  
-  filter(predicate: (value: T, index: number) => boolean): Query<T>;
-  
-  map<TResult>(projection: (value: T, index: number) => TResult): Query<TResult>;
-  
-  flatMap<TResult>(projection: (value: T, index: number) => Iterator<TResult>): Query<TResult>;
-  
-  skip(count: number): Query<T>;
-  
-  take(count: number): Query<T>;
-  
-  skipWhile(condition: (value: T, index: number) => boolean): Query<T>;
-  
-  takeWhile(condition: (value: T, index: number) => boolean): Query<T>;
-  
-  reverse(): Query<T>;
-  
-  intersect(other: Iterable<T>): Query<T>;
-  
-  intersect(other: GeneratorFunction<T>): Query<T>;
-  
-  union(other: Iterable<T>): Query<T>;
-  
-  union(other: GeneratorFunction<T>): Query<T>;
-  
-  except(other: Iterable<T>): Query<T>;
-  
-  except(other: GeneratorFunction<T>): Query<T>;
-  
-  distinct(): Query<T>;
-  
-  concat(other: Iterable<T>): Query<T>;
-  
-  concat(other: GeneratorFunction<T>): Query<T>;
-  
-  zip<TOther, TResult>(other: Iterable<TOther>, selector: (x: T, y: TOther) => TResult): Query<TResult>;
-  
-  zip<TOther, TResult>(other: GeneratorFunction<TOther>, selector: (x: T, y: TOther) => TResult): Query<TResult>;
-  
-  orderBy<TKey>(keySelector: (value: T) => TKey, comparison?: (x: TKey, y: TKey) => number): OrderedQuery<T>;
-  
-  orderByDescending<TKey>(keySelector: (value: T) => TKey, comparison?: (x: TKey, y: TKey) => number): OrderedQuery<T>;
-  
-  groupBy<TKey>(keySelector: (value: T) => TKey): Query<Grouping<TKey, T>>;
-  
-  groupBy<TKey, TElement>(keySelector: (value: T) => TKey, elementSelector: (value: T) => TElement): Query<Grouping<TKey, TElement>>;
-  
-  groupBy<TKey, TElement, TResult>(keySelector: (value: T) => TKey, elementSelector: (value: T) => TElement, resultSelector: (key: TKey, values: Query<TElement>) => TResult): Query<TResult>;
-  
-  groupJoin<TInner, TKey, TResult>(inner: Iterable<TInner>, outerKeySelector: (value: T) => TKey, innerKeySelector: (value: TInner) => TKey, resultSelector: (outer: T, inner: Query<TInner>) => TResult): Query<TResult>;
-
-  groupJoin<TInner, TKey, TResult>(inner: GeneratorFunction<TInner>, outerKeySelector: (value: T) => TKey, innerKeySelector: (value: TInner) => TKey, resultSelector: (outer: T, inner: Query<TInner>) => TResult): Query<TResult>;
-  
-  join<TInner, TKey, TResult>(inner: Iterable<TInner>, outerKeySelector: (value: T) => TKey, innerKeySelector: (value: TInner) => TKey, resultSelector: (outer: T, inner: TInner) => TResult): Query<TResult>;
-
-  join<TInner, TKey, TResult>(inner: GeneratorFunction<TInner>, outerKeySelector: (value: T) => TKey, innerKeySelector: (value: TInner) => TKey, resultSelector: (outer: T, inner: TInner) => TResult): Query<TResult>;
-  
-  min(): T;
-  
-  min<TElement>(selector: (value: T) => TElement): TElement;
-  
-  max(): T;
-  
-  max<TElement>(selector: (value: T) => TElement): TElement;
-  
-  sum(selector?: (value: T) => number): number;
-  
-  average(selector?: (value: T) => number): number;
-  
-  has(value: T): boolean;
-  
-  sequenceEquals(other: Iterable<T>): boolean;
-  
-  reduce(accumulator: (accumulator: T, value: T) => T): T;
-  
-  reduce<TAccumulator>(accumulator: (accumulator: TAccumulator, value: T) => TAccumulator, seed: TAccumulator): TAccumulator;
-  
-  reduceRight(accumulator: (accumulator: T, value: T) => T): T;
-  
-  reduceRight<TAccumulator>(accumulator: (accumulator: TAccumulator, value: T) => TAccumulator, seed: TAccumulator): TAccumulator;
-  
-  forEach(callback: (value: T, index: number) => void);
-  
-  first(filter?: (value: T) => boolean): T;
-  
-  last(filter?: (value: T) => boolean): T;
-  
-  item(index: number): T;
-  
-  single(filter?: (value: T) => boolean): T;
-  
-  count(filter?: (value: T) => boolean): number;
-  
-  some(filter?: (value: T) => boolean): boolean;
-  
-  every(filter: (value: T) => boolean): boolean;
-  
-  toArray(): T[];
-  
-  toArray<TElement>(selector: (value: T) => TElement): TElement[];
-  
-  toLookup<TKey>(keySelector: (value: T) => TKey): Lookup<TKey, T>;
-  
-  toLookup<TKey, TElement>(keySelector: (value: T) => TKey, elementSelector: (value: T) => TElement): Lookup<TKey, TElement>;
-  
-  toSet(): Set<T>;
-  
-  toSet<TElement>(selector: (value: T) => TElement): TElement;
-  
-  toMap<TKey>(keySelector: (value: T) => TKey): Map<TKey, T>;
-  
-  toMap<TKey, TValue>(keySelector: (value: T) => TKey, valueSelector: (value: T) => TValue): Map<TKey, TValue>;
-  
-  toString(): string;
-  
-  [Symbol.iterator](): Iterator<T>;
-}
-
-interface OrderedQuery<T> extends Query<T> {
-  thenBy<TKey>(keySelector: (value: T) => TKey, comparison?: (x: TKey, y: TKey) => number): OrderedQuery<T>;
-  
-  thenByDescending<TKey>(keySelector: (value: T) => TKey, comparison?: (x: TKey, y: TKey) => number): OrderedQuery<T>;
-}
+// get all thumbnails
+let thumbnails = doc
+  .descendants()
+  .filter(node => node.type === "IMG")
+  .map(node => <HTMLImageElement>node)
+  .filter(img => img.height < 32 && img.width < 32)
+  .toArray();
 ```
