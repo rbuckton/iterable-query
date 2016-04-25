@@ -627,6 +627,7 @@ for (const context of contexts) {
                 it("finds single", () => expect(Query.from([1]).single()).to.equal(1));
                 it("finds undefined when many", () => expect(Query.from([1, 2, 3]).single()).to.be.undefined);
                 it("finds undefined when empty", () => expect(Query.from([]).single()).to.be.undefined);
+                preconditions("predicate", MustBeFunctionOrUndefined, predicate => Query.from([]).single(predicate));
             });
             describe("min()", () => {
                 it("finds minimum", () => expect(Query.from([5, 6, 3, 9, 4]).min()).to.equal(3));

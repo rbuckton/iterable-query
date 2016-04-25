@@ -918,24 +918,24 @@ export class Query<T> implements Iterable<T> {
      * @param predicate An optional callback used to match each element.
      */
     public count(predicate?: (element: T) => boolean): number {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
-        let count = 0;
-        if (predicate) {
-            ForOf(this, element => {
-                if (predicate(element)) {
-                    count++;
-                }
-            });
-        }
-        else {
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
+
+        if (predicate === True) {
+            if (this._source instanceof ArrayLikeIterable) {
+                return (<ArrayLikeIterable<any>>this._source)._source.length;
+            }
             if (this._source instanceof Set || this._source instanceof Map) {
                 return (<Set<T> | Map<any, any>>this._source).size;
             }
-
-            ForOf(this, element => {
-                count++;
-            })
         }
+
+        let count = 0;
+        ForOf(this, element => {
+            if (predicate(element)) {
+                count++;
+            }
+        });
         return count;
     }
 
@@ -946,22 +946,16 @@ export class Query<T> implements Iterable<T> {
      * @param predicate An optional callback used to match each element.
      */
     public first(predicate?: (element: T) => boolean): T {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
-        if (predicate) {
-            const state = ForOf(this, element => {
-                if (predicate(element)) {
-                    return Return(element);
-                }
-            });
-            if (IsReturn(state)) return state.return;
-        }
-        else {
-            const state = ForOf(this, element => {
-                return Return(element);
-            })
-            if (IsReturn(state)) return state.return;
-        }
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
 
+        const state = ForOf(this, element => {
+            if (predicate(element)) {
+                return Return(element);
+            }
+        });
+
+        if (IsReturn(state)) return state.return;
         return undefined;
     }
 
@@ -972,20 +966,15 @@ export class Query<T> implements Iterable<T> {
      * @param predicate An optional callback used to match each element.
      */
     public last(predicate?: (element: T) => boolean): T {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
+
         let result: T;
-        if (predicate) {
-            ForOf(this, element => {
-                if (predicate(element)) {
-                    result = element;
-                }
-            });
-        }
-        else {
-            ForOf(this, element => {
-                result = element
-            });
-        }
+        ForOf(this, element => {
+            if (predicate(element)) {
+                result = element;
+            }
+        });
 
         return result;
     }
@@ -995,16 +984,21 @@ export class Query<T> implements Iterable<T> {
      *
      * @param predicate An optional callback used to match each element.
      */
-    public single() {
+    public single(predicate?: (element: T) => boolean) {
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
+
         let hasElements = false;
         let result: T;
         const state = ForOf(this, element => {
-            if (hasElements) {
-                return Return(undefined);
-            }
+            if (predicate(element)) {
+                if (hasElements) {
+                    return Return(undefined);
+                }
 
-            hasElements = true;
-            result = element;
+                hasElements = true;
+                result = element;
+            }
         });
         if (IsReturn(state)) return state.return;
         return hasElements ? result : undefined;
@@ -1018,7 +1012,8 @@ export class Query<T> implements Iterable<T> {
      */
     public min(comparison?: (x: T, y: T) => number): T {
         if (comparison === undefined) comparison = CompareValues;
-        Assert.mustBeFunctionOrUndefined(comparison, "comparison");
+        Assert.mustBeFunction(comparison, "comparison");
+
         let hasElements = false;
         let result: T;
         ForOf(this, element => {
@@ -1042,7 +1037,8 @@ export class Query<T> implements Iterable<T> {
      */
     public max(comparison?: (x: T, y: T) => number): T {
         if (comparison === undefined) comparison = CompareValues;
-        Assert.mustBeFunctionOrUndefined(comparison, "comparison");
+        Assert.mustBeFunction(comparison, "comparison");
+
         let hasElements = false;
         let result: T;
         ForOf(this, element => {
@@ -1064,21 +1060,16 @@ export class Query<T> implements Iterable<T> {
      * @param predicate An optional callback used to match each element.
      */
     public some(predicate?: (element: T) => boolean): boolean {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
-        if (predicate) {
-            const state = ForOf(this, element => {
-                if (predicate(element)) {
-                    return Return(true);
-                }
-            });
-            if (IsReturn(state)) return state.return;
-        }
-        else {
-            const state = ForOf(this, element => {
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
+
+        const state = ForOf(this, element => {
+            if (predicate(element)) {
                 return Return(true);
-            })
-            if (IsReturn(state)) return state.return;
-        }
+            }
+        });
+
+        if (IsReturn(state)) return state.return;
         return false;
     }
 
@@ -1539,7 +1530,8 @@ export class Query<T> implements Iterable<T> {
      * @param elementSelector An optional callback that selects a value for each element.
      */
     public toArray<V>(elementSelector?: (element: T) => T | V): (T | V)[] {
-        Assert.mustBeFunctionOrUndefined(elementSelector, "elementSelector");
+        if (elementSelector === undefined) elementSelector = Identity;
+        Assert.mustBeFunction(elementSelector, "elementSelector");
         return ToArray<T, T | V>(this, elementSelector);
     }
 
@@ -1982,7 +1974,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public root(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.root), this._view);
     }
 
@@ -1992,7 +1985,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public ancestors(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.ancestors), this._view);
     }
 
@@ -2002,7 +1996,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public ancestorsAndSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.ancestorsAndSelf), this._view);
     }
 
@@ -2012,7 +2007,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public parents(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.parents), this._view);
     }
 
@@ -2022,7 +2018,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public self(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.self), this._view);
     }
 
@@ -2032,7 +2029,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public siblings(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblings), this._view);
     }
 
@@ -2042,7 +2040,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public siblingsAndSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblingsAndSelf), this._view);
     }
 
@@ -2052,7 +2051,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public siblingsBeforeSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblingsBeforeSelf), this._view);
     }
 
@@ -2062,7 +2062,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public siblingsAfterSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblingsAfterSelf), this._view);
     }
 
@@ -2072,7 +2073,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public children(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.children), this._view);
     }
 
@@ -2093,7 +2095,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public descendants(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.descendants), this._view);
     }
 
@@ -2103,7 +2106,8 @@ export class HierarchyQuery<T> extends Query<T> {
      * @param predicate A callback used to filter the results.
      */
     public descendantsAndSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
-        Assert.mustBeFunctionOrUndefined(predicate, "predicate");
+        if (predicate === undefined) predicate = True;
+        Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.descendantsAndSelf), this._view);
     }
 }
@@ -5318,6 +5322,10 @@ function Return<R>(value?: R): Return<R> {
 
 function Identity<T>(x: T): T {
     return x;
+}
+
+function True(x: any) {
+    return true;
 }
 
 function CompareValues<T>(x: T, y: T): number {
