@@ -14,7 +14,7 @@
   limitations under the License.
  */
 
-import { iterator, GetIterator, NextResult, DoneResult, IteratorClose, SameValue } from "./utils";
+import { iterator, GetIterator, NextResult, DoneResult, IteratorClose, IsObject, IsArrayLike, IsIterable, IsIterableShim, SameValue } from "./utils";
 import { Map, Set, WeakMap } from "./collections";
 
 declare var Symbol: any;
@@ -38,15 +38,14 @@ export interface IteratorResult<T> {
     done: boolean;
 }
 
-export interface ObjectLike<T> {
-    [key: string]: T;
-    [key: number]: T;
+export interface ES6ShimIterable<T> {
+    "_es6-shim iterator_"(): Iterator<T>;
 }
 
 /**
  * Represents an object that is either iterable or array-like.
  */
-export type Queryable<T> = Iterable<T> | ArrayLike<T>;
+export type Queryable<T> = Iterable<T> | ES6ShimIterable<T> | ArrayLike<T>;
 
 /**
  * Creates a Query from a Queryable source.
@@ -258,7 +257,7 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source An object.
      */
-    public static objectKeys<T>(source: ObjectLike<T>): Query<string> {
+    public static objectKeys<T>(source: { [key: string]: T }): Query<string> {
         Assert.mustBeObject(source, "source");
         const keys = Object.keys(source);
         return new Query(keys);
@@ -269,7 +268,7 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source An object.
      */
-    public static objectValues<T>(source: ObjectLike<T>): Query<T> {
+    public static objectValues<T>(source: { [key: string]: T }): Query<T> {
         Assert.mustBeObject(source, "source");
         const keys = Object.keys(source);
         return new Query(new MapIterable(ToIterable(keys), key => source[key]));
@@ -280,7 +279,7 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source An object.
      */
-    public static objectEntries<T>(source: ObjectLike<T>): Query<[string, T]> {
+    public static objectEntries<T>(source: { [key: string]: T }): Query<[string, T]> {
         Assert.mustBeObject(source, "source");
         const keys = Object.keys(source);
         return new Query(new MapIterable(ToIterable(keys), key => MakeTuple(key, source[key])));
@@ -2266,6 +2265,14 @@ class EmptyIterator<T> implements IterableIterator<T> {
     next(value?: any) { return DoneResult<T>(); }
     return(value?: any) { return DoneResult<T>(); }
     @iterator __iterator__() { return this; }
+}
+
+class IterableShimWrapper<T> implements Iterable<T> {
+    _source: ES6ShimIterable<T>;
+    constructor(source: ES6ShimIterable<T>) {
+        this._source = source;
+    }
+    @iterator __iterator__() { return this._source["_es6-shim iterator_"](); }
 }
 
 class ArrayLikeIterable<T> implements Iterable<T> {
@@ -5327,22 +5334,6 @@ function MakeTuple<T, U>(x: T, y: U): [T, U] {
     return [x, y];
 }
 
-function IsObject(x: any): boolean {
-    return x !== null && (typeof x === "object" || typeof x === "function");
-}
-
-function IsArrayLike<T>(x: Queryable<T>): x is ArrayLike<T>;
-function IsArrayLike(x: any): x is ArrayLike<any>;
-function IsArrayLike(x: any): x is ArrayLike<any> {
-    return x !== null && typeof x === "object" && typeof x.length === "number";
-}
-
-function IsIterable<T>(x: Queryable<T>): x is Iterable<T>;
-function IsIterable(x: any): x is Iterable<any>;
-function IsIterable(x: any): x is Iterable<any> {
-    return IsObject(x) && Symbol.iterator in x;
-}
-
 function Iterable<T>(factory: () => Iterator<T>): Iterable<T> {
     const iterable = {
         __iterator__: () => IterableIterator(factory())
@@ -5393,7 +5384,9 @@ function CreateGroupings<T, K, V>(source: Iterable<T>, keySelector: (element: T)
 }
 
 function ToIterable<T>(queryable: Queryable<T>): Iterable<T> {
-    return IsIterable(queryable) ? queryable : new ArrayLikeIterable(queryable);
+    return IsIterable(queryable) ? queryable
+        : IsIterableShim(queryable) ? new IterableShimWrapper(queryable)
+        : new ArrayLikeIterable(queryable);
 }
 
 function ToArray<T>(source: Queryable<T>): T[];
@@ -5524,15 +5517,5 @@ namespace Assert {
 
     export function mustBeOrderedIterable<T>(value: OrderedIterableBase<T>, paramName: string, message?: string) {
         assertType(IsOrderedIterable(value), paramName, message, mustBeOrderedIterable);
-    }
-}
-
-declare global {
-    interface ArrayConstructor {
-        /**
-          * Creates an array from an array-like object.
-          * @param arrayLike An array-like object to convert to an array.
-          */
-        from<T>(arrayLike: Queryable<T>): Array<T>;
     }
 }

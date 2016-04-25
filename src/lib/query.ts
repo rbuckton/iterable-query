@@ -20,11 +20,6 @@
  */
 export type Queryable<T> = Iterable<T> | ArrayLike<T>;
 
-export interface ObjectLike<T> {
-    [key: string]: T;
-    [key: number]: T;
-}
-
 /**
  * Creates a Query from a Queryable source.
  *
@@ -235,7 +230,7 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source An object.
      */
-    public static objectKeys<T>(source: ObjectLike<T>): Query<string> {
+    public static objectKeys<T>(source: { [key: string]: T }): Query<string> {
         Assert.mustBeObject(source, "source");
         const keys = Object.keys(source);
         return new Query(keys);
@@ -246,7 +241,7 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source An object.
      */
-    public static objectValues<T>(source: ObjectLike<T>): Query<T> {
+    public static objectValues<T>(source: { [key: string]: T }): Query<T> {
         Assert.mustBeObject(source, "source");
         const keys = Object.keys(source);
         return new Query(new MapIterable(keys, key => source[key]));
@@ -257,7 +252,7 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source An object.
      */
-    public static objectEntries<T>(source: ObjectLike<T>): Query<[string, T]> {
+    public static objectEntries<T>(source: { [key: string]: T }): Query<[string, T]> {
         Assert.mustBeObject(source, "source");
         const keys = Object.keys(source);
         return new Query(new MapIterable(keys, key => MakeTuple(key, source[key])));

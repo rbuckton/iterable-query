@@ -1,31 +1,55 @@
-import { Iterable, Iterator, IterableIterator, IteratorResult } from "./query";
+import { Queryable, Iterable, ES6ShimIterable, Iterator, IterableIterator, IteratorResult } from "./query";
 
 declare var Symbol: any;
 
+export const IteratorKey = "__iterator__";
+export const ES6ShimIteratorKey = "_es6-shim iterator_";
+export const IteratorSymbol = typeof Symbol === "function" && Symbol.iterator;
+
 export function iterator(target: any, name: string) {
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-        target[Symbol.iterator] = target[name];
-    }
+    const iterator = target[name];
+    if (IteratorSymbol) target[IteratorSymbol] = iterator;
+    if (name !== IteratorKey) target[IteratorKey] = iterator;
+    if (name !== ES6ShimIteratorKey) target[ES6ShimIteratorKey] = iterator;
 }
 
-export function GetIterator<T>(source: Iterable<T> | ArrayLike<T>): Iterator<T> {
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-        const iterator = (<any>source)[Symbol.iterator];
-        if (typeof iterator === "function") {
-            return iterator.call(source);
-        }
-    }
+export function GetIterator<T>(source: Queryable<T>): Iterator<T>;
+export function GetIterator(source: any): Iterator<any> {
+    const iterator = (IteratorSymbol && source[IteratorSymbol])
+        || source[IteratorKey]
+        || source[ES6ShimIteratorKey];
 
-    const iterator = (<Iterable<T>>source).__iterator__;
     if (typeof iterator === "function") {
         return iterator.call(source);
     }
 
-    if (typeof (<ArrayLike<T>>source).length === "number") {
-        return new ArrayLikeIterator(<ArrayLike<T>>source);
+    if (IsArrayLike(source)) {
+        return new ArrayLikeIterator(source);
     }
 
     throw new TypeError();
+}
+
+export function IsObject(x: any) {
+    return Object(x) === x;
+}
+
+export function IsIterable<T>(x: Queryable<T>): x is Iterable<T>;
+export function IsIterable(x: any): x is Iterable<any>;
+export function IsIterable(x: any): x is Iterable<any> {
+    return IsObject(x) && (IteratorKey in x || IteratorSymbol in x);
+}
+
+export function IsIterableShim<T>(x: Queryable<T>): x is ES6ShimIterable<T> {
+    return IsObject(x) && (ES6ShimIteratorKey in x);
+}
+
+export function IsArrayLike<T>(source: Queryable<T>): source is ArrayLike<T>;
+export function IsArrayLike(source: any): source is ArrayLike<any>;
+export function IsArrayLike(source: any): source is ArrayLike<any> {
+    return source !== null
+        && typeof source === "object"
+        && typeof source.length === "number";
 }
 
 export function SameValue(x: any, y: any): boolean {
