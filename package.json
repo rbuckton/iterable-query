@@ -20,7 +20,8 @@
     "typescript": "^1.9.0-dev.20160330"
   },
   "scripts": {
-    "build": "./node_modules/.bin/tsc.cmd"
+    "build": "gulp build",
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -42,12 +43,5 @@
   "bugs": {
     "url": "https://github.com/rbuckton/queryjs/issues"
   },
-  "homepage": "https://github.com/rbuckton/queryjs",
-  "files": [
-    "query.js",
-    "query.d.ts",
-    "package.json",
-    "LICENSE",
-    "README.md"
-  ]
+  "homepage": "https://github.com/rbuckton/queryjs"
 }

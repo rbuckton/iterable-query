@@ -27,6 +27,20 @@ npm install iterable-query
 
 * [API Reference](docs/iterable-query.md)
 
+## ES5 Support
+
+The **iterable-query** library can be used in an ES5-compatible runtime by importing `"iterable-query/out/es5"`:
+
+```ts
+// TypeScript
+import { Query } from "iterable-query/out/es5";
+
+// JavaScript
+var Query = require("iterable-query/out/es5").Query;
+```
+
+The ES5 version of the library has all of the same features as the ES6 version.
+
 ## Examples
 ### Filtering
 ```ts
