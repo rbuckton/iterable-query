@@ -52,6 +52,34 @@ export type Queryable<T> = Iterable<T> | ES6ShimIterable<T> | ArrayLike<T>;
  *
  * @param source The source elements.
  */
+export function from<T>(source: OrderedHierarchyQuery<T>): OrderedHierarchyQuery<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
+export function from<T>(source: HierarchyQuery<T>): HierarchyQuery<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
+export function from<T>(source: OrderedQuery<T>): OrderedQuery<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
+export function from<T>(source: Queryable<T>): Query<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
 export function from<T>(source: Queryable<T>): Query<T> {
     return Query.from(source);
 }
@@ -112,7 +140,39 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source The Iterable or ArrayLike source.
      */
+
+    public static from<T>(source: OrderedHierarchyQuery<T>): OrderedHierarchyQuery<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
+    public static from<T>(source: HierarchyQuery<T>): HierarchyQuery<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
+    public static from<T>(source: OrderedQuery<T>): OrderedQuery<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
+    public static from<T>(source: Queryable<T>): Query<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
     public static from<T>(source: Queryable<T>): Query<T> {
+        if (source instanceof Query) {
+            return source;
+        }
         return new Query(source);
     }
 
@@ -394,6 +454,26 @@ export class Query<T> implements Iterable<T> {
     public do(callback: (element: T, offset: number) => void): Query<T> {
         Assert.mustBeFunction(callback, "callback");
         return new Query(new DoIterable(this, callback));
+    }
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    public tap(callback: (element: T, offset: number) => void): Query<T> {
+        return this.do(callback);
+    }
+
+    /**
+     * Pass the entire query to the provided callback, creating a new query from the result.
+     *
+     * @param callback A callback function.
+     */
+    public through<U>(callback: (query: Query<T>) => Iterable<U>): Query<U> {
+        Assert.mustBeFunction(callback, "callback");
+        return new Query(callback(this));
     }
 
     /**
@@ -737,6 +817,22 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFunction(innerKeySelector, "innerKeySelector");
         Assert.mustBeFunction(resultSelector, "resultSelector");
         return new Query(new JoinIterable(this, ToIterable(inner), outerKeySelector, innerKeySelector, resultSelector));
+    }
+
+    /**
+     * Creates a subquery for the correlated elements of this Query and another Queryable.
+     *
+     * @param inner A Queryable.
+     * @param outerKeySelector A callback used to select the key for an element in this Query.
+     * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+     * @param resultSelector A callback used to select the result for the correlated elements.
+     */
+    public fullJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): Query<R> {
+        Assert.mustBeQueryable(inner, "inner");
+        Assert.mustBeFunction(outerKeySelector, "outerKeySelector");
+        Assert.mustBeFunction(innerKeySelector, "innerKeySelector");
+        Assert.mustBeFunction(resultSelector, "resultSelector");
+        return new Query(new FullOuterJoinIterable(this, ToIterable(inner), outerKeySelector, innerKeySelector, resultSelector));
     }
 
     /**
@@ -1779,6 +1875,36 @@ export class HierarchyQuery<T> extends Query<T> {
     }
 
     /**
+     * Creates a subquery whose elements match the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     */
+    public where(predicate: (element: T, offset: number) => boolean): HierarchyQuery<T> {
+        Assert.mustBeFunction(predicate, "predicate");
+        return new HierarchyQuery(new FilterIterable(this, predicate), this._view);
+    }
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     *
+     * @param callback The callback to invoke.
+     */
+    public do(callback: (element: T, offset: number) => void): HierarchyQuery<T> {
+        Assert.mustBeFunction(callback, "callback");
+        return new HierarchyQuery(new DoIterable(this, callback), this._view);
+    }
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    public tap(callback: (element: T, offset: number) => void): HierarchyQuery<T> {
+        return this.do(callback);
+    }
+
+    /**
      * Creates a subquery whose elements are in the reverse order.
      */
     public reverse(): HierarchyQuery<T> {
@@ -1940,6 +2066,13 @@ export class HierarchyQuery<T> extends Query<T> {
      */
     public defaultIfEmpty(defaultValue: T): HierarchyQuery<T> {
         return new HierarchyQuery(new DefaultIfEmptyIterable(this, defaultValue), this._view);
+    }
+
+    /**
+     * Eagerly evaluate the query, returning a new Query
+     */
+    public eval(): HierarchyQuery<T> {
+        return new HierarchyQuery(this.toArray(), this.hierarchy);
     }
 
     /**
@@ -2109,6 +2242,22 @@ export class HierarchyQuery<T> extends Query<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.descendantsAndSelf), this._view);
+    }
+
+    /**
+     * Creates a subquery for the top-most elements. Elements that are a descendant of any other
+     * element are removed.
+     */
+    public topMost(): HierarchyQuery<T> {
+        return new HierarchyQuery(new TopMostIterable(this, this._view), this._view);
+    }
+
+    /**
+     * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
+     * element are removed.
+     */
+    public bottomMost(): HierarchyQuery<T> {
+        return new HierarchyQuery(new BottomMostIterable(this, this._view), this._view);
     }
 }
 
@@ -4379,6 +4528,122 @@ class JoinIterator<O, I, K, R> implements IterableIterator<R> {
     @iterator __iterator__() { return this; }
 }
 
+class FullOuterJoinIterable<O, I, K, R> implements Iterable<R> {
+    _outer: Iterable<O>;
+    _inner: Iterable<I>;
+    _outerKeySelector: (element: O) => K;
+    _innerKeySelector: (element: I) => K;
+    _resultSelector: (outer: O | undefined, inner: I | undefined) => R;
+    constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R) {
+        this._outer = outer;
+        this._inner = inner;
+        this._outerKeySelector = outerKeySelector;
+        this._innerKeySelector = innerKeySelector;
+        this._resultSelector = resultSelector;
+    }
+    @iterator __iterator__() { return new FullOuterJoinIterator<O, I, K, R>(this); }
+}
+
+class FullOuterJoinIterator<O, I, K, R> implements IterableIterator<R> {
+    private _iterable: FullOuterJoinIterable<O, I, K, R>;
+    private _outerLookup: Lookup<K, O>;
+    private _innerLookup: Lookup<K, I>;
+    private _keysIterator: Iterator<K>;
+    private _outer: Iterable<O>;
+    private _outerIterator: Iterator<O>;
+    private _outerElement: O;
+    private _inner: Iterable<I>;
+    private _innerIterator: Iterator<I>;
+    private _state: string;
+    constructor(iterable: FullOuterJoinIterable<O, I, K, R>) {
+        this._iterable = iterable;
+        this._state = "new";
+    }
+    next() {
+        let ok = false;
+        try {
+            while (true) {
+                switch (this._state) {
+                    case "new":
+                        this._outerLookup = new Lookup(CreateGroupings(this._iterable._outer, this._iterable._outerKeySelector, Identity));
+                        this._innerLookup = new Lookup(CreateGroupings(this._iterable._inner, this._iterable._innerKeySelector, Identity));
+                        const keys = Query
+                            .from(this._outerLookup.select(group => group.key))
+                            .union(this._innerLookup.select(group => group.key));
+                        this._keysIterator = GetIterator(keys);
+                        this._state = "iteratingKeys";
+                    case "iteratingKeys": {
+                        const { value: key, done } = this._keysIterator.next();
+                        if (done) {
+                            this._keysIterator = undefined;
+                            this._state = "doneIteratingKeys";
+                            continue;
+                        }
+
+                        this._outer = this._outerLookup.get(key).defaultIfEmpty(undefined);
+                        this._inner = this._innerLookup.get(key).defaultIfEmpty(undefined);
+                        this._outerIterator = GetIterator(this._outer);
+                        this._state = "iteratingOuter";
+                    }
+                    case "iteratingOuter": {
+                        const { value: outerElement, done } = this._outerIterator.next();
+                        if (done) {
+                            this._outer = undefined;
+                            this._inner = undefined;
+                            this._outerIterator = undefined;
+                            this._state = "iteratingKeys";
+                            continue;
+                        }
+
+                        this._outerElement = outerElement;
+                        this._innerIterator = GetIterator(this._inner);
+                        this._state = "iteratingInner";
+                    }
+                    case "iteratingInner": {
+                        const { value: innerElement, done } = this._innerIterator.next();
+                        if (done) {
+                            this._outerElement = undefined;
+                            this._innerIterator = undefined;
+                            this._state = "iteratingOuter";
+                            continue;
+                        }
+
+                        const result = (void 0, this._iterable._resultSelector)(this._outerElement, innerElement);
+                        return ok = true, NextResult(result);
+                    }
+                    case "doneIteratingKeys":
+                    case "done":
+                        return ok = true, this.return();
+                }
+            }
+        }
+        finally {
+            if (!ok) this.return();
+        }
+    }
+    return() {
+        switch (this._state) {
+            default:
+                IteratorClose(this._keysIterator);
+                IteratorClose(this._innerIterator);
+                IteratorClose(this._outerIterator);
+                this._keysIterator = undefined;
+                this._outerIterator = undefined;
+                this._outerElement = undefined;
+                this._outer = undefined;
+                this._outerLookup = undefined;
+                this._innerIterator = undefined;
+                this._inner = undefined;
+                this._innerLookup = undefined;
+                this._iterable = undefined;
+                this._state = "done";
+            case "done":
+                return DoneResult<R>();
+        }
+    }
+    @iterator __iterator__() { return this; }
+}
+
 class ScanIterable<T, U> implements Iterable<T | U> {
     _source: Iterable<T>;
     _aggregator: (aggregate: T | U, element: T, offset: number) => T | U;
@@ -5156,6 +5421,166 @@ class HierarchyAxisIterator<T> implements IterableIterator<T> {
                 IteratorClose(this._axisIterator);
                 this._sourceIterator = undefined;
                 this._axisIterator = undefined;
+                this._state = "done";
+            case "done":
+                return DoneResult<T>();
+        }
+    }
+    @iterator __iterator__() { return this; }
+}
+
+class TopMostIterable<T> implements Iterable<T> {
+    _source: Iterable<T>;
+    _hierarchy: HierarchyProviderView<T>;
+
+    constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>) {
+        this._source = source;
+        this._hierarchy = hierarchy;
+    }
+
+    @iterator __iterator__() { return new TopMostIterableIterator<T>(this); }
+}
+
+class TopMostIterableIterator<T> implements IterableIterator<T> {
+    private _iterable: TopMostIterable<T>;
+    private _topMostNodes: T[];
+    private _index: number;
+    private _state: string;
+    constructor(iterable: TopMostIterable<T>) {
+        this._iterable = iterable;
+        this._state = "new";
+    }
+    next() {
+        while (true) {
+            switch (this._state) {
+                case "new":
+                    const topMostNodes = ToArray(this._iterable._source);
+                    const ancestors = new Map<T, Set<T>>();
+                    for (let i = topMostNodes.length - 1; i >= 1; i--) {
+                        const node = topMostNodes[i];
+                        for (let j = i - 1; j >= 0; j--) {
+                            const other = topMostNodes[j];
+                            let ancestorsOfNode = ancestors.get(node);
+                            if (!ancestorsOfNode) {
+                                ancestorsOfNode = new Set(this._iterable._hierarchy.ancestors(node, /*self*/ false));
+                                ancestors.set(node, ancestorsOfNode);
+                            }
+
+                            if (ancestorsOfNode.has(other)) {
+                                topMostNodes.splice(i, 1);
+                                break;
+                            }
+
+                            let ancestorsOfOther = ancestors.get(other);
+                            if (!ancestorsOfOther) {
+                                ancestorsOfOther = new Set(this._iterable._hierarchy.ancestors(other, /*self*/ false));
+                                ancestors.set(other, ancestorsOfOther);
+                            }
+
+                            if (ancestorsOfOther.has(node)) {
+                                topMostNodes.splice(j, 1);
+                                i--;
+                            }
+                        }
+                    }
+
+                    this._topMostNodes = topMostNodes;
+                    this._index = 0;
+                    this._state = "iterating";
+                case "iterating":
+                    if (this._index < this._topMostNodes.length) {
+                        return NextResult(this._topMostNodes[this._index++])
+                    }
+                case "done":
+                    return this.return();
+            }
+        }
+    }
+    return() {
+        switch (this._state) {
+            default:
+                this._topMostNodes = undefined;
+                this._index = undefined;
+                this._state = "done";
+            case "done":
+                return DoneResult<T>();
+        }
+    }
+    @iterator __iterator__() { return this; }
+}
+
+class BottomMostIterable<T> implements Iterable<T> {
+    _source: Iterable<T>;
+    _hierarchy: HierarchyProviderView<T>;
+
+    constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>) {
+        this._source = source;
+        this._hierarchy = hierarchy;
+    }
+
+    @iterator __iterator__() { return new BottomMostIterableIterator<T>(this); }
+}
+
+class BottomMostIterableIterator<T> implements IterableIterator<T> {
+    private _iterable: BottomMostIterable<T>;
+    private _bottomMostNodes: T[];
+    private _index: number;
+    private _state: string;
+    constructor(iterable: BottomMostIterable<T>) {
+        this._iterable = iterable;
+        this._state = "new";
+    }
+    next() {
+        while (true) {
+            switch (this._state) {
+                case "new":
+                    const bottomMostNodes = ToArray(this._iterable._source);
+                    const ancestors = new Map<T, Set<T>>();
+                    for (let i = bottomMostNodes.length - 1; i >= 1; i--) {
+                        const node = bottomMostNodes[i];
+                        for (let j = i - 1; j >= 0; j--) {
+                            const other = bottomMostNodes[j];
+                            let ancestorsOfOther = ancestors.get(other);
+                            if (!ancestorsOfOther) {
+                                ancestorsOfOther = new Set(this._iterable._hierarchy.ancestors(other, /*self*/ false));
+                                ancestors.set(other, ancestorsOfOther);
+                            }
+
+                            if (ancestorsOfOther.has(node)) {
+                                bottomMostNodes.splice(i, 1);
+                                break;
+                            }
+
+                            let ancestorsOfNode = ancestors.get(node);
+                            if (!ancestorsOfNode) {
+                                ancestorsOfNode = new Set(this._iterable._hierarchy.ancestors(node, /*self*/ false));
+                                ancestors.set(node, ancestorsOfNode);
+                            }
+
+                            if (ancestorsOfNode.has(other)) {
+                                bottomMostNodes.splice(j, 1);
+                                i--;
+                            }
+                        }
+                    }
+
+                    this._bottomMostNodes = bottomMostNodes;
+                    this._index = 0;
+                    this._state = "iterating";
+                case "iterating":
+                    if (this._index < this._bottomMostNodes.length) {
+                        return NextResult(this._bottomMostNodes[this._index++])
+                    }
+                case "done":
+                    return this.return();
+            }
+        }
+    }
+    return() {
+        switch (this._state) {
+            default:
+                this._bottomMostNodes = undefined;
+                this._index = undefined;
                 this._state = "done";
             case "done":
                 return DoneResult<T>();

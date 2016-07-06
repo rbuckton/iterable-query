@@ -25,6 +25,34 @@ export type Queryable<T> = Iterable<T> | ArrayLike<T>;
  *
  * @param source The source elements.
  */
+export function from<T>(source: OrderedHierarchyQuery<T>): OrderedHierarchyQuery<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
+export function from<T>(source: HierarchyQuery<T>): HierarchyQuery<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
+export function from<T>(source: OrderedQuery<T>): OrderedQuery<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
+export function from<T>(source: Queryable<T>): Query<T>;
+
+/**
+ * Creates a Query from a Queryable source.
+ *
+ * @param source The source elements.
+ */
 export function from<T>(source: Queryable<T>): Query<T> {
     return Query.from(source);
 }
@@ -85,7 +113,39 @@ export class Query<T> implements Iterable<T> {
      *
      * @param source The Iterable or ArrayLike source.
      */
+
+    public static from<T>(source: OrderedHierarchyQuery<T>): OrderedHierarchyQuery<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
+    public static from<T>(source: HierarchyQuery<T>): HierarchyQuery<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
+    public static from<T>(source: OrderedQuery<T>): OrderedQuery<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
+    public static from<T>(source: Queryable<T>): Query<T>;
+
+    /**
+     * Creates a Query from a Queryable source.
+     *
+     * @param source The Iterable or ArrayLike source.
+     */
     public static from<T>(source: Queryable<T>): Query<T> {
+        if (source instanceof Query) {
+            return source;
+        }
         return new Query(source);
     }
 
@@ -370,6 +430,26 @@ export class Query<T> implements Iterable<T> {
     }
 
     /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    public tap(callback: (element: T, offset: number) => void): Query<T> {
+        return this.do(callback);
+    }
+
+    /**
+     * Pass the entire query to the provided callback, creating a new query from the result.
+     *
+     * @param callback A callback function.
+     */
+    public through<U>(callback: (query: Query<T>) => Iterable<U>): Query<U> {
+        Assert.mustBeFunction(callback, "callback");
+        return new Query(callback(this));
+    }
+
+    /**
      * Creates a subquery whose elements are in the reverse order.
      */
     public reverse(): Query<T> {
@@ -504,6 +584,13 @@ export class Query<T> implements Iterable<T> {
      */
     public prepend(value: T): Query<T> {
         return new Query(new PrependIterable(value, this));
+    }
+
+    /**
+     * Eagerly evaluate the query, returning a new Query
+     */
+    public eval(): Query<T> {
+        return new Query(this.toArray());
     }
 
     /**
@@ -710,6 +797,22 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFunction(innerKeySelector, "innerKeySelector");
         Assert.mustBeFunction(resultSelector, "resultSelector");
         return new Query(new JoinIterable(this, ToIterable(inner), outerKeySelector, innerKeySelector, resultSelector));
+    }
+
+    /**
+     * Creates a subquery for the correlated elements of this Query and another Queryable.
+     *
+     * @param inner A Queryable.
+     * @param outerKeySelector A callback used to select the key for an element in this Query.
+     * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+     * @param resultSelector A callback used to select the result for the correlated elements.
+     */
+    public fullJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): Query<R> {
+        Assert.mustBeQueryable(inner, "inner");
+        Assert.mustBeFunction(outerKeySelector, "outerKeySelector");
+        Assert.mustBeFunction(innerKeySelector, "innerKeySelector");
+        Assert.mustBeFunction(resultSelector, "resultSelector");
+        return new Query(new FullOuterJoinIterable(this, ToIterable(inner), outerKeySelector, innerKeySelector, resultSelector));
     }
 
     /**
@@ -1730,13 +1833,33 @@ export class HierarchyQuery<T> extends Query<T> {
     }
 
     /**
+     * Creates a subquery whose elements match the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     */
+    public where(predicate: (element: T, offset: number) => boolean): HierarchyQuery<T> {
+        Assert.mustBeFunction(predicate, "predicate");
+        return new HierarchyQuery(new FilterIterable(this, predicate), this._view);
+    }
+
+    /**
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
      */
-    public do(callback: (element: T, offset: number) => void): Query<T> {
+    public do(callback: (element: T, offset: number) => void): HierarchyQuery<T> {
         Assert.mustBeFunction(callback, "callback");
         return new HierarchyQuery(new DoIterable(this, callback), this._view);
+    }
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    public tap(callback: (element: T, offset: number) => void): HierarchyQuery<T> {
+        return this.do(callback);
     }
 
     /**
@@ -1901,6 +2024,13 @@ export class HierarchyQuery<T> extends Query<T> {
      */
     public defaultIfEmpty(defaultValue: T): HierarchyQuery<T> {
         return new HierarchyQuery(new DefaultIfEmptyIterable(this, defaultValue), this._view);
+    }
+
+    /**
+     * Eagerly evaluate the query, returning a new Query
+     */
+    public eval(): HierarchyQuery<T> {
+        return new HierarchyQuery(this.toArray(), this.hierarchy);
     }
 
     /**
@@ -2070,6 +2200,22 @@ export class HierarchyQuery<T> extends Query<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
         return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.descendantsAndSelf), this._view);
+    }
+
+    /**
+     * Creates a subquery for the top-most elements. Elements that are a descendant of any other
+     * element are removed.
+     */
+    public topMost(): HierarchyQuery<T> {
+        return new HierarchyQuery(new TopMostIterable(this, this._view), this._view);
+    }
+
+    /**
+     * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
+     * element are removed.
+     */
+    public bottomMost(): HierarchyQuery<T> {
+        return new HierarchyQuery(new BottomMostIterable(this, this._view), this._view);
     }
 }
 
@@ -3129,6 +3275,44 @@ class JoinIterable<O, I, K, R> implements Iterable<R> {
     }
 }
 
+class FullOuterJoinIterable<O, I, K, R> implements Iterable<R> {
+    private _outer: Iterable<O>;
+    private _inner: Iterable<I>;
+    private _outerKeySelector: (element: O) => K;
+    private _innerKeySelector: (element: I) => K;
+    private _resultSelector: (outer: O | undefined, inner: I | undefined) => R;
+
+    constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R) {
+        this._outer = outer;
+        this._inner = inner;
+        this._outerKeySelector = outerKeySelector;
+        this._innerKeySelector = innerKeySelector;
+        this._resultSelector = resultSelector;
+    }
+
+    public *[Symbol.iterator](): Iterator<R> {
+        const outer = this._outer;
+        const inner = this._inner;
+        const outerKeySelector = this._outerKeySelector;
+        const innerKeySelector = this._innerKeySelector;
+        const resultSelector = this._resultSelector;
+        const outerLookup = new Lookup(CreateGroupings(outer, outerKeySelector, Identity));
+        const innerLookup = new Lookup(CreateGroupings(inner, innerKeySelector, Identity));
+        const keys = Query
+            .from(outerLookup.select(group => group.key))
+            .union(innerLookup.select(group => group.key));
+        for (const key of keys) {
+            const outer = outerLookup.get(key).defaultIfEmpty(undefined);
+            const inner = innerLookup.get(key).defaultIfEmpty(undefined);
+            for (const outerElement of outer) {
+                for (const innerElement of inner) {
+                    yield resultSelector(outerElement, innerElement);
+                }
+            }
+        }
+    }
+}
+
 class ScanIterable<T, U> implements Iterable<T | U> {
     private _source: Iterable<T>;
     private _aggregator: (aggregate: T | U, element: T, offset: number) => T | U;
@@ -3517,6 +3701,94 @@ class HierarchyAxisIterable<T> implements Iterable<T> {
                 }
             }
         }
+    }
+}
+
+class TopMostIterable<T> implements Iterable<T> {
+    private _source: Iterable<T>;
+    private _hierarchy: HierarchyProviderView<T>;
+
+    constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>) {
+        this._source = source;
+        this._hierarchy = hierarchy;
+    }
+
+    public *[Symbol.iterator](): Iterator<T> {
+        const topMostNodes = Array.from(this._source);
+        const ancestors = new Map<T, Set<T>>();
+        for (let i = topMostNodes.length - 1; i >= 1; i--) {
+            const node = topMostNodes[i];
+            for (let j = i - 1; j >= 0; j--) {
+                const other = topMostNodes[j];
+                let ancestorsOfNode = ancestors.get(node);
+                if (!ancestorsOfNode) {
+                    ancestorsOfNode = new Set(this._hierarchy.ancestors(node, /*self*/ false));
+                    ancestors.set(node, ancestorsOfNode);
+                }
+
+                if (ancestorsOfNode.has(other)) {
+                    topMostNodes.splice(i, 1);
+                    break;
+                }
+
+                let ancestorsOfOther = ancestors.get(other);
+                if (!ancestorsOfOther) {
+                    ancestorsOfOther = new Set(this._hierarchy.ancestors(other, /*self*/ false));
+                    ancestors.set(other, ancestorsOfOther);
+                }
+
+                if (ancestorsOfOther.has(node)) {
+                    topMostNodes.splice(j, 1);
+                    i--;
+                }
+            }
+        }
+
+        yield* topMostNodes;
+    }
+}
+
+class BottomMostIterable<T> implements Iterable<T> {
+    private _source: Iterable<T>;
+    private _hierarchy: HierarchyProviderView<T>;
+
+    constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>) {
+        this._source = source;
+        this._hierarchy = hierarchy;
+    }
+
+    public *[Symbol.iterator](): Iterator<T> {
+        const bottomMostNodes = Array.from(this._source);
+        const ancestors = new Map<T, Set<T>>();
+        for (let i = bottomMostNodes.length - 1; i >= 1; i--) {
+            const node = bottomMostNodes[i];
+            for (let j = i - 1; j >= 0; j--) {
+                const other = bottomMostNodes[j];
+                let ancestorsOfOther = ancestors.get(other);
+                if (!ancestorsOfOther) {
+                    ancestorsOfOther = new Set(this._hierarchy.ancestors(other, /*self*/ false));
+                    ancestors.set(other, ancestorsOfOther);
+                }
+
+                if (ancestorsOfOther.has(node)) {
+                    bottomMostNodes.splice(i, 1);
+                    break;
+                }
+
+                let ancestorsOfNode = ancestors.get(node);
+                if (!ancestorsOfNode) {
+                    ancestorsOfNode = new Set(this._hierarchy.ancestors(node, /*self*/ false));
+                    ancestors.set(node, ancestorsOfNode);
+                }
+
+                if (ancestorsOfNode.has(other)) {
+                    bottomMostNodes.splice(j, 1);
+                    i--;
+                }
+            }
+        }
+
+        yield* bottomMostNodes;
     }
 }
 

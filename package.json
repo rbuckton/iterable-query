@@ -1,6 +1,6 @@
 {
   "name": "iterable-query",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Query library for ES6 iterables.",
   "main": "./out/lib/query.js",
   "typings": "./out/lib/query.d.ts",
