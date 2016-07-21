@@ -14,3 +14,4 @@
   limitations under the License.
  */
 export * from "./out/es5/query";
+export * from "./out/es5/collections";

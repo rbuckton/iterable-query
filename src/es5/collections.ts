@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import { iterator, SameValue, GetIterator, IteratorClose, NextResult, DoneResult } from "./utils";
-import { Iterable, Iterator, IteratorResult } from "./query";
+import { Iterable, Iterator, IterableIterator, IteratorResult } from "./query";
 
 const rootKey = uuid();
 const uniqueKey = uuid();
@@ -77,19 +77,19 @@ export class Map<K, V> {
         this._size = 0;
     }
 
-    public keys(): Iterator<K> {
-        return <Iterator<K>>new KeyValueIterator(this._keys, this._values, "key");
+    public keys(): IterableIterator<K> {
+        return <IterableIterator<K>>new KeyValueIterator(this._keys, this._values, "key");
     }
 
-    public values(): Iterator<V> {
-        return <Iterator<V>>new KeyValueIterator(this._keys, this._values, "value");
+    public values(): IterableIterator<V> {
+        return <IterableIterator<V>>new KeyValueIterator(this._keys, this._values, "value");
     }
 
-    public entries(): Iterator<[K, V]> {
-        return <Iterator<[K, V]>>new KeyValueIterator(this._keys, this._values, "key+value");
+    public entries(): IterableIterator<[K, V]> {
+        return <IterableIterator<[K, V]>>new KeyValueIterator(this._keys, this._values, "key+value");
     }
 
-    @iterator __iterator__(): Iterator<[K, V]> {
+    @iterator __iterator__(): IterableIterator<[K, V]> {
         return this.entries();
     }
 }
@@ -156,16 +156,16 @@ export class Set<T> {
         this._size = 0;
     }
 
-    public keys(): Iterator<T> {
-        return <Iterator<T>>new KeyValueIterator(this._values, this._values, "key");
+    public keys(): IterableIterator<T> {
+        return <IterableIterator<T>>new KeyValueIterator(this._values, this._values, "key");
     }
 
-    public values(): Iterator<T> {
-        return <Iterator<T>>new KeyValueIterator(this._values, this._values, "value");
+    public values(): IterableIterator<T> {
+        return <IterableIterator<T>>new KeyValueIterator(this._values, this._values, "value");
     }
 
-    public entries(): Iterator<[T, T]> {
-        return <Iterator<[T, T]>>new KeyValueIterator(this._values, this._values, "key+value");
+    public entries(): IterableIterator<[T, T]> {
+        return <IterableIterator<[T, T]>>new KeyValueIterator(this._values, this._values, "key+value");
     }
 
     @iterator __iterator__(): Iterator<T> {
@@ -202,7 +202,7 @@ export class WeakMap<K, V> {
     }
 }
 
-class KeyValueIterator<K, V> implements Iterator<K | V | [K, V]> {
+class KeyValueIterator<K, V> implements IterableIterator<K | V | [K, V]> {
     private _keys: { [id: string]: K; };
     private _values: { [id: string]: V; };
     private _kind: "key" | "value" | "key+value";
@@ -219,6 +219,10 @@ class KeyValueIterator<K, V> implements Iterator<K | V | [K, V]> {
         }
 
         this._ids = ids;
+    }
+
+    @iterator __iterator__() {
+        return this;
     }
 
     public next(): IteratorResult<K | V | [K, V]> {
