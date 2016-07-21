@@ -13,4 +13,4 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
-module.exports = require("./out/es5/query");
+module.exports = require("./out/es5");
