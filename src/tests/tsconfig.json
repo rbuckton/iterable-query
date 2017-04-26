@@ -6,10 +6,7 @@
         "sourceMap": true,
         "stripInternal": true,
         "declaration": true,
-        "experimentalDecorators": true
-    },
-    "exclude": [
-        "typings/browser.d.ts",
-        "typings/browser"
-    ]
+        "experimentalDecorators": true,
+        "types": ["node", "mocha"]
+    }
 }

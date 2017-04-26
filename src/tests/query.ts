@@ -4,27 +4,27 @@ import * as es6 from "../lib/query";
 import * as es5 from "../es5/query";
 import * as collections from "../es5/collections";
 
-const NoUndefineds: [any, ErrorConstructor][] = [
+const NoUndefineds: [any, new () => Error][] = [
     [undefined, TypeError]
 ];
 
-const NoNulls: [any, ErrorConstructor][] = [
+const NoNulls: [any, new () => Error][] = [
     [null, TypeError]
 ];
 
-const NoStrings: [any, ErrorConstructor][] = [
+const NoStrings: [any, new () => Error][] = [
     ["", TypeError],
     ["1", TypeError],
     ["string", TypeError]
 ];
 
-const NoNumbers: [any, ErrorConstructor][] = [
+const NoNumbers: [any, new () => Error][] = [
     [0, TypeError],
     [NaN, TypeError],
     [Infinity, TypeError]
 ];
 
-const NoFloats: [any, ErrorConstructor][] = [
+const NoFloats: [any, new () => Error][] = [
     [NaN, TypeError],
     [+Infinity, TypeError],
     [-Infinity, TypeError],
@@ -32,39 +32,39 @@ const NoFloats: [any, ErrorConstructor][] = [
     [-0, TypeError]
 ]
 
-const NoNaN: [any, ErrorConstructor][] = [
+const NoNaN: [any, new () => Error][] = [
     [NaN, RangeError]
 ];
 
-const NoInfinity: [any, ErrorConstructor][] = [
+const NoInfinity: [any, new () => Error][] = [
     [+Infinity, RangeError],
     [-Infinity, RangeError]
 ];
 
-const NoZeros: [any, ErrorConstructor][] = [
+const NoZeros: [any, new () => Error][] = [
     [+0, RangeError],
     [-0, RangeError]
 ];
 
-const NoNegatives: [any, ErrorConstructor][] = [
+const NoNegatives: [any, new () => Error][] = [
     [-1, RangeError]
 ];
 
-const NoObjects: [any, ErrorConstructor][] = [
+const NoObjects: [any, new () => Error][] = [
     [{}, TypeError],
     [{ valueOf() { return 1; } }, TypeError]
 ];
 
-const NoFunctions: [any, ErrorConstructor][] = [
+const NoFunctions: [any, new () => Error][] = [
     [() => { }, TypeError]
 ];
 
-const NoBooleans: [any, ErrorConstructor][] = [
+const NoBooleans: [any, new () => Error][] = [
     [true, TypeError],
     [false, TypeError]
 ];
 
-const MustBePositiveNonZeroFiniteNumber: [any, ErrorConstructor][] = [].concat(
+const MustBePositiveNonZeroFiniteNumber: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -78,7 +78,7 @@ const MustBePositiveNonZeroFiniteNumber: [any, ErrorConstructor][] = [].concat(
     [[1], [1.5]]
 );
 
-const MustBePositiveNonZeroFiniteNumberOrUndefined: [any, ErrorConstructor][] = [].concat(
+const MustBePositiveNonZeroFiniteNumberOrUndefined: [any, new () => Error][] = [].concat(
     NoNulls,
     NoStrings,
     NoBooleans,
@@ -91,7 +91,7 @@ const MustBePositiveNonZeroFiniteNumberOrUndefined: [any, ErrorConstructor][] = 
     [[1], [1.5], [undefined]]
 );
 
-const MustBePositiveFiniteNumber: [any, ErrorConstructor][] = [].concat(
+const MustBePositiveFiniteNumber: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -104,7 +104,7 @@ const MustBePositiveFiniteNumber: [any, ErrorConstructor][] = [].concat(
     [[0], [1], [1.5]]
 );
 
-const MustBeFiniteNumber: [any, ErrorConstructor][] = [].concat(
+const MustBeFiniteNumber: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -116,7 +116,7 @@ const MustBeFiniteNumber: [any, ErrorConstructor][] = [].concat(
     [[-1], [0], [1], [1.5]]
 );
 
-const MustBeInteger: [any, ErrorConstructor][] = [].concat(
+const MustBeInteger: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -127,7 +127,7 @@ const MustBeInteger: [any, ErrorConstructor][] = [].concat(
     [[-1], [0], [1]]
 );
 
-const MustBeFunction: [any, ErrorConstructor][] = [].concat(
+const MustBeFunction: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -137,7 +137,7 @@ const MustBeFunction: [any, ErrorConstructor][] = [].concat(
     [[() => { }]]
 );
 
-const MustBeFunctionOrUndefined: [any, ErrorConstructor][] = [].concat(
+const MustBeFunctionOrUndefined: [any, new () => Error][] = [].concat(
     NoNulls,
     NoStrings,
     NoBooleans,
@@ -146,7 +146,7 @@ const MustBeFunctionOrUndefined: [any, ErrorConstructor][] = [].concat(
     [[() => { }], [undefined]]
 );
 
-const MustBeIterator: [any, ErrorConstructor][] = [].concat(
+const MustBeIterator: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -162,7 +162,7 @@ const MustBeIterator: [any, ErrorConstructor][] = [].concat(
     ]
 );
 
-const MustBeObject: [any, ErrorConstructor][] = [].concat(
+const MustBeObject: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -174,7 +174,7 @@ const MustBeObject: [any, ErrorConstructor][] = [].concat(
     ]
 );
 
-const MustBeObjectOrNull: [any, ErrorConstructor][] = [].concat(
+const MustBeObjectOrNull: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoStrings,
     NoBooleans,
@@ -186,7 +186,7 @@ const MustBeObjectOrNull: [any, ErrorConstructor][] = [].concat(
     ]
 );
 
-const MustBeHierarchyProvider: [any, ErrorConstructor][] = [].concat(
+const MustBeHierarchyProvider: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -201,7 +201,7 @@ const MustBeHierarchyProvider: [any, ErrorConstructor][] = [].concat(
     ]
 );
 
-const MustBeQueryable: [any, ErrorConstructor][] = [].concat(
+const MustBeQueryable: [any, new () => Error][] = [].concat(
     NoUndefineds,
     NoNulls,
     NoStrings,
@@ -212,7 +212,7 @@ const MustBeQueryable: [any, ErrorConstructor][] = [].concat(
     [[[]]]
 );
 
-const MustBeQueryableOrUndefined: [any, ErrorConstructor][] = [].concat(
+const MustBeQueryableOrUndefined: [any, new () => Error][] = [].concat(
     NoNulls,
     NoStrings,
     NoBooleans,
@@ -730,7 +730,7 @@ for (const context of contexts) {
                     const iterator: IterableIterator<number> = {
                         [Symbol.iterator]() { return this; },
                         next() { return { value: 1, done: false } },
-                        return() { returnWasCalled = true; return { done: true } }
+                        return() { returnWasCalled = true; return { value: undefined, done: true } }
                     };
                     const error = new Error();
                     expect(() => Query.from(iterator).forEach(x => { throw error; })).to.throw(error);

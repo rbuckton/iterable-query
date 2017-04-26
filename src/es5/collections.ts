@@ -322,3 +322,55 @@ function uuid() {
     return "@@DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD".replace(/DD/g,
         () => (data[offset] < 16 ? "0" : "") + data[offset++].toString(16));
 }
+
+declare global {
+    interface MapConstructor {
+        new (): Map<any, any>;
+        new <K, V>(entries?: [K, V][]): Map<K, V>;
+        readonly prototype: Map<any, any>;
+    }
+
+    interface Map<K, V> {
+        readonly size: number;
+        has(key: K): boolean;
+        get(key: K): V | undefined;
+        set(key: K, value: V): this;
+        delete(key: K): boolean;
+        clear(): void;
+        forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
+    }
+
+    var Map: MapConstructor;
+
+    interface SetConstructor {
+        readonly prototype: Set<any>;
+        new (): Set<any>;
+        new <T>(values?: T[]): Set<T>;
+    }
+
+    interface Set<T> {
+        readonly size: number;
+        has(value: T): boolean;
+        add(value: T): this;
+        delete(value: T): boolean;
+        clear(): void;
+        forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
+    }
+
+    var Set: SetConstructor;
+
+    interface WeakMapConstructor {
+        readonly prototype: WeakMap<any, any>;
+        new (): WeakMap<any, any>;
+        new <K extends object, V>(entries?: [K, V][]): WeakMap<K, V>;
+    }
+
+    interface WeakMap<K extends object, V> {
+        has(key: K): boolean;
+        get(key: K): V | undefined;
+        set(key: K, value: V): this;
+        delete(key: K): boolean;
+    }
+
+    var WeakMap: WeakMapConstructor;
+}

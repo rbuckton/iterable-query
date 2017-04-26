@@ -6,6 +6,10 @@
   "typings": "./out/lib/query.d.ts",
   "dependencies": {},
   "devDependencies": {
+    "@types/chai": "^3.5.1",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.14",
+    "@types/source-map-support": "^0.2.28",
     "chai": "^3.5.0",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
@@ -17,7 +21,7 @@
     "merge2": "^1.0.1",
     "mocha": "^2.4.5",
     "source-map-support": "^0.4.0",
-    "typescript": "^1.9.0-dev.20160330"
+    "typescript": "^2.3.0-dev.20170426"
   },
   "scripts": {
     "build": "gulp build",

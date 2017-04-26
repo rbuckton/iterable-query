@@ -6,11 +6,7 @@
         "sourceMap": true,
         "stripInternal": true,
         "declaration": true,
-        "experimentalDecorators": true
-    },
-    "exclude": [
-        "node_modules",
-        "typings/browser/browser.d.ts",
-        "typings/browser"
-    ]
+        "experimentalDecorators": true,
+        "types": ["node"]
+    }
 }
