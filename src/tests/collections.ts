@@ -1,6 +1,8 @@
 import { assert, expect } from "chai";
 import { theory, preconditions } from "./test-utils";
-import { Map, Set, WeakMap } from "../es5/collections";
+import { Map, Set, WeakMap, noConflict } from "../es5/collections";
+
+noConflict();
 
 describe("es5", () => {
     describe("Map", () => {

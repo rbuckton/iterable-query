@@ -4,6 +4,8 @@ import * as es6 from "../lib/query";
 import * as es5 from "../es5/query";
 import * as collections from "../es5/collections";
 
+collections.noConflict();
+
 const NoUndefineds: [any, new () => Error][] = [
     [undefined, TypeError]
 ];
@@ -730,7 +732,7 @@ for (const context of contexts) {
                     const iterator: IterableIterator<number> = {
                         [Symbol.iterator]() { return this; },
                         next() { return { value: 1, done: false } },
-                        return() { returnWasCalled = true; return { value: undefined, done: true } }
+                        return() { returnWasCalled = true; return { value: undefined as any, done: true } }
                     };
                     const error = new Error();
                     expect(() => Query.from(iterator).forEach(x => { throw error; })).to.throw(error);

@@ -13,39 +13,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+"use strict";
 
-import { iterator, GetIterator, NextResult, DoneResult, IteratorClose, IsObject, IsArrayLike, IsIterable, IsIterableShim, SameValue } from "./utils";
+import { Symbol as Sym } from "./symbol";
 import { Map, Set, WeakMap } from "./collections";
-
-declare var Symbol: any;
-
-export interface Iterable<T> {
-    __iterator__(): Iterator<T>;
-}
-
-export interface Iterator<T> {
-    next(value?: any): IteratorResult<T>;
-    throw?(value?: any): IteratorResult<T>;
-    return?(value?: any): IteratorResult<T>;
-}
-
-export interface IterableIterator<T> extends Iterator<T> {
-    __iterator__(): IterableIterator<T>;
-}
-
-export interface IteratorResult<T> {
-    value?: T;
-    done: boolean;
-}
-
-export interface ES6ShimIterable<T> {
-    "_es6-shim iterator_"(): Iterator<T>;
-}
+import { IsIterable, ToIterable, ToArray, GetIterator, Debug, MakeTuple, CompareValues, Identity, IteratorClose, True, SameValue, IsObject, IsArrayLike } from "./utils";
 
 /**
  * Represents an object that is either iterable or array-like.
  */
-export type Queryable<T> = Iterable<T> | ES6ShimIterable<T> | ArrayLike<T>;
+export type Queryable<T> = Iterable<T> | ArrayLike<T>;
 
 /**
  * Creates a Query from a Queryable source.
@@ -219,7 +196,7 @@ export class Query<T> implements Iterable<T> {
         return new Query(new RepeatIterable(value, count));
     }
 
-        /**
+    /**
      * Creates a Query over a range of numbers.
      *
      * @param start The starting number of the range.
@@ -232,10 +209,10 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFiniteNumber(end, "end");
         Assert.mustBePositiveNonZeroFiniteNumber(increment, "increment");
         if (start < end) {
-            return new Query(new RangeIterable(start, end, increment, /*reverse*/ false));
+            return new Query(new RangeIterable(start, end, increment));
         }
         else {
-            return new Query(new RangeIterable(start, end, increment, /*reverse*/ true));
+            return new Query(new ReverseRangeIterable(start, end, increment));
         }
     }
 
@@ -614,6 +591,13 @@ export class Query<T> implements Iterable<T> {
     }
 
     /**
+     * Eagerly evaluate the query, returning a new Query
+     */
+    public eval(): Query<T> {
+        return new Query(this.toArray());
+    }
+
+    /**
      * Creates a subquery for the elements of this Query with the provided range
      * patched into the results.
      *
@@ -985,8 +969,8 @@ export class Query<T> implements Iterable<T> {
      */
     public reduceRight<U, R>(accumulator: (current: T | U, element: T, offset: number) => T | U, seed?: T | U, resultSelector?: (result: T | U, count: number) => T | U | R): T | U | R {
         if (resultSelector === undefined) resultSelector = Identity;
-        if (typeof accumulator !== "function") throw new TypeError();
-        if (typeof resultSelector !== "function") throw new TypeError();
+        Assert.mustBeFunction(accumulator, "accumulator");
+        Assert.mustBeFunction(resultSelector, "resultSelector");
         const source = ToArray<T>(this._source);
         let isSeeded = arguments.length >= 2;
         let current = seed;
@@ -1018,20 +1002,21 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFunction(predicate, "predicate");
 
         if (predicate === True) {
-            if (this._source instanceof ArrayLikeIterable) {
-                return (<ArrayLikeIterable<any>>this._source)._source.length;
+            if (Array.isArray(this._source)) {
+                return (<T[]>this._source).length;
             }
-            if (this._source instanceof Set || this._source instanceof Map) {
+            else if (this._source instanceof Set || this._source instanceof Map) {
                 return (<Set<T> | Map<any, any>>this._source).size;
             }
         }
 
         let count = 0;
-        ForOf(this, element => {
+        for (const element of this) {
             if (predicate(element)) {
                 count++;
             }
-        });
+        }
+
         return count;
     }
 
@@ -1045,13 +1030,12 @@ export class Query<T> implements Iterable<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
 
-        const state = ForOf(this, element => {
+        for (const element of this) {
             if (predicate(element)) {
-                return Return(element);
+                return element;
             }
-        });
+        }
 
-        if (IsReturn(state)) return state.return;
         return undefined;
     }
 
@@ -1066,11 +1050,11 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFunction(predicate, "predicate");
 
         let result: T;
-        ForOf(this, element => {
+        for (const element of this) {
             if (predicate(element)) {
                 result = element;
             }
-        });
+        }
 
         return result;
     }
@@ -1086,17 +1070,17 @@ export class Query<T> implements Iterable<T> {
 
         let hasElements = false;
         let result: T;
-        const state = ForOf(this, element => {
+        for (const element of this) {
             if (predicate(element)) {
                 if (hasElements) {
-                    return Return(undefined);
+                    return undefined;
                 }
 
                 hasElements = true;
                 result = element;
             }
-        });
-        if (IsReturn(state)) return state.return;
+        }
+
         return hasElements ? result : undefined;
     }
 
@@ -1112,7 +1096,7 @@ export class Query<T> implements Iterable<T> {
 
         let hasElements = false;
         let result: T;
-        ForOf(this, element => {
+        for (const element of this) {
             if (!hasElements) {
                 result = element;
                 hasElements = true;
@@ -1120,7 +1104,7 @@ export class Query<T> implements Iterable<T> {
             else if (comparison(element, result) < 0) {
                 result = element;
             }
-        });
+        }
 
         return result;
     }
@@ -1137,7 +1121,7 @@ export class Query<T> implements Iterable<T> {
 
         let hasElements = false;
         let result: T;
-        ForOf(this, element => {
+        for (const element of this) {
             if (!hasElements) {
                 result = element;
                 hasElements = true;
@@ -1145,7 +1129,8 @@ export class Query<T> implements Iterable<T> {
             else if (comparison(element, result) > 0) {
                 result = element;
             }
-        });
+        }
+
         return result;
     }
 
@@ -1159,13 +1144,12 @@ export class Query<T> implements Iterable<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
 
-        const state = ForOf(this, element => {
+        for (const element of this) {
             if (predicate(element)) {
-                return Return(true);
+                return true;
             }
-        });
+        }
 
-        if (IsReturn(state)) return state.return;
         return false;
     }
 
@@ -1178,14 +1162,14 @@ export class Query<T> implements Iterable<T> {
     public every(predicate: (element: T) => boolean): boolean {
         Assert.mustBeFunction(predicate, "predicate");
         let hasMatchingElements = false;
-        const state = ForOf(this, element => {
+        for (const element of this) {
             if (!predicate(element)) {
-                return Return(false);
+                return false;
             }
 
             hasMatchingElements = true;
-        });
-        if (IsReturn(state)) return state.return;
+        }
+
         return hasMatchingElements;
     }
 
@@ -1217,7 +1201,6 @@ export class Query<T> implements Iterable<T> {
         if (equalityComparison === undefined) equalityComparison = SameValue;
         Assert.mustBeQueryable(other, "other");
         Assert.mustBeFunction(equalityComparison, "equalityComparison");
-
         let leftIterator = GetIterator(this);
         try {
             let rightIterator = GetIterator(ToIterable(other));
@@ -1257,12 +1240,12 @@ export class Query<T> implements Iterable<T> {
      * @param value A value.
      */
     public includes(value: T): boolean {
-        const state = ForOf(this, element => {
+        for (const element of this) {
             if (SameValue(value, element)) {
-                return Return(true);
+                return true;
             }
-        })
-        if (IsReturn(state)) return state.return;
+        }
+
         return false;
     }
 
@@ -1464,27 +1447,24 @@ export class Query<T> implements Iterable<T> {
         if (offset < 0) {
             offset = Math.abs(offset);
             const array: T[] = [];
-            ForOf(this, element => {
+            for (const element of this) {
                 if (array.length >= offset) {
                     array.shift();
                 }
 
                 array.push(element);
-            });
+            }
 
             return array.length - offset >= 0 ? array[array.length - offset] : undefined;
         }
 
-        const state = ForOf(this, element => {
+        for (const element of this) {
             if (offset === 0) {
-                return Return(element);
+                return element;
             }
 
             offset--;
-        });
-
-        if (IsReturn(state)) return state.return;
-        return undefined;
+        }
     }
 
     /**
@@ -1584,18 +1564,17 @@ export class Query<T> implements Iterable<T> {
      */
     public forEach(callback: (element: T, offset: number) => void): void {
         Assert.mustBeFunction(callback, "callback");
-
         let offset = 0;
-        ForOf(this, element => {
+        for (const element of this) {
             callback(element, offset++);
-        });
+        }
     }
 
     /**
      * Iterates over all of the elements in the query, ignoring the results.
      */
     public drain(): void {
-        ForOf(this, element => { });
+        for (const element of this) ;
     }
 
     /**
@@ -1653,10 +1632,10 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFunction(elementSelector, "elementSelector");
 
         const set = new Set<T | V>();
-        ForOf(this, item => {
+        for (const item of this) {
             const element = elementSelector(item);
             set.add(element);
-        });
+        }
         return set;
     }
 
@@ -1687,11 +1666,11 @@ export class Query<T> implements Iterable<T> {
         Assert.mustBeFunction(elementSelector, "elementSelector");
 
         const map = new Map<K, T | V>();
-        ForOf(this, item => {
+        for (const item of this) {
             const key = keySelector(item);
             const element = elementSelector(item);
             map.set(key, element);
-        });
+        }
         return map;
     }
 
@@ -1751,15 +1730,17 @@ export class Query<T> implements Iterable<T> {
      */
     public toObject<V>(prototype: any, keySelector: (element: T) => string | symbol, elementSelector?: (element: T) => T | V): any {
         if (elementSelector === undefined) elementSelector = Identity;
+        Assert.mustBeObjectOrNull(prototype, "prototype");
         Assert.mustBeFunction(keySelector, "keySelector");
         Assert.mustBeFunction(elementSelector, "elementSelector");
 
         const obj = Object.create(prototype);
-        ForOf(this, item => {
+        for (const item of this) {
             const key = keySelector(item);
             const element = elementSelector(item);
             obj[key] = element;
-        });
+        }
+
         return obj;
     }
 
@@ -1767,27 +1748,8 @@ export class Query<T> implements Iterable<T> {
         return this.toArray();
     }
 
-    @iterator
-    public __iterator__(): Iterator<T> {
-        let iterator: Iterator<T> = null;
-        return IterableIterator({
-            next: () => {
-                if (iterator === undefined) return DoneResult<T>();
-                if (iterator === null) iterator = GetIterator(this._source);
-                const { value, done } = iterator.next();
-                if (done) {
-                    iterator = undefined;
-                    return DoneResult<T>();
-                }
-
-                return NextResult(value);
-            },
-            return: () => {
-                IteratorClose(iterator);
-                iterator = undefined;
-                return DoneResult<T>();
-            }
-        });
+    public *[Symbol.iterator](): Iterator<T> {
+        yield* this._source;
     }
 }
 
@@ -2109,7 +2071,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public root(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.root), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.root), this._view);
     }
 
     /**
@@ -2120,7 +2082,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public ancestors(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.ancestors), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.ancestors), this._view);
     }
 
     /**
@@ -2131,7 +2093,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public ancestorsAndSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.ancestorsAndSelf), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.ancestorsAndSelf), this._view);
     }
 
     /**
@@ -2142,7 +2104,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public parents(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.parents), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.parents), this._view);
     }
 
     /**
@@ -2153,7 +2115,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public self(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.self), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.self), this._view);
     }
 
     /**
@@ -2164,7 +2126,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public siblings(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblings), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.siblings), this._view);
     }
 
     /**
@@ -2175,7 +2137,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public siblingsAndSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblingsAndSelf), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.siblingsAndSelf), this._view);
     }
 
     /**
@@ -2186,7 +2148,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public siblingsBeforeSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblingsBeforeSelf), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.siblingsBeforeSelf), this._view);
     }
 
     /**
@@ -2197,7 +2159,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public siblingsAfterSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.siblingsAfterSelf), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.siblingsAfterSelf), this._view);
     }
 
     /**
@@ -2208,7 +2170,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public children(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.children), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.children), this._view);
     }
 
     /**
@@ -2230,7 +2192,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public descendants(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.descendants), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.descendants), this._view);
     }
 
     /**
@@ -2241,7 +2203,7 @@ export class HierarchyQuery<T> extends Query<T> {
     public descendantsAndSelf(predicate?: (element: T) => boolean): HierarchyQuery<T> {
         if (predicate === undefined) predicate = True;
         Assert.mustBeFunction(predicate, "predicate");
-        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, HierarchyAxis.descendantsAndSelf), this._view);
+        return new HierarchyQuery(new HierarchyAxisIterable(this, this._view, predicate, Axis.descendantsAndSelf), this._view);
     }
 
     /**
@@ -2411,1723 +2373,742 @@ export class Page<T> extends Query<T> {
 // Iterables
 
 class EmptyIterable<T> implements Iterable<T> {
-    @iterator __iterator__() { return new EmptyIterator<T>(); }
-}
-
-class EmptyIterator<T> implements IterableIterator<T> {
-    next(value?: any) { return DoneResult<T>(); }
-    return(value?: any) { return DoneResult<T>(); }
-    @iterator __iterator__() { return this; }
-}
-
-class IterableShimWrapper<T> implements Iterable<T> {
-    _source: ES6ShimIterable<T>;
-    constructor(source: ES6ShimIterable<T>) {
-        this._source = source;
+    public *[Symbol.iterator](): Iterator<T> {
     }
-    @iterator __iterator__() { return this._source["_es6-shim iterator_"](); }
 }
 
 class ArrayLikeIterable<T> implements Iterable<T> {
-    _source: ArrayLike<T>;
+    private _source: ArrayLike<T>;
+
     constructor(source: ArrayLike<T>) {
         this._source = source;
     }
-    @iterator __iterator__() { return new ArrayLikeIterator<T>(this); }
-}
 
-class ArrayLikeIterator<T> implements IterableIterator<T> {
-    private _iterable: ArrayLikeIterable<T>;
-    private _offset: number;
-    private _state: string;
-    constructor (iterable: ArrayLikeIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._offset = 0;
-                this._state = "yielding";
-            case "yielding":
-                if (this._offset < this._iterable._source.length) {
-                    return NextResult(this._iterable._source[this._offset++]);
-                }
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        for (let i = 0; i < source.length; ++i) {
+            yield source[i];
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class OnceIterable<T> implements Iterable<T> {
-    _value: T;
+    private _value: T;
+
     constructor(value: T) {
         this._value = value;
     }
-    @iterator __iterator__() { return new OnceIterator<T>(this); }
-}
 
-class OnceIterator<T> implements IterableIterator<T> {
-    private _iterable: OnceIterable<T>;
-    private _state: string;
-    constructor(iterable: OnceIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
+    public *[Symbol.iterator](): Iterator<T> {
+        yield this._value;
     }
-    next() {
-        switch (this._state) {
-            case "new":
-                const value = this._iterable._value;
-                this._iterable = undefined;
-                this._state = "done";
-                return NextResult(value);
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class RepeatIterable<T> implements Iterable<T> {
-    _value: T;
-    _count: number;
+    private _value: T;
+    private _count: number;
+
     constructor(value: T, count: number) {
         this._value = value;
         this._count = count;
     }
-    @iterator __iterator__() { return new RepeatIterator<T>(this); }
-}
 
-class RepeatIterator<T> implements IterableIterator<T> {
-    private _iterable: RepeatIterable<T>;
-    private _remainingCount: number;
-    private _state: string;
-    constructor(iterable: RepeatIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._remainingCount = this._iterable._count;
-                this._state = "yielding";
-            case "yielding":
-                if (this._remainingCount > 0) {
-                    this._remainingCount--;
-                    return NextResult(this._iterable._value);
-                }
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const value = this._value;
+        for (let count = this._count; count > 0; --count) {
+            yield value;
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._remainingCount = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class RangeIterable implements Iterable<number> {
-    _start: number;
-    _end: number;
-    _increment: number;
-    private _reverse: boolean;
-    constructor(start: number, end: number, increment: number, reverse: boolean) {
+    private _start: number;
+    private _end: number;
+    private _increment: number;
+
+    constructor(start: number, end: number, increment: number) {
         this._start = start;
         this._end = end;
         this._increment = increment;
-        this._reverse = reverse;
     }
 
-    @iterator __iterator__() {
-        return this._reverse
-            ? new ReverseRangeIterator(this)
-            : new RangeIterator(this);
+    public *[Symbol.iterator](): Iterator<number> {
+        const end = this._end;
+        const increment = this._increment;
+        for (let i = this._start; i <= end; i += increment) {
+            yield i;
+        }
     }
 }
 
-class RangeIterator implements IterableIterator<number> {
-    private _iterable: RangeIterable;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: RangeIterable) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._offset = this._iterable._start;
-                this._state = "yielding";
-            case "yielding":
-                if (this._offset <= this._iterable._end) {
-                    const value = this._offset;
-                    this._offset += this._iterable._increment;
-                    return NextResult(value);
-                }
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<number>();
-        }
-    }
-    @iterator __iterator__() { return this; }
-}
+class ReverseRangeIterable implements Iterable<number> {
+    private _start: number;
+    private _end: number;
+    private _increment: number;
 
-class ReverseRangeIterator implements IterableIterator<number> {
-    private _iterable: RangeIterable;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: RangeIterable) {
-        this._iterable = iterable;
-        this._state = "new";
+    constructor(start: number, end: number, increment: number) {
+        this._start = start;
+        this._end = end;
+        this._increment = increment;
     }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._offset = this._iterable._start;
-                this._state = "yielding";
-            case "yielding":
-                if (this._offset >= this._iterable._end) {
-                    const value = this._offset;
-                    this._offset -= this._iterable._increment;
-                    return NextResult(value);
-                }
-            case "done":
-                return this.return();
+
+    public *[Symbol.iterator](): Iterator<number> {
+        const end = this._end;
+        const increment = this._increment;
+        for (let i = this._start; i >= end; i -= increment) {
+            yield i;
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<number>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ContinuousIterable<T> implements Iterable<T> {
-    _value: T;
+    private _value: T;
+
     constructor(value: T) {
         this._value = value;
     }
-    @iterator __iterator__() { return new ContinuousIterator<T>(this); }
-}
 
-class ContinuousIterator<T> implements IterableIterator<T> {
-    private _iterable: ContinuousIterable<T>;
-    private _state: string;
-    constructor(iterable: ContinuousIterable<T>) {
-        this._iterable = iterable;
-        this._state = "yielding";
-    }
-    next() {
-        switch (this._state) {
-            case "yielding":
-                return NextResult(this._iterable._value);
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const value = this._value;
+        while (true) {
+            yield value;
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class GenerateIterable<T> implements Iterable<T> {
-    _count: number;
-    _generator: (offset: number) => T;
+    private _count: number;
+    private _generator: (offset: number) => T;
+
     constructor(count: number, generator: (offset: number) => T) {
         this._count = count;
         this._generator = generator;
     }
-    @iterator __iterator__() { return new GenerateIterator<T>(this); }
-}
 
-class GenerateIterator<T> implements Iterator<T> {
-    private _iterable: GenerateIterable<T>;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: GenerateIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._offset = 0;
-                this._state = "yielding";
-            case "yielding":
-                if (this._offset < this._iterable._count) {
-                    const value = this._offset;
-                    this._offset++;
-                    return NextResult((void 0, this._iterable._generator)(value));
-                }
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
+    public *[Symbol.iterator](): Iterator<T> {
+        const count = this._count;
+        const generator = this._generator;
+        for (let i = 0; i < count; i++) {
+            yield generator(i);
         }
     }
 }
 
 class AppendIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _value: T;
+    private _source: Iterable<T>;
+    private _value: T;
+
     constructor(source: Iterable<T>, value: T) {
         this._source = source;
         this._value = value;
     }
-    @iterator __iterator__() { return new AppendIterator<T>(this); }
-}
 
-class AppendIterator<T> implements IterableIterator<T> {
-    private _iterable: AppendIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: AppendIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
+    public *[Symbol.iterator](): Iterator<T> {
+        yield* this._source;
+        yield this._value;
     }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._state = "yieldingSource";
-            case "yieldingSource":
-                const { value, done } = this._sourceIterator.next();
-                if (done) {
-                    const value = this._iterable._value;
-                    this._sourceIterator = undefined;
-                    this._iterable = undefined;
-                    this._state = "done";
-                    return NextResult(value);
-                }
-                return NextResult(value);
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class PrependIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _value: T;
+    private _source: Iterable<T>;
+    private _value: T;
+
     constructor(value: T, source: Iterable<T>) {
         this._value = value;
         this._source = source;
     }
-    @iterator __iterator__() { return new PrependIterator<T>(this); }
-}
 
-class PrependIterator<T> implements IterableIterator<T> {
-    private _iterable: PrependIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: PrependIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
+    public *[Symbol.iterator](): Iterator<T> {
+        yield this._value;
+        yield* this._source;
     }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._state = "yieldedValue";
-                return NextResult(this._iterable._value);
-            case "yieldedValue":
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._state = "yieldingSource";
-            case "yieldingSource":
-                const { value, done } = this._sourceIterator.next();
-                if (done) {
-                    this._sourceIterator = undefined;
-                    return this.return();
-                }
-                return NextResult(value);
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class PatchIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _start: number;
-    _skipCount: number;
-    _range: Iterable<T>;
+    private _source: Iterable<T>;
+    private _start: number;
+    private _skipCount: number;
+    private _range: Iterable<T>;
+
     constructor(source: Iterable<T>, start: number, skipCount: number, range: Iterable<T>) {
         this._source = source;
         this._start = start;
         this._skipCount = skipCount;
         this._range = range;
     }
-    @iterator __iterator__() { return new PatchIterator<T>(this); };
-}
 
-class PatchIterator<T> implements IterableIterator<T> {
-    private _iterable: PatchIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _rangeIterator: Iterator<T>;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: PatchIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
+    public *[Symbol.iterator](): Iterator<T> {
+        const start = this._start;
+        const skipCount = this._skipCount;
+        const range = this._range;
+        let offset = 0;
+        let iterator = GetIterator(this._source);
         try {
-            switch (this._state) {
-                case "new":
-                    this._offset = 0;
-                    this._sourceIterator = GetIterator(this._iterable._source);
-                    this._state = "yieldingLeadingSource";
-                case "yieldingLeadingSource":
-                    if (this._offset < this._iterable._start) {
-                        const { value, done } = this._sourceIterator.next();
-                        if (!done) {
-                            this._offset++;
-                            return ok = true, NextResult(value);
-                        }
-                        this._sourceIterator = undefined;
-                    }
-                    this._rangeIterator = GetIterator(this._iterable._range);
-                    this._state = "yieldingRange";
-                case "yieldingRange":
-                    const { value, done } = this._rangeIterator.next();
-                    if (!done) {
-                        return ok = true, NextResult(value);
-                    }
-                    this._rangeIterator = undefined;
-                    if (this._sourceIterator === undefined) {
-                        return ok = true, this.return();
-                    }
-                    this._state = "yieldingTrailingSource";
-                case "yieldingTrailingSource":
-                    while (true) {
-                        const { value, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            break;
-                        }
-                        if (this._offset < this._iterable._start + this._iterable._skipCount) {
-                            this._offset++;
-                            continue;
-                        }
-                        return ok = true, NextResult(value);
-                    }
-                case "done":
-                    return ok = true, this.return();
+            // yield the starting elements
+            while (iterator !== undefined && offset < start) {
+                const result = iterator.next(), done = result.done, value = result.value;
+                if (done) {
+                    iterator = undefined;
+                }
+                else {
+                    yield value;
+                    offset++;
+                }
+            }
+
+            // skip elements to be removed
+            while (iterator !== undefined && offset < start + skipCount) {
+                const result = iterator.next(), done = result.done, value = result.value;
+                if (done) {
+                    iterator = undefined;
+                }
+                else {
+                    offset++;
+                }
+            }
+
+            // yield the patched range
+            yield* range;
+
+            // yield the remaining elements
+            while (iterator !== undefined) {
+                const result = iterator.next(), done = result.done, value = result.value;
+                if (done) {
+                    iterator = undefined;
+                }
+                else {
+                    yield value;
+                }
             }
         }
         finally {
-            if (!ok) {
-                this.return();
-            }
+            IteratorClose(iterator);
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._rangeIterator);
-                IteratorClose(this._sourceIterator);
-                this._iterable = undefined;
-                this._rangeIterator = undefined;
-                this._sourceIterator = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ConsumeIterable<T> implements Iterable<T> {
     private _source: Iterator<T>;
+
     constructor(source: Iterator<T>) {
         this._source = source;
     }
-    @iterator __iterator__(): Iterator<T> { return this._source; }
+
+    public *[Symbol.iterator](): Iterator<T> {
+        if (this._source === undefined) {
+            return;
+        }
+
+        try {
+            while (this._source !== undefined) {
+                const result = this._source.next(), done = result.done, value = result.value;
+                if (done) {
+                    this._source = undefined;
+                    return;
+                }
+
+                yield value;
+            }
+        }
+        finally {
+            const source = this._source;
+            this._source = undefined;
+            IteratorClose(source);
+        }
+    }
 }
 
 class IfIterable<T> implements Iterable<T> {
-    _condition: () => boolean;
-    _thenIterable: Iterable<T>;
-    _elseIterable: Iterable<T>;
+    private _condition: () => boolean;
+    private _thenIterable: Iterable<T>;
+    private _elseIterable: Iterable<T>;
+
     constructor(condition: () => boolean, thenIterable: Iterable<T>, elseIterable: Iterable<T>) {
         this._condition = condition;
         this._thenIterable = thenIterable;
         this._elseIterable = elseIterable;
     }
-    @iterator __iterator__() { return new IfIterator<T>(this); }
+
+    public *[Symbol.iterator](): Iterator<T> {
+        const condition = this._condition;
+        const iterable = condition() ? this._thenIterable : this._elseIterable;
+        yield* iterable;
+    }
 }
 
 class ChooseIterable<K, T> implements Iterable<T> {
-    _chooser: () => K;
-    _choices: Lookup<K, T>;
-    _otherwise: Iterable<T>;
+    private _chooser: () => K;
+    private _choices: Lookup<K, T>;
+    private _otherwise: Iterable<T>;
+
     constructor(chooser: () => K, choices: Iterable<[K, Queryable<T>]>, otherwise: Iterable<T>) {
         this._chooser = chooser;
         this._choices = new Lookup(choices);
         this._otherwise = otherwise;
     }
-    @iterator __iterator__() { return new ChooseIterator<K, T>(this); }
-}
 
-class ChooseIterator<K, T> implements IterableIterator<T> {
-    private _iterable: ChooseIterable<K, T>;
-    private _iterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: ChooseIterable<K, T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                const choice = (void 0, this._iterable._chooser)();
-                if (this._iterable._choices.has(choice)) {
-                    this._iterator = GetIterator(this._iterable._choices.get(choice));
-                }
-                else if (this._iterable._otherwise) {
-                    this._iterator = GetIterator(this._iterable._otherwise);
-                }
-                else {
-                    return this.return();
-                }
-                this._state = "yielding";
-            case "yielding":
-                const { value, done } = this._iterator.next();
-                if (!done) {
-                    return NextResult(value);
-                }
-                this._iterator = undefined;
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const chooser = this._chooser;
+        const choices = this._choices;
+        const otherwise = this._otherwise;
+        const choice = chooser();
+        if (choices.has(choice)) {
+            yield* choices.get(choice);
+        }
+        else if (otherwise) {
+            yield* otherwise;
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._iterator);
-                this._iterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
-}
-
-class IfIterator<T> implements IterableIterator<T> {
-    private _iterable: IfIterable<T>;
-    private _iterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: IfIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._iterator = (void 0, this._iterable._condition)()
-                    ? GetIterator(this._iterable._thenIterable)
-                    : GetIterator(this._iterable._elseIterable);
-                this._state = "yielding";
-            case "yielding":
-                const { value, done } = this._iterator.next();
-                if (!done) {
-                    return NextResult(value);
-                }
-                this._iterator = undefined;
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._iterator);
-                this._iterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class FilterIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _predicate: (element: T, offset: number) => boolean;
+    private _source: Iterable<T>;
+    private _predicate: (element: T, offset: number) => boolean;
+
     constructor(source: Iterable<T>, predicate: (element: T, offset: number) => boolean) {
         this._source = source;
         this._predicate = predicate;
     }
-    @iterator __iterator__() { return new FilterIterator<T>(this); }
-}
 
-class FilterIterator<T> implements IterableIterator<T> {
-    private _iterable: FilterIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: FilterIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._sourceIterator = GetIterator(this._iterable._source);
-                        this._offset = 0;
-                        this._state = "yielding";
-                    case "yielding":
-                        const { value, done } = this._sourceIterator.next();
-                        if (!done) {
-                            if ((void 0, this._iterable._predicate)(value, this._offset++)) {
-                                return ok = true, NextResult(value);
-                            }
-                            continue;
-                        }
-                    case "done":
-                        return ok = true, this.return();
-                }
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const predicate = this._predicate;
+        let offset = 0;
+        for (const element of source) {
+            if (predicate(element, offset++)) {
+                yield element;
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class MapIterable<T, U> implements Iterable<U> {
-    _source: Iterable<T>;
-    _selector: (element: T, offset: number) => U;
+    private _source: Iterable<T>;
+    private _selector: (element: T, offset: number) => U;
+
     constructor(source: Iterable<T>, selector: (element: T, offset: number) => U) {
         this._source = source;
         this._selector = selector;
     }
-    @iterator __iterator__() { return new MapIterator<T, U>(this); }
-}
 
-class MapIterator<T, U> implements IterableIterator<U> {
-    private _iterable: MapIterable<T, U>;
-    private _sourceIterator: Iterator<T>;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: MapIterable<T, U>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._sourceIterator = GetIterator(this._iterable._source);
-                    this._offset = 0;
-                    this._state = "yielding";
-                case "yielding":
-                    const { value, done } = this._sourceIterator.next();
-                    if (!done) {
-                        const element = (void 0, this._iterable._selector)(value, this._offset++);
-                        return ok = true, NextResult(element);
-                    }
-
-                case "done":
-                    return ok = true, this.return();
-            }
-        }
-        finally {
-            if (!ok) this.return();
+    public *[Symbol.iterator](): Iterator<U> {
+        const source = this._source;
+        const selector = this._selector;
+        let offset = 0;
+        for (const element of source) {
+            yield selector(element, offset++);
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._offset = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<U>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class FlatMapIterable<T, U> implements Iterable<U> {
-    _source: Iterable<T>;
-    _projection: (element: T) => Queryable<U>;
+    private _source: Iterable<T>;
+    private _projection: (element: T) => Queryable<U>;
+
     constructor(source: Iterable<T>, projection: (element: T) => Queryable<U>) {
         this._source = source;
         this._projection = projection;
     }
-    @iterator __iterator__() { return new FlatMapIterator<T, U>(this); }
-}
 
-class FlatMapIterator<T, U> implements IterableIterator<U> {
-    private _iterable: FlatMapIterable<T, U>;
-    private _sourceIterator: Iterator<T>;
-    private _projectionIterator: Iterator<U>;
-    private _state: string;
-    constructor(iterable: FlatMapIterable<T, U>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._sourceIterator = GetIterator(this._iterable._source);
-                        this._state = "iteratingSource";
-                    case "iteratingSource": {
-                        const { value, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            return ok = true, this.return();
-                        }
-                        const elements = (void 0, this._iterable._projection)(value);
-                        this._projectionIterator = GetIterator(ToIterable(elements));
-                        this._state = "yieldingProjection";
-                    }
-                    case "yieldingProjection": {
-                        const { value, done } = this._projectionIterator.next();
-                        if (done) {
-                            this._projectionIterator = undefined;
-                            this._state = "iteratingSource";
-                            continue;
-                        }
-                        return ok = true, NextResult(value);
-                    }
-                    case "done":
-                        return ok = true, this.return();
-                }
-            }
-        }
-        finally {
-            if (!ok) this.return();
+    public *[Symbol.iterator](): Iterator<U> {
+        const source = this._source;
+        const projection = this._projection;
+        for (const element of source) {
+            yield* ToIterable(projection(element));
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._projectionIterator);
-                IteratorClose(this._sourceIterator);
-                this._projectionIterator = undefined;
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<U>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ExpandIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _projection: (element: T) => Queryable<T>;
+    private _source: Iterable<T>;
+    private _projection: (element: T) => Queryable<T>;
+
     constructor(source: Iterable<T>, projection: (element: T) => Queryable<T>) {
         this._source = source;
         this._projection = projection;
     }
-    @iterator __iterator__() { return new ExpandIterator<T>(this); }
-}
 
-class ExpandIterator<T> implements IterableIterator<T> {
-    private _iterable: ExpandIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _queue: Iterable<T>[];
-    private _state: string;
-    constructor(iterable: ExpandIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._queue = [this._iterable._source];
-                        this._state = "dequeue";
-                    case "dequeue":
-                        if (this._queue.length) {
-                            const source = this._queue.shift();
-                            this._sourceIterator = GetIterator(source);
-                            this._state = "iteratingSource";
-                            continue;
-                        }
-                    case "done":
-                        return ok = true, this.return();
-                    case "iteratingSource": {
-                        const { value, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            this._state = "dequeue";
-                            continue;
-                        }
-                        this._queue.push(ToIterable((void 0, this._iterable._projection)(value)));
-                        return ok = true, NextResult(value);
-                    }
-                }
+    public *[Symbol.iterator](): Iterator<T> {
+        const projection = this._projection;
+        const queue: Iterable<T>[] = [this._source];
+        while (queue.length) {
+            const source = queue.shift();
+            for (const element of source) {
+                queue.push(ToIterable(projection(element)));
+                yield element;
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._queue = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class DoIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _callback: (element: T, offset: number) => void;
+    private _source: Iterable<T>;
+    private _callback: (element: T, offset: number) => void;
 
     constructor(source: Iterable<T>, callback: (element: T, offset: number) => void) {
         this._source = source;
         this._callback = callback;
     }
 
-    @iterator __iterator__() { return new DoIterator<T>(this); }
-}
-
-class DoIterator<T> implements IterableIterator<T> {
-    private _iterable: DoIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: DoIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._sourceIterator = GetIterator(this._iterable._source);
-                    this._offset = 0;
-                    this._state = "yielding";
-                case "yielding":
-                    const { value, done } = this._sourceIterator.next();
-                    if (!done) {
-                        (void 0, this._iterable._callback)(value, this._offset++);
-                        return ok = true, NextResult(value);
-                    }
-
-                case "done":
-                    return ok = true, this.return();
-            }
-        }
-        finally {
-            if (!ok) this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const callback = this._callback;
+        let offset = 0;
+        for (const element of source) {
+            callback(element, offset++);
+            yield element;
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._offset = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ReverseIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
+    private _source: Iterable<T>;
+
     constructor(source: Iterable<T>) {
         this._source = source;
     }
-    @iterator __iterator__() { return new ReverseIterator<T>(this); }
-}
 
-class ReverseIterator<T> implements IterableIterator<T> {
-    private _iterable: ReverseIterable<T>;
-    private _list: T[];
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: ReverseIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._list = ToArray(this._iterable._source);
-                this._iterable = undefined;
-                this._offset = this._list.length - 1;
-                this._state = "yielding";
-            case "yielding":
-                if (this._offset >= 0) {
-                    return NextResult(this._list[this._offset--]);
-                }
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const list = ToArray<T>(this._source);
+        for (let i = list.length - 1; i >= 0; --i) {
+            yield list[i];
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._list = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class SkipIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _count: number;
+    private _source: Iterable<T>;
+    private _count: number;
+
     constructor(source: Iterable<T>, count: number) {
         this._source = source;
         this._count = count;
     }
-    @iterator __iterator__() { return new SkipIterator<T>(this); }
-}
 
-class SkipIterator<T> implements IterableIterator<T> {
-    private _iterable: SkipIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _remainingCount: number;
-    private _state: string;
-    constructor(iterable: SkipIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._remainingCount = this._iterable._count;
-                this._iterable = undefined;
-                this._state = "yielding";
-            case "yielding":
-                while (true) {
-                    const { value, done } = this._sourceIterator.next();
-                    if (done) {
-                        this._sourceIterator = undefined;
-                        break;
-                    }
-                    if (this._remainingCount > 0) {
-                        this._remainingCount--;
-                    }
-                    else {
-                        return NextResult(value);
-                    }
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        let remaining = this._count;
+        if (remaining <= 0) {
+            yield* source;
+        }
+        else {
+            for (const element of source) {
+                if (remaining > 0) {
+                    remaining--;
                 }
-            case "done":
-                return this.return();
+                else {
+                    yield element;
+                }
+            }
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._remainingCount = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class SkipRightIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _count: number;
+    private _source: Iterable<T>;
+    private _count: number;
+
     constructor(source: Iterable<T>, count: number) {
         this._source = source;
         this._count = count;
     }
-    @iterator __iterator__() { return new SkipRightIterator<T>(this); }
-}
 
-class SkipRightIterator<T> implements IterableIterator<T> {
-    private _iterable: SkipRightIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _pending: T[];
-    private _state: string;
-    constructor(iterable: SkipRightIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._pending = [];
-                this._state = "yielding";
-            case "yielding":
-                while (true) {
-                    const { value, done } = this._sourceIterator.next();
-                    if (done) {
-                        this._sourceIterator = undefined;
-                        break;
-                    }
-                    this._pending.push(value);
-                    if (this._pending.length > this._iterable._count) {
-                        return NextResult(this._pending.shift());
-                    }
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const pending: T[] = [];
+        const count = this._count;
+        if (count <= 0) {
+            yield* source;
+        }
+        else {
+            for (const element of source) {
+                pending.push(element);
+                if (pending.length > count) {
+                    yield pending.shift();
                 }
-            case "done":
-                return this.return();
+            }
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._pending = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class SkipWhileIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _predicate: (element: T) => boolean;
+    private _source: Iterable<T>;
+    private _predicate: (element: T) => boolean;
+
     constructor(source: Iterable<T>, predicate: (element: T) => boolean) {
         this._source = source;
         this._predicate = predicate;
     }
-    @iterator __iterator__() { return new SkipWhileIterator<T>(this); }
-}
 
-class SkipWhileIterator<T> implements IterableIterator<T> {
-    private _iterable: SkipWhileIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _skipping: boolean;
-    private _state: string;
-    constructor(iterable: SkipWhileIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._sourceIterator = GetIterator(this._iterable._source);
-                    this._skipping = true;
-                    this._state = "yielding";
-                case "yielding":
-                    while (true) {
-                        const { value, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            break;
-                        }
-
-                        if (this._skipping) {
-                            this._skipping = (void 0, this._iterable._predicate)(value);
-                            if (this._skipping) {
-                                continue;
-                            }
-                        }
-
-                        return ok = true, NextResult(value);
-                    }
-                case "done":
-                    return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const predicate = this._predicate;
+        let skipping = true;
+        for (const element of source) {
+            if (skipping) {
+                skipping = predicate(element);
+            }
+            if (!skipping) {
+                yield element;
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._skipping = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class TakeIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _count: number;
+    private _source: Iterable<T>;
+    private _count: number;
+
     constructor(source: Iterable<T>, count: number) {
         this._source = source;
         this._count = count;
     }
-    @iterator __iterator__() { return new TakeIterator<T>(this); }
-}
 
-class TakeIterator<T> implements IterableIterator<T> {
-    private _iterable: TakeIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _remainingCount: number;
-    private _state: string;
-    constructor(iterable: TakeIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                if (this._iterable._count <= 0) {
-                    return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        let remaining = this._count;
+        if (remaining > 0) {
+            for (const element of source) {
+                yield element;
+                if (--remaining <= 0) {
+                    break;
                 }
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._remainingCount = this._iterable._count;
-                this._state = "yielding";
-            case "yielding":
-                if (this._remainingCount > 0) {
-                    const { value, done } = this._sourceIterator.next();
-                    if (!done) {
-                        this._remainingCount--;
-                        return NextResult(value);
-                    }
-
-                    this._sourceIterator = undefined;
-                }
-            case "done":
-                return this.return();
+            }
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._remainingCount = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class TakeRightIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _count: number;
+    private _source: Iterable<T>;
+    private _count: number;
+
     constructor(source: Iterable<T>, count: number) {
         this._source = source;
         this._count = count;
     }
-    @iterator __iterator__() { return new TakeRightIterator<T>(this); }
-}
 
-class TakeRightIterator<T> implements IterableIterator<T> {
-    private _iterable: TakeRightIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _pending: T[];
-    private _state: string;
-    constructor(iterable: TakeRightIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._pending = [];
-                this._state = "queueing";
-            case "queueing":
-                while (true) {
-                    const { value, done } = this._sourceIterator.next();
-                    if (done) {
-                        this._sourceIterator = undefined;
-                        break;
-                    }
-                    this._pending.push(value);
-                    if (this._pending.length > this._iterable._count) {
-                        this._pending.shift();
-                    }
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const pending: T[] = [];
+        const count = this._count;
+        if (count <= 0) {
+            return;
+        }
+        else {
+            for (const element of source) {
+                pending.push(element);
+                if (pending.length > count) {
+                    pending.shift();
                 }
-                this._state = "taking";
-            case "taking":
-                if (this._pending.length > 0) {
-                    return NextResult(this._pending.shift());
-                }
+            }
 
-            case "done":
-                return this.return();
+            yield* pending;
         }
     }
-
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._pending = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class TakeWhileIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _predicate: (element: T) => boolean;
+    private _source: Iterable<T>;
+    private _predicate: (element: T) => boolean;
+
     constructor(source: Iterable<T>, predicate: (element: T) => boolean) {
         this._source = source;
         this._predicate = predicate;
     }
-    @iterator __iterator__() { return new TakeWhileIterator<T>(this); }
-}
 
-class TakeWhileIterator<T> implements IterableIterator<T> {
-    private _iterable: TakeWhileIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: TakeWhileIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._sourceIterator = GetIterator(this._iterable._source);
-                    this._state = "yielding";
-                case "yielding":
-                    const { value, done } = this._sourceIterator.next();
-                    if (done) {
-                        this._sourceIterator = undefined;
-                        break;
-                    }
-                    if ((void 0, this._iterable._predicate)(value)) {
-                        return ok = true, NextResult(value);
-                    }
-                case "done":
-                    return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const predicate = this._predicate;
+        for (const element of source) {
+            if (!predicate(element)) {
+                break;
             }
-        }
-        finally {
-            if (!ok) this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
+
+            yield element;
         }
     }
-    @iterator __iterator__() { return this; }
 }
 
 class IntersectIterable<T> implements Iterable<T> {
-    _left: Iterable<T>;
-    _right: Iterable<T>;
+    private _left: Iterable<T>;
+    private _right: Iterable<T>;
+
     constructor(left: Iterable<T>, right: Iterable<T>) {
         this._left = left;
         this._right = right;
     }
-    @iterator __iterator__() { return new IntersectIterator<T>(this); }
-}
 
-class IntersectIterator<T> implements IterableIterator<T> {
-    private _iterable: IntersectIterable<T>;
-    private _leftIterator: Iterator<T>;
-    private _set: Set<T>;
-    private _state: string;
-    constructor(iterable: IntersectIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._leftIterator = GetIterator(this._iterable._left);
-                    this._set = new Set(this._iterable._right);
-                    this._state = "yielding";
-                case "yielding":
-                    while (true) {
-                        const { value, done } = this._leftIterator.next();
-                        if (done) {
-                            this._leftIterator = undefined;
-                            break;
-                        }
-                        if (!this._set.delete(value)) {
-                            continue;
-                        }
-                        return ok = true, NextResult(value);
-                    }
-                case "done":
-                    return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const left = this._left;
+        const right = this._right;
+        const set = new Set(right);
+        if (set.size <= 0) {
+            return;
+        }
+
+        for (const element of left) {
+            if (set.delete(element)) {
+                yield element;
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._leftIterator);
-                this._leftIterator = undefined;
-                this._set = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class UnionIterable<T> implements Iterable<T> {
-    _left: Iterable<T>;
-    _right: Iterable<T>;
+    private _left: Iterable<T>;
+    private _right: Iterable<T>;
+
     constructor(left: Iterable<T>, right: Iterable<T>) {
         this._left = left;
         this._right = right;
     }
-    @iterator __iterator__() { return new UnionIterator<T>(this); }
-}
 
-class UnionIterator<T> implements IterableIterator<T> {
-    private _iterable: UnionIterable<T>;
-    private _leftIterator: Iterator<T>;
-    private _rightIterator: Iterator<T>;
-    private _set: Set<T>;
-    private _state: string;
-    constructor(iterable: UnionIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._leftIterator = GetIterator(this._iterable._left);
-                this._set = new Set<T>();
-                this._state = "yieldingLeft";
-            case "yieldingLeft":
-                while (true) {
-                    const { value, done } = this._leftIterator.next();
-                    if (done) {
-                        this._leftIterator = undefined;
-                        break;
-                    }
-                    if (this._set.has(value)) {
-                        continue;
-                    }
-                    this._set.add(value);
-                    return NextResult(value);
-                }
-                this._rightIterator = GetIterator(this._iterable._right);
-                this._state = "yieldingRight";
-            case "yieldingRight":
-                while (true) {
-                    const { value, done } = this._rightIterator.next();
-                    if (done) {
-                        this._rightIterator = undefined;
-                        break;
-                    }
-                    if (this._set.has(value)) {
-                        continue;
-                    }
-                    this._set.add(value);
-                    return NextResult(value);
-                }
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const left = this._left;
+        const right = this._right;
+        const set = new Set<T>();
+        for (const element of left) {
+            if (!set.has(element)) {
+                set.add(element);
+                yield element;
+            }
+        }
+
+        for (const element of right) {
+            if (!set.has(element)) {
+                set.add(element);
+                yield element;
+            }
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._leftIterator);
-                IteratorClose(this._rightIterator);
-                this._leftIterator = undefined;
-                this._rightIterator = undefined;
-                this._set = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ExceptIterable<T> implements Iterable<T> {
-    _left: Iterable<T>;
-    _right: Iterable<T>;
+    private _left: Iterable<T>;
+    private _right: Iterable<T>;
+
     constructor(left: Iterable<T>, right: Iterable<T>) {
         this._left = left;
         this._right = right;
     }
-    @iterator __iterator__() { return new ExceptIterator<T>(this); }
-}
 
-class ExceptIterator<T> implements IterableIterator<T> {
-    private _iterable: ExceptIterable<T>;
-    private _leftIterator: Iterator<T>;
-    private _set: Set<T>;
-    private _state: string;
-    constructor(iterable: ExceptIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._leftIterator = GetIterator(this._iterable._left);
-                this._set = new Set(this._iterable._right);
-                this._state = "yielding";
-            case "yielding":
-                while (true) {
-                    const { value, done } = this._leftIterator.next();
-                    if (done) {
-                        this._leftIterator = undefined;
-                        break;
-                    }
-                    if (!this._set.has(value)) {
-                        this._set.add(value);
-                        return NextResult(value);
-                    }
-                }
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const left = this._left;
+        const right = this._right;
+        const set = new Set<T>(right);
+        for (const element of left) {
+            if (!set.has(element)) {
+                set.add(element);
+                yield element;
+            }
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._leftIterator);
-                this._leftIterator = undefined;
-                this._set = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class DistinctIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
+    private _source: Iterable<T>;
+
     constructor(source: Iterable<T>) {
         this._source = source;
     }
-    @iterator __iterator__() { return new DistinctIterator<T>(this); }
-}
 
-class DistinctIterator<T> implements IterableIterator<T> {
-    private _iterable: DistinctIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _set: Set<T>;
-    private _state: string;
-    constructor(iterable: DistinctIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._sourceIterator = GetIterator(this._iterable._source);
-                this._set = new Set<T>();
-                this._state = "yielding";
-            case "yielding":
-                while (true) {
-                    const { value, done } = this._sourceIterator.next();
-                    if (done) {
-                        this._sourceIterator = undefined;
-                        break;
-                    }
-                    if (!this._set.has(value)) {
-                        this._set.add(value);
-                        return NextResult(value);
-                    }
-                }
-            case "done":
-                return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const set = new Set<T>();
+        for (const element of source) {
+            if (!set.has(element)) {
+                set.add(element);
+                yield element;
+            }
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._set = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ConcatIterable<T> implements Iterable<T> {
-    _left: Iterable<T>;
-    _right: Iterable<T>;
+    private _left: Iterable<T>;
+    private _right: Iterable<T>;
+
     constructor(left: Iterable<T>, right: Iterable<T>) {
         this._left = left;
         this._right = right;
     }
-    @iterator __iterator__() { return new ConcatIterator<T>(this); }
-}
 
-class ConcatIterator<T> implements IterableIterator<T> {
-    private _iterable: ConcatIterable<T>;
-    private _leftIterator: Iterator<T>;
-    private _rightIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: ConcatIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
+    public *[Symbol.iterator](): Iterator<T> {
+        yield* this._left;
+        yield* this._right;
     }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._leftIterator = GetIterator(this._iterable._left);
-                this._state = "yieldingLeft";
-            case "yieldingLeft": {
-                const { value, done } = this._leftIterator.next();
-                if (!done) {
-                    return NextResult(value);
-                }
-                this._leftIterator = undefined;
-                this._rightIterator = GetIterator(this._iterable._right);
-                this._state = "yieldingRight";
-            }
-            case "yieldingRight": {
-                const { value, done } = this._rightIterator.next();
-                if (!done) {
-                    return NextResult(value);
-                }
-                this._rightIterator = undefined;
-            }
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._leftIterator);
-                IteratorClose(this._rightIterator);
-                this._leftIterator = undefined;
-                this._rightIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ZipIterable<T, U, R> implements Iterable<R> {
-    _left: Iterable<T>;
-    _right: Iterable<U>;
-    _selector: (left: T, right: U) => R;
+    private _left: Iterable<T>;
+    private _right: Iterable<U>;
+    private _selector: (left: T, right: U) => R;
+
     constructor(left: Iterable<T>, right: Iterable<U>, selector: (left: T, right: U) => R) {
         this._left = left;
         this._right = right;
         this._selector = selector;
     }
-    @iterator __iterator__() { return new ZipIterator<T, U, R>(this); }
-}
 
-class ZipIterator<T, U, R> implements IterableIterator<R> {
-    private _iterable: ZipIterable<T, U, R>;
-    private _leftIterator: Iterator<T>;
-    private _rightIterator: Iterator<U>;
-    private _state: string;
-    constructor(iterable: ZipIterable<T, U, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
+    public *[Symbol.iterator](): Iterator<R> {
+        const left = this._left;
+        const right = this._right;
+        const selector = this._selector;
+        let leftIterator = GetIterator(left);
         try {
-            switch (this._state) {
-                case "new":
-                    this._leftIterator = GetIterator(this._iterable._left);
-                    this._rightIterator = GetIterator(this._iterable._right);
-                    this._state = "yielding";
-                case "yielding":
-                    const { value: leftValue, done: leftDone } = this._leftIterator.next();
-                    const { value: rightValue, done: rightDone } = this._rightIterator.next();
-                    if (leftDone) this._leftIterator = undefined;
-                    if (rightDone) this._rightIterator = undefined;
-                    if (!leftDone && !rightDone) {
-                        const value = (void 0, this._iterable._selector)(leftValue, rightValue)
-                        return ok = true, NextResult(value);
+            let rightIterator = GetIterator(right);
+            try {
+                while (true) {
+                    const leftResult = leftIterator.next(), leftDone = leftResult.done, leftValue = leftResult.value;
+                    const rightResult = rightIterator.next(), rightDone = rightResult.done, rightValue = rightResult.value;
+                    if (leftDone) {
+                        leftIterator = undefined;
                     }
-                case "done":
-                    return ok = true, this.return();
+
+                    if (rightDone) {
+                        rightIterator = undefined;
+                    }
+
+                    if (leftDone || rightDone) {
+                        break;
+                    }
+
+                    yield selector(leftValue, rightValue);
+                }
             }
-        } finally {
-            if (!ok) this.return();
+            finally {
+                IteratorClose(rightIterator);
+            }
+        }
+        finally {
+            IteratorClose(leftIterator);
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._leftIterator);
-                IteratorClose(this._rightIterator);
-                this._leftIterator = undefined;
-                this._rightIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 abstract class OrderedIterableBase<T> implements Iterable<T> {
-    _source: Iterable<T>;
+    /*@internal*/ readonly _source: Iterable<T>;
+
     constructor(source: Iterable<T>) {
         this._source = source;
     }
-    @iterator __iterator__() { return new OrderedIterator<T>(this); }
+
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const array = ToArray<T>(source);
+        const sorter = this._getSorter(array);
+        const len = array.length;
+        const indices = new Array<number>(len);
+        for (let i = 0; i < len; ++i) {
+            indices[i] = i;
+        }
+
+        indices.sort(sorter);
+        for (const index of indices) {
+            yield array[index];
+        }
+    }
+
     /*@internal*/ abstract _getSorter(elements: T[], next?: (x: number, y: number) => number): (x: number, y: number) => number;
 }
 
@@ -4165,217 +3146,82 @@ class OrderedIterable<T, K> extends OrderedIterableBase<T> {
     }
 }
 
-class OrderedIterator<T> implements IterableIterator<T> {
-    private _iterable: OrderedIterableBase<T>;
-    private _indices: number[];
-    private _array: T[];
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: OrderedIterableBase<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new": {
-                this._array = ToArray(this._iterable._source);
-                this._indices = new Array<number>(this._array.length);
-                for (let i = 0; i < this._indices.length; ++i) this._indices[i] = i;
-                this._indices.sort(this._iterable._getSorter(this._array));
-                this._offset = 0;
-                this._state = "yielding";
-            }
-            case "yielding": {
-                if (this._offset < this._array.length) {
-                    const value = this._array[this._indices[this._offset++]];
-                    return NextResult(value);
-                }
-            }
-            case "done":
-                return this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                this._iterable = undefined;
-                this._indices = undefined;
-                this._array = undefined;
-                this._offset = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
-}
-
 class SpanMapIterable<T, K, V, R> implements Iterable<R> {
-    _source: Iterable<T>;
-    _keySelector: (element: T) => K;
-    _elementSelector: (element: T) => V;
-    _spanSelector: (key: K, elements: Query<V>) => R;
+    private _source: Iterable<T>;
+    private _keySelector: (element: T) => K;
+    private _elementSelector: (element: T) => V;
+    private _spanSelector: (key: K, elements: Query<V>) => R;
+
     constructor(source: Iterable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Query<V>) => R) {
         this._source = source;
         this._keySelector = keySelector;
         this._elementSelector = elementSelector;
         this._spanSelector = spanSelector;
     }
-    @iterator __iterator__() { return new SpanMapIterator<T, K, V, R>(this); }
-}
 
-class SpanMapIterator<T, K, V, R> implements IterableIterator<R> {
-    private _iterable: SpanMapIterable<T, K, V, R>;
-    private _span: V[];
-    private _hasElements: boolean;
-    private _previousKey: K;
-    private _previousElement: T;
-    private _sourceIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: SpanMapIterable<T, K, V, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok =  false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._hasElements = false;
-                        this._sourceIterator = GetIterator(this._iterable._source);
-                        this._state = "iteratingSource";
-                    case "iteratingSource": {
-                        const { value, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            this._state = "yieldingRemainingSpan";
-                            break;
-                        }
-                        const key = (void 0, this._iterable._keySelector)(value);
-                        this._previousElement = value;
-                        this._state = "addingElement";
-                        if (!this._hasElements) {
-                            this._previousKey = key;
-                            this._hasElements = true;
-                            this._span = [];
-                        }
-                        else if (!SameValue(this._previousKey, key)) {
-                            const previousKey = this._previousKey;
-                            const span = this._span;
-                            this._previousKey = key;
-                            this._span = [];
-                            const result = (void 0, this._iterable._spanSelector)(previousKey, new Query(span));
-                            return ok = true, NextResult(result);
-                        }
-                    }
-                    case "addingElement": {
-                        const value = this._previousElement;
-                        this._previousElement = undefined;
-                        this._span.push((void 0, this._iterable._elementSelector)(value));
-                        this._state = "iteratingSource";
-                        continue;
-                    }
-                    case "yieldingRemainingSpan": {
-                        this._state = "yieldedRemainingSpan";
-                        if (this._span) {
-                            const result = (void 0, this._iterable._spanSelector)(this._previousKey, new Query(this._span));
-                            return NextResult(result);
-                        }
-                    }
-                    case "done":
-                        return this.return();
-                }
+    public *[Symbol.iterator](): Iterator<R> {
+        const source = this._source;
+        const keySelector = this._keySelector;
+        const elementSelector = this._elementSelector;
+        const spanSelector = this._spanSelector;
+        let span: V[];
+        let hasElements = false;
+        let previousKey: K;
+        for (const element of source) {
+            const key = keySelector(element);
+            if (!hasElements) {
+                previousKey = key;
+                hasElements = true;
+                span = [];
             }
+            else if (!SameValue(previousKey, key)) {
+                yield spanSelector(previousKey, new Query(span));
+                span = [];
+                previousKey = key;
+            }
+
+            span.push(elementSelector(element));
         }
-        finally {
-            if (!ok) this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._span = undefined;
-                this._hasElements = undefined;
-                this._previousKey = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
+
+        if (span) {
+            yield spanSelector(previousKey, new Query(span));
         }
     }
-    @iterator __iterator__() { return this; }
 }
 
 class GroupByIterable<T, K, V, R> implements Iterable<R> {
-    _source: Iterable<T>;
-    _keySelector: (element: T) => K;
-    _elementSelector: (element: T) => V;
-    _resultSelector: (key: K, elements: Query<V>) => R;
+    private _source: Iterable<T>;
+    private _keySelector: (element: T) => K;
+    private _elementSelector: (element: T) => V;
+    private _resultSelector: (key: K, elements: Query<V>) => R;
+
     constructor(source: Iterable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R) {
         this._source = source;
         this._keySelector = keySelector;
         this._elementSelector = elementSelector;
         this._resultSelector = resultSelector;
     }
-    @iterator __iterator__() { return new GroupByIterator<T, K, V, R>(this); }
-}
 
-class GroupByIterator<T, K, V, R> implements IterableIterator<R> {
-    private _iterable: GroupByIterable<T, K, V, R>;
-    private _mapIterator: Iterator<[K, V[]]>;
-    private _state: string;
-    constructor(iterable: GroupByIterable<T, K, V, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    const map = CreateGroupings(this._iterable._source, this._iterable._keySelector, this._iterable._elementSelector);
-                    this._mapIterator = GetIterator(map);
-                    this._state = "yielding";
-                case "yielding":
-                    const { value, done } = this._mapIterator.next();
-                    if (!done) {
-                        const [key, values] = value;
-                        const result = (void 0, this._iterable._resultSelector)(key, new Query(values));
-                        return ok = true, NextResult(result);
-                    }
-
-                    this._mapIterator = undefined;
-                case "done":
-                    return ok = true, this.return();
-            }
-        }
-        finally {
-            if (!ok) this.return();
+    public *[Symbol.iterator](): Iterator<R> {
+        const source = this._source;
+        const keySelector = this._keySelector;
+        const elementSelector = this._elementSelector;
+        const resultSelector = this._resultSelector;
+        const map = CreateGroupings(source, keySelector, elementSelector);
+        for (const element of map) {
+            const key = element[0], values = element[1];
+            yield resultSelector(key, new Query<V>(values));
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._mapIterator);
-                this._mapIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class GroupJoinIterable<O, I, K, R> implements Iterable<R> {
-    _outer: Iterable<O>;
-    _inner: Iterable<I>;
-    _outerKeySelector: (element: O) => K;
-    _innerKeySelector: (element: I) => K;
-    _resultSelector: (outer: O, inner: Query<I>) => R;
+    private _outer: Iterable<O>;
+    private _inner: Iterable<I>;
+    private _outerKeySelector: (element: O) => K;
+    private _innerKeySelector: (element: I) => K;
+    private _resultSelector: (outer: O, inner: Query<I>) => R;
+
     constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Query<I>) => R) {
         this._outer = outer;
         this._inner = inner;
@@ -4383,66 +3229,29 @@ class GroupJoinIterable<O, I, K, R> implements Iterable<R> {
         this._innerKeySelector = innerKeySelector;
         this._resultSelector = resultSelector;
     }
-    @iterator __iterator__() { return new GroupJoinIterator<O, I, K, R>(this); }
-}
 
-class GroupJoinIterator<O, I, K, R> implements IterableIterator<R> {
-    private _iterable: GroupJoinIterable<O, I, K, R>;
-    private _map: Map<K, I[]>;
-    private _outerIterator: Iterator<O>;
-    private _state: string;
-    constructor(iterable: GroupJoinIterable<O, I, K, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._map = CreateGroupings(this._iterable._inner, this._iterable._innerKeySelector, Identity);
-                    this._outerIterator = GetIterator(this._iterable._outer);
-                    this._state = "yielding";
-                case "yielding":
-                    const { value: outerElement, done } = this._outerIterator.next();
-                    if (!done) {
-                        const outerKey = (void 0, this._iterable._outerKeySelector)(outerElement);
-                        const innerElements = this._map.has(outerKey)
-                            ? new Query(this._map.get(outerKey))
-                            : Query.empty<I>();
-                        const result = (void 0, this._iterable._resultSelector)(outerElement, innerElements);
-                        return ok = true, NextResult(result);
-                    }
-                    this._outerIterator = undefined;
-                case "done":
-                    return ok = true, this.return();
-            }
-        }
-        finally {
-            if (!ok) this.return();
+    public *[Symbol.iterator](): Iterator<R> {
+        const outer = this._outer;
+        const inner = this._inner;
+        const outerKeySelector = this._outerKeySelector;
+        const innerKeySelector = this._innerKeySelector;
+        const resultSelector = this._resultSelector;
+        const map = CreateGroupings(inner, innerKeySelector, Identity);
+        for (const outerElement of outer) {
+            const outerKey = outerKeySelector(outerElement);
+            const innerElements = map.has(outerKey) ? <Queryable<I>>map.get(outerKey) : new EmptyIterable<I>();
+            yield resultSelector(outerElement, new Query<I>(innerElements));
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._outerIterator);
-                this._map = undefined;
-                this._outerIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class JoinIterable<O, I, K, R> implements Iterable<R> {
-    _outer: Iterable<O>;
-    _inner: Iterable<I>;
-    _outerKeySelector: (element: O) => K;
-    _innerKeySelector: (element: I) => K;
-    _resultSelector: (outer: O, inner: I) => R;
+    private _outer: Iterable<O>;
+    private _inner: Iterable<I>;
+    private _outerKeySelector: (element: O) => K;
+    private _innerKeySelector: (element: I) => K;
+    private _resultSelector: (outer: O, inner: I) => R;
+
     constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: I) => R) {
         this._outer = outer;
         this._inner = inner;
@@ -4450,90 +3259,33 @@ class JoinIterable<O, I, K, R> implements Iterable<R> {
         this._innerKeySelector = innerKeySelector;
         this._resultSelector = resultSelector;
     }
-    @iterator __iterator__() { return new JoinIterator<O, I, K, R>(this); }
-}
 
-class JoinIterator<O, I, K, R> implements IterableIterator<R> {
-    private _iterable: JoinIterable<O, I, K, R>;
-    private _map: Map<K, I[]>;
-    private _outerIterator: Iterator<O>;
-    private _outerElement: O;
-    private _innerIterator: Iterator<I>;
-    private _state: string;
-    constructor(iterable: JoinIterable<O, I, K, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._map = CreateGroupings(this._iterable._inner, this._iterable._innerKeySelector, Identity);
-                        this._outerIterator = GetIterator(this._iterable._outer);
-                        this._state = "iteratingOuter";
-                    case "iteratingOuter": {
-                        const { value: outerElement, done } = this._outerIterator.next();
-                        if (done) {
-                            this._outerIterator = undefined;
-                            this._outerElement = undefined;
-                            this._state = "doneIteratingOuter";
-                            continue;
-                        }
-                        const outerKey = (void 0, this._iterable._outerKeySelector)(outerElement);
-                        if (!this._map.has(outerKey)) {
-                            continue;
-                        }
-                        const innerElements = this._map.get(outerKey);
-                        this._innerIterator = GetIterator(ToIterable(innerElements));
-                        this._outerElement = outerElement;
-                        this._state = "yieldingInner";
-                    }
-                    case "yieldingInner": {
-                        const { value: innerElement, done } = this._innerIterator.next();
-                        if (done) {
-                            this._innerIterator = undefined;
-                            this._state = "iteratingOuter";
-                            continue;
-                        }
-                        const result = (void 0, this._iterable._resultSelector)(this._outerElement, innerElement);
-                        return ok = true, NextResult(result);
-                    }
-                    case "doneIteratingOuter":
-                    case "done":
-                        return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<R> {
+        const outer = this._outer;
+        const inner = this._inner;
+        const outerKeySelector = this._outerKeySelector;
+        const innerKeySelector = this._innerKeySelector;
+        const resultSelector = this._resultSelector;
+        const map = CreateGroupings(inner, innerKeySelector, Identity);
+        for (const outerElement of outer) {
+            const outerKey = outerKeySelector(outerElement);
+            const innerElements = map.get(outerKey);
+            if (innerElements != undefined) {
+                for (const innerElement of innerElements) {
+                    yield resultSelector(outerElement, innerElement);
                 }
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._innerIterator);
-                IteratorClose(this._outerIterator);
-                this._map = undefined;
-                this._outerIterator = undefined;
-                this._outerElement = undefined;
-                this._innerIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class FullOuterJoinIterable<O, I, K, R> implements Iterable<R> {
-    _outer: Iterable<O>;
-    _inner: Iterable<I>;
-    _outerKeySelector: (element: O) => K;
-    _innerKeySelector: (element: I) => K;
-    _resultSelector: (outer: O | undefined, inner: I | undefined) => R;
+    private _outer: Iterable<O>;
+    private _inner: Iterable<I>;
+    private _outerKeySelector: (element: O) => K;
+    private _innerKeySelector: (element: I) => K;
+    private _resultSelector: (outer: O | undefined, inner: I | undefined) => R;
+
     constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R) {
         this._outer = outer;
         this._inner = inner;
@@ -4541,437 +3293,201 @@ class FullOuterJoinIterable<O, I, K, R> implements Iterable<R> {
         this._innerKeySelector = innerKeySelector;
         this._resultSelector = resultSelector;
     }
-    @iterator __iterator__() { return new FullOuterJoinIterator<O, I, K, R>(this); }
-}
 
-class FullOuterJoinIterator<O, I, K, R> implements IterableIterator<R> {
-    private _iterable: FullOuterJoinIterable<O, I, K, R>;
-    private _outerLookup: Lookup<K, O>;
-    private _innerLookup: Lookup<K, I>;
-    private _keysIterator: Iterator<K>;
-    private _outer: Iterable<O>;
-    private _outerIterator: Iterator<O>;
-    private _outerElement: O;
-    private _inner: Iterable<I>;
-    private _innerIterator: Iterator<I>;
-    private _state: string;
-    constructor(iterable: FullOuterJoinIterable<O, I, K, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._outerLookup = new Lookup(CreateGroupings(this._iterable._outer, this._iterable._outerKeySelector, Identity));
-                        this._innerLookup = new Lookup(CreateGroupings(this._iterable._inner, this._iterable._innerKeySelector, Identity));
-                        const keys = Query
-                            .from(this._outerLookup.select(group => group.key))
-                            .union(this._innerLookup.select(group => group.key));
-                        this._keysIterator = GetIterator(keys);
-                        this._state = "iteratingKeys";
-                    case "iteratingKeys": {
-                        const { value: key, done } = this._keysIterator.next();
-                        if (done) {
-                            this._keysIterator = undefined;
-                            this._state = "doneIteratingKeys";
-                            continue;
-                        }
-
-                        this._outer = this._outerLookup.get(key).defaultIfEmpty(undefined);
-                        this._inner = this._innerLookup.get(key).defaultIfEmpty(undefined);
-                        this._outerIterator = GetIterator(this._outer);
-                        this._state = "iteratingOuter";
-                    }
-                    case "iteratingOuter": {
-                        const { value: outerElement, done } = this._outerIterator.next();
-                        if (done) {
-                            this._outer = undefined;
-                            this._inner = undefined;
-                            this._outerIterator = undefined;
-                            this._state = "iteratingKeys";
-                            continue;
-                        }
-
-                        this._outerElement = outerElement;
-                        this._innerIterator = GetIterator(this._inner);
-                        this._state = "iteratingInner";
-                    }
-                    case "iteratingInner": {
-                        const { value: innerElement, done } = this._innerIterator.next();
-                        if (done) {
-                            this._outerElement = undefined;
-                            this._innerIterator = undefined;
-                            this._state = "iteratingOuter";
-                            continue;
-                        }
-
-                        const result = (void 0, this._iterable._resultSelector)(this._outerElement, innerElement);
-                        return ok = true, NextResult(result);
-                    }
-                    case "doneIteratingKeys":
-                    case "done":
-                        return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<R> {
+        const outer = this._outer;
+        const inner = this._inner;
+        const outerKeySelector = this._outerKeySelector;
+        const innerKeySelector = this._innerKeySelector;
+        const resultSelector = this._resultSelector;
+        const outerLookup = new Lookup(CreateGroupings(outer, outerKeySelector, Identity));
+        const innerLookup = new Lookup(CreateGroupings(inner, innerKeySelector, Identity));
+        const keys = Query
+            .from(outerLookup.select(group => group.key))
+            .union(innerLookup.select(group => group.key));
+        for (const key of keys) {
+            const outer = outerLookup.get(key).defaultIfEmpty(undefined);
+            const inner = innerLookup.get(key).defaultIfEmpty(undefined);
+            for (const outerElement of outer) {
+                for (const innerElement of inner) {
+                    yield resultSelector(outerElement, innerElement);
                 }
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._keysIterator);
-                IteratorClose(this._innerIterator);
-                IteratorClose(this._outerIterator);
-                this._keysIterator = undefined;
-                this._outerIterator = undefined;
-                this._outerElement = undefined;
-                this._outer = undefined;
-                this._outerLookup = undefined;
-                this._innerIterator = undefined;
-                this._inner = undefined;
-                this._innerLookup = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ScanIterable<T, U> implements Iterable<T | U> {
-    _source: Iterable<T>;
-    _aggregator: (aggregate: T | U, element: T, offset: number) => T | U;
-    _isSeeded: boolean;
-    _seed: T | U;
+    private _source: Iterable<T>;
+    private _aggregator: (aggregate: T | U, element: T, offset: number) => T | U;
+    private _isSeeded: boolean;
+    private _seed: T | U;
+
     constructor(source: Iterable<T>, aggregator: (aggregate: T | U, element: T, offset: number) => U, isSeeded: boolean, seed: U) {
         this._source = source;
         this._aggregator = aggregator;
         this._isSeeded = isSeeded;
         this._seed = seed;
     }
-    @iterator __iterator__() { return new ScanIterator<T, U>(this); }
-}
 
-class ScanIterator<T, U> implements IterableIterator<T | U> {
-    private _iterable: ScanIterable<T, U>;
-    private _iterator: Iterator<T>;
-    private _offset: number;
-    private _aggregate: T | U;
-    private _state: string;
-    constructor(iterable: ScanIterable<T, U>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
+    public *[Symbol.iterator](): Iterator<T | U> {
+        const aggregator = this._aggregator;
+        let isSeeded = this._isSeeded;
+        let aggregate = this._seed;
+        let iterator = GetIterator(this._source);
+        let offset = 0;
         try {
-            switch (this._state) {
-                case "new":
-                    this._iterator = GetIterator(this._iterable._source);
-                    this._offset = 0;
-                    if (this._iterable._isSeeded) {
-                        this._aggregate = this._iterable._seed;
-                    }
-                    else {
-                        const { value, done } = this._iterator.next();
-                        if (done) {
-                            this._iterator = undefined;
-                            return ok = true, this.return();
-                        }
-                        this._aggregate = value;
-                        this._offset++;
-                    }
-                    this._state = "yielding";
-                case "yielding":
-                    const { value, done } = this._iterator.next();
-                    if (!done) {
-                        this._aggregate = (void 0, this._iterable._aggregator)(this._aggregate, value, this._offset++);
-                        return ok = true, NextResult(this._aggregate);
-                    }
-                    this._iterator = undefined;
-                case "done":
-                    return ok = true, this.return();
+            while (true) {
+                const result = iterator.next(), done = result.done, value = result.value;
+                if (done) {
+                    iterator = undefined;
+                    break;
+                }
+
+                if (!isSeeded) {
+                    aggregate = value;
+                    isSeeded = true;
+                    offset++;
+                    continue;
+                }
+
+                aggregate = aggregator(aggregate, value, offset);
+                yield aggregate;
+                offset++;
             }
         }
         finally {
-            if (!ok) this.return();
+            IteratorClose(iterator);
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._iterator);
-                this._iterator = undefined;
-                this._offset = undefined;
-                this._aggregate = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T | U>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class ScanRightIterable<T, U> implements Iterable<T | U> {
-    _source: Iterable<T>;
-    _aggregator: (aggregate: T | U, element: T, offset: number) => T | U;
-    _isSeeded: boolean;
-    _seed: T | U;
+    private _source: Iterable<T>;
+    private _aggregator: (aggregate: T | U, element: T, offset: number) => T | U;
+    private _isSeeded: boolean;
+    private _seed: T | U;
+
     constructor(source: Iterable<T>, aggregator: (aggregate: T | U, element: T, offset: number) => U, isSeeded: boolean, seed: U) {
         this._source = source;
         this._aggregator = aggregator;
         this._isSeeded = isSeeded;
         this._seed = seed;
     }
-    @iterator __iterator__() { return new ScanRightIterator<T, U>(this); }
-}
 
-class ScanRightIterator<T, U> implements IterableIterator<T | U> {
-    private _iterable: ScanRightIterable<T, U>;
-    private _sourceArray: T[];
-    private _aggregate: T | U;
-    private _offset: number;
-    private _state: string;
-    constructor(iterable: ScanRightIterable<T, U>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._sourceArray = ToArray(this._iterable._source);
-                    this._offset = this._sourceArray.length - 1;
-                    if (this._offset < 0) {
-                        return ok = true, this.return();
-                    }
-                    if (this._iterable._isSeeded) {
-                        this._aggregate = this._iterable._seed;
-                    }
-                    else {
-                        this._aggregate = this._sourceArray[this._offset];
-                        this._offset--;
-                    }
-                    this._state = "yielding";
-                case "yielding":
-                    if (this._offset < 0) {
-                        return ok = true, this.return();
-                    }
-                    const value = this._sourceArray[this._offset];
-                    this._aggregate = (void 0, this._iterable._aggregator)(this._aggregate, value, this._offset--);
-                    return ok = true, NextResult(this._aggregate);
-                case "done":
-                    return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<T | U> {
+        const source = ToArray(this._source);
+        const aggregator = this._aggregator;
+        let isSeeded = this._isSeeded;
+        let aggregate = this._seed;
+        for (let offset = source.length - 1; offset >= 0; offset--) {
+            const value = source[offset];
+            if (!isSeeded) {
+                aggregate = value;
+                isSeeded = true;
+                continue;
             }
-        }
-        finally {
-            if (!ok) this.return();
-        }
-    }
-    return() {
-        switch (this._state) {
-            default:
-                this._sourceArray = undefined;
-                this._aggregate = undefined;
-                this._offset = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T | U>();
+
+            aggregate = aggregator(aggregate, value, offset);
+            yield aggregate;
         }
     }
-    @iterator __iterator__() { return this; }
 }
 
 class LookupIterable<K, V, R> implements Iterable<R> {
-    _map: Map<K, Queryable<V>>;
-    _selector: (key: K, elements: Query<V>) => R;
+    private _map: Map<K, Queryable<V>>;
+    private _selector: (key: K, elements: Query<V>) => R;
+
     constructor(map: Map<K, Queryable<V>>, selector: (key: K, elements: Query<V>) => R) {
         this._map = map;
         this._selector = selector;
     }
-    @iterator __iterator__() { return new LookupIterator<K, V, R>(this); }
-}
 
-class LookupIterator<K, V, R> implements IterableIterator<R> {
-    private _iterable: LookupIterable<K, V, R>;
-    private _mapIterator: Iterator<[K, Queryable<V>]>;
-    private _state: string;
-    constructor(iterable: LookupIterable<K, V, R>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._mapIterator = GetIterator(this._iterable._map);
-                    this._state = "yielding";
-                case "yielding":
-                    const { value, done } = this._mapIterator.next();
-                    if (!done) {
-                        const [key, values] = value;
-                        const result = (void 0, this._iterable._selector)(key, new Query(values));
-                        return ok = true, NextResult(result);
-                    }
-                    this._mapIterator = undefined;
-                case "done":
-                    return ok = true, this.return();
-            }
-        }
-        finally {
-            if (!ok) this.return();
+    public *[Symbol.iterator](): Iterator<R> {
+        const map = this._map;
+        const selector = this._selector;
+        for (const element of map) {
+            const key = element[0], values = element[1];
+            yield selector(key, new Query<V>(values));
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._mapIterator);
-                this._mapIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<R>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class DefaultIfEmptyIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _defaultValue: T;
+    private _source: Iterable<T>;
+    private _defaultValue: T;
+
     constructor(source: Iterable<T>, defaultValue: T) {
         this._source = source;
         this._defaultValue = defaultValue;
     }
-    @iterator __iterator__() { return new DefaultIfEmptyIterator<T>(this); }
-}
 
-class DefaultIfEmptyIterator<T> implements IterableIterator<T> {
-    private _iterable: DefaultIfEmptyIterable<T>;
-    private _iterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: DefaultIfEmptyIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._iterator = GetIterator(this._iterable._source);
-                this._state = "yieldingFirstValue";
-            case "yieldingFirstValue": {
-                const { value, done } = this._iterator.next();
-                if (!done) {
-                    this._state = "yieldingRemainingValues";
-                    return NextResult(value);
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const defaultValue = this._defaultValue;
+        let iterator = GetIterator(source);
+        let hasElements = false;
+        try {
+            while (true) {
+                const iterResult = iterator.next();
+                if (iterResult.done) {
+                    iterator = undefined;
+                    if (!hasElements) {
+                        yield defaultValue;
+                    }
+
+                    return;
                 }
-                this._iterator = undefined;
-                this._state = "doneYieldingDefaultValue";
-                return NextResult(this._iterable._defaultValue);
-            }
-            case "yieldingRemainingValues": {
-                const { value, done } = this._iterator.next();
-                if (!done) {
-                    return NextResult(value);
+                else {
+                    hasElements = true;
+                    yield iterResult.value;
                 }
-                this._iterator = undefined;
             }
-            case "doneYieldingDefaultValue":
-            case "done":
-                return this.return();
+        }
+        finally {
+            IteratorClose(iterator);
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._iterator);
-                this._iterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class PageByIterable<T> implements Iterable<Page<T>> {
-    _source: Iterable<T>;
-    _pageSize: number;
+    private _source: Iterable<T>;
+    private _pageSize: number;
+
     constructor(source: Iterable<T>, pageSize: number) {
         this._source = source;
         this._pageSize = pageSize;
     }
-    @iterator __iterator__() { return new PageByIterator<T>(this); }
-}
 
-class PageByIterator<T> implements IterableIterator<Page<T>> {
-    private _iterable: PageByIterable<T>;
-    private _page: number;
-    private _iterator: Iterator<T>;
-    private _elements: T[];
-    private _state: string;
-    constructor(iterable: PageByIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        switch (this._state) {
-            case "new":
-                this._iterator = GetIterator(this._iterable._source);
-                this._elements = [];
-                this._page = 0;
-                this._state = "yielding";
-            case "yielding":
-                while (true) {
-                    const { value, done } = this._iterator.next();
-                    if (done) {
-                        this._iterator = undefined;
-                        break;
-                    }
-                    this._elements.push(value);
-                    if (this._elements.length >= this._iterable._pageSize) {
-                        const page = new Page(this._page, this._page * this._iterable._pageSize, this._elements);
-                        this._elements = [];
-                        this._page++;
-                        return NextResult(page);
-                    }
+    public *[Symbol.iterator](): Iterator<Page<T>> {
+        const pageSize = this._pageSize;
+        let iterator = GetIterator(this._source);
+        try {
+            let elements: T[] = [];
+            let page = 0;
+            while (true) {
+                const result = iterator.next(), done = result.done, value = result.value;
+                if (done) {
+                    iterator = undefined;
+                    break;
                 }
-                if (this._elements.length > 0) {
-                    const page = new Page(this._page, this._page * this._iterable._pageSize, this._elements);
-                    this._state = "doneYieldingLastPage";
-                    this._elements = undefined;
-                    return NextResult(page);
+
+                elements.push(value);
+                if (elements.length >= pageSize) {
+                    yield new Page(page, page * pageSize, elements);
+                    elements = [];
+                    page++;
                 }
-            case "doneYieldingLastPage":
-            case "done":
-                return this.return();
+            }
+
+            if (elements.length > 0) {
+                yield new Page(page, page * pageSize, elements);
+            }
+        }
+        finally {
+            IteratorClose(iterator);
         }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._iterator);
-                this._iterable = undefined;
-                this._page = undefined;
-                this._iterator = undefined;
-                this._elements = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<Page<T>>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class HierarchyProviderView<T> {
@@ -4985,34 +3501,25 @@ class HierarchyProviderView<T> {
     public root(element: T) {
         if (element !== undefined) {
             let root: T;
-            ForOf(this.ancestors(element, /*self*/ true), ancestor => {
+            for (const ancestor of this.ancestors(element, /*self*/ true)) {
                 root = ancestor;
-            });
+            }
+
             return root;
         }
+
         return undefined;
     }
 
-    public ancestors(element: T, self: boolean) {
+    public * ancestors(element: T, self: boolean) {
         Assert.mustBeBoolean(self, "self");
-        return IterableIterator({
-            next: () => {
-                if (element === undefined) return DoneResult<T>();
-                if (self) {
-                    self = false;
-                }
-                else {
-                    element = this.parent(element);
-                }
-
-                if (element === undefined) return DoneResult<T>();
-                return NextResult(element);
-            },
-            return: () => {
-                element = undefined;
-                return DoneResult<T>();
+        if (element !== undefined) {
+            let ancestor = self ? element : this.parent(element);
+            while (ancestor !== undefined) {
+                yield ancestor;
+                ancestor = this.parent(ancestor);
             }
-        });
+        }
     }
 
     public parent(element: T) {
@@ -5023,166 +3530,70 @@ class HierarchyProviderView<T> {
         return undefined;
     }
 
-    public children(element: T) {
-        let childrenIterator: Iterator<T>;
-        return IterableIterator({
-            next: () => {
-                if (element === undefined) return DoneResult<T>();
-                if (childrenIterator === undefined) {
-                    const children = this.hierarchy.children(element);
-                    if (children === undefined) {
-                        element = undefined;
-                        return DoneResult<T>();
-                    }
-
-                    childrenIterator = GetIterator(ToIterable(children));
-                }
-
-                while (true) {
-                    const { value: child, done } = childrenIterator.next();
-                    if (done) {
-                        element = undefined;
-                        childrenIterator = undefined;
-                        return DoneResult<T>();
-                    }
-
+    public * children(element: T) {
+        if (element !== undefined) {
+            const children = this.hierarchy.children(element);
+            if (children !== undefined) {
+                for (const child of ToIterable(children)) {
                     if (child !== undefined) {
-                        return NextResult(child);
+                        yield child;
                     }
                 }
-            },
-            return: () => {
-                IteratorClose(childrenIterator);
-                childrenIterator = undefined;
-                element = undefined;
-                return DoneResult<T>();
             }
-        });
+        }
     }
 
     public nthChild(element: T, offset: number) {
         Assert.mustBeInteger(offset, "offset");
         if (element !== undefined) {
             const children = this.children(element);
-            return from(children).elementAt(offset);
+            return Query.from(children).elementAt(offset);
         }
 
         return undefined;
     }
 
-    public siblings(element: T, self: boolean) {
+    public * siblings(element: T, self: boolean) {
         Assert.mustBeBoolean(self, "self");
-        let siblingIterator: Iterator<T>;
-        return IterableIterator({
-            next: () => {
-                if (element === undefined) return DoneResult<T>();
-                if (siblingIterator === undefined) {
-                    const parent = this.parent(element);
-                    if (parent === undefined) {
-                        if (self) {
-                            const sibling = element;
-                            element = undefined;
-                            return NextResult(sibling);
-                        }
-
-                        element = undefined;
-                        return DoneResult<T>();
-                    }
-
-                    siblingIterator = this.children(parent);
+        const parent = this.parent(element);
+        if (parent !== undefined) {
+            for (const child of this.children(parent)) {
+                if (self || !SameValue(child, element)) {
+                    yield child;
                 }
-
-                while (true) {
-                    const { value: sibling, done } = siblingIterator.next();
-                    if (done) {
-                        siblingIterator = undefined;
-                        element = undefined;
-                        return DoneResult<T>();
-                    }
-
-                    if (self || !SameValue(sibling, element)) {
-                        return NextResult(sibling);
-                    }
-                }
-            },
-            return: () => {
-                IteratorClose(siblingIterator);
-                siblingIterator = undefined;
-                element = undefined;
-                return DoneResult<T>();
             }
-        });
+        }
     }
 
-    public siblingsBeforeSelf(element: T) {
-        let siblingIterator: Iterator<T>;
-        return IterableIterator({
-            next: () => {
-                if (element === undefined) return DoneResult<T>();
-                if (siblingIterator === undefined) {
-                    siblingIterator = this.siblings(element, /*self*/ true);
-                }
-                const { value: sibling, done } = siblingIterator.next();
-                if (done || SameValue(sibling, element)) {
-                    siblingIterator = undefined;
-                    element = undefined;
-                    return DoneResult<T>();
-                }
-
-                return NextResult(sibling);
-            },
-            return: () => {
-                IteratorClose(siblingIterator);
-                siblingIterator = undefined;
-                element = undefined;
-                return DoneResult<T>();
+    public * siblingsBeforeSelf(element: T) {
+        for (const sibling of this.siblings(element, /*self*/ true)) {
+            if (SameValue(sibling, element)) {
+                return;
             }
-        });
+
+            yield sibling;
+        }
     }
 
-    public siblingsAfterSelf(element: T) {
-        let siblingIterator: Iterator<T>;
+    public * siblingsAfterSelf(element: T) {
         let hasSeenSelf: boolean;
-        return IterableIterator({
-            next: () => {
-                if (element === undefined) return DoneResult<T>();
-                if (siblingIterator === undefined) {
-                    siblingIterator = this.siblings(element, /*self*/ true);
-                }
-
-                while (true) {
-                    const { value: sibling, done } = siblingIterator.next();
-                    if (done) {
-                        siblingIterator = undefined;
-                        element = undefined;
-                        return DoneResult<T>();
-                    }
-
-                    if (hasSeenSelf) {
-                        return NextResult(sibling);
-                    }
-                    else {
-                        hasSeenSelf = SameValue(sibling, element);
-                    }
-                }
-            },
-            return: () => {
-                IteratorClose(siblingIterator);
-                siblingIterator = undefined;
-                element = undefined;
-                return DoneResult<T>();
+        for (const sibling of this.siblings(element, /*self*/ true)) {
+            if (hasSeenSelf) {
+                yield sibling;
             }
-        });
+            else {
+                hasSeenSelf = SameValue(sibling, element);
+            }
+        }
     }
 
     // NOTE: Currently disabled as View is not public and these are inefficient.
     //
     // public firstChild(element: T) {
     //     if (element !== undefined) {
-    //         const state = ForOf(this.children(element), child => {
-    //             return Return(child);
-    //         });
-    //         if (IsReturn(state)) return state.return;
+    //         for (const child of this.children(element)) {
+    //             return child;
+    //         }
     //     }
 
     //     return undefined;
@@ -5191,9 +3602,10 @@ class HierarchyProviderView<T> {
     // public lastChild(element: T) {
     //     if (element !== undefined) {
     //         let lastChild: T;
-    //         ForOf(this.children(element), child => {
+    //         for (const child of this.children(element)) {
     //             lastChild = child;
-    //         });
+    //         }
+
     //         return lastChild;
     //     }
 
@@ -5203,14 +3615,13 @@ class HierarchyProviderView<T> {
     // public previousSibling(element: T) {
     //     if (element !== undefined) {
     //         let previousSibling: T;
-    //         const state = ForOf(this.siblings(element, /*self*/ true), sibling => {
+    //         for (const sibling of this.siblings(element, /*self*/ true)) {
     //             if (SameValue(sibling, element)) {
-    //                 return Return(previousSibling);
+    //                 return previousSibling;
     //             }
 
     //             previousSibling = sibling;
-    //         });
-    //         if (IsReturn(state)) return state.return;
+    //         }
     //     }
 
     //     return undefined;
@@ -5219,567 +3630,217 @@ class HierarchyProviderView<T> {
     // public nextSibling(element: T) {
     //     if (element !== undefined) {
     //         let hasSeenSelf: boolean;
-    //         const state = ForOf(this.siblings(element, /*self*/ true), sibling => {
+    //         for (const sibling of this.siblings(element, /*self*/ true)) {
     //             if (hasSeenSelf) {
-    //                 return Return(sibling);
+    //                 return sibling;
     //             }
 
     //             if (SameValue(sibling, element)) {
     //                 hasSeenSelf = true;
     //             }
-    //         });
-    //         if (IsReturn(state)) return state.return;
+    //         }
     //     }
 
     //     return undefined;
     // }
 
-    public descendants(element: T, self: boolean) {
+    public * descendants(element: T, self: boolean): IterableIterator<T> {
         Assert.mustBeBoolean(self, "self");
-        let childrenIterator: Iterator<T>;
-        let descendantsIterator: Iterator<T>;
-        return IterableIterator({
-            next: () => {
-                if (element === undefined) {
-                    return DoneResult<T>();
-                }
-
-                if (self) {
-                    self = false;
-                    return NextResult(element);
-                }
-
-                if (childrenIterator === undefined) {
-                    childrenIterator = this.children(element);
-                }
-
-                while (true) {
-                    if (descendantsIterator === undefined) {
-                        const { value: child, done } = childrenIterator.next();
-                        if (done) {
-                            childrenIterator = undefined;
-                            element = undefined;
-                            return DoneResult<T>();
-                        }
-
-                        descendantsIterator = GetIterator(this.descendants(child, /*self*/ true));
-                    }
-
-                    const { value, done } = descendantsIterator.next();
-                    if (done) {
-                        descendantsIterator = undefined;
-                    }
-                    else {
-                        return NextResult(value);
-                    }
-                }
-            },
-            return: () => {
-                IteratorClose(childrenIterator);
-                IteratorClose(descendantsIterator);
-                childrenIterator = undefined;
-                descendantsIterator = undefined;
-                element = undefined;
-                return DoneResult<T>();
+        if (element !== undefined) {
+            if (self) {
+                yield element;
             }
-        });
+
+            for (const child of this.children(element)) {
+                yield* this.descendants(child, /*self*/ true);
+            }
+        }
     }
 }
 
 class NthChildIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _hierarchy: HierarchyProviderView<T>;
-    _offset: number;
+    private _source: Iterable<T>;
+    private _hierarchy: HierarchyProviderView<T>;
+    private _offset: number;
+
     constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>, offset: number) {
         this._source = source;
         this._hierarchy = hierarchy;
         this._offset = offset;
     }
-    @iterator __iterator__() { return new NthChildIterator<T>(this); }
-}
 
-class NthChildIterator<T> implements IterableIterator<T> {
-    private _iterable: NthChildIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: NthChildIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            switch (this._state) {
-                case "new":
-                    this._sourceIterator = GetIterator(this._iterable._source);
-                    this._state = "yielding";
-                case "yielding":
-                    while (true) {
-                        const { value: element, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            break;
-                        }
-                        const child = this._iterable._hierarchy.nthChild(element, this._iterable._offset);
-                        if (child !== undefined) {
-                            return ok = true, NextResult(child);
-                        }
-                    }
-                case "done":
-                    return this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const hierarchy = this._hierarchy;
+        const offset = this._offset;
+        for (const element of source) {
+            const child = hierarchy.nthChild(element, offset);
+            if (child !== undefined) {
+                yield child;
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                this._sourceIterator = undefined;
-                this._iterable = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class HierarchyAxisIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _hierarchy: HierarchyProviderView<T>;
-    _predicate: (element: T) => boolean;
-    _axis: (provider: HierarchyProviderView<T>, element: T) => Iterable<T>;
+    private _source: Iterable<T>;
+    private _hierarchy: HierarchyProviderView<T>;
+    private _predicate: (element: T) => boolean;
+    private _axis: (provider: HierarchyProviderView<T>, element: T) => Iterable<T>;
     constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>, predicate: (element: T) => boolean, axis: (provider: HierarchyProviderView<T>, element: T) => Iterable<T>) {
         this._source = source;
         this._hierarchy = hierarchy;
         this._predicate = predicate;
         this._axis = axis;
     }
-    @iterator __iterator__() { return new HierarchyAxisIterator<T>(this); }
-}
-
-class HierarchyAxisIterator<T> implements IterableIterator<T> {
-    private _iterable: HierarchyAxisIterable<T>;
-    private _sourceIterator: Iterator<T>;
-    private _axisIterator: Iterator<T>;
-    private _state: string;
-    constructor(iterable: HierarchyAxisIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        let ok = false;
-        try {
-            while (true) {
-                switch (this._state) {
-                    case "new":
-                        this._sourceIterator = GetIterator(this._iterable._source);
-                        this._state = "iteratingSource";
-                    case "iteratingSource": {
-                        const { value: element, done } = this._sourceIterator.next();
-                        if (done) {
-                            this._sourceIterator = undefined;
-                            this._state = "doneIteratingSource";
-                            continue;
-                        }
-                        if (element === undefined) {
-                            continue;
-                        }
-                        const axisElements = (void 0, this._iterable._axis)(this._iterable._hierarchy, element);
-                        this._axisIterator = GetIterator(axisElements);
-                        this._state = "yieldingAxis";
-                    }
-                    case "yieldingAxis": {
-                        const { value, done } = this._axisIterator.next();
-                        if (done) {
-                            this._axisIterator = undefined;
-                            this._state = "iteratingSource";
-                            continue;
-                        }
-                        if (!this._iterable._predicate || (void 0, this._iterable._predicate)(value)) {
-                            return ok = true, NextResult(value);
-                        }
-                        continue;
-                    }
-                    case "doneIteratingSource":
-                    case "done":
-                        return ok = true, this.return();
+    public *[Symbol.iterator](): Iterator<T> {
+        const source = this._source;
+        const hierarchy = this._hierarchy;
+        const predicate = this._predicate;
+        const axis = this._axis;
+        for (const element of source) {
+            for (const related of axis(hierarchy, element)) {
+                if (!predicate || predicate(related)) {
+                    yield related;
                 }
             }
         }
-        finally {
-            if (!ok) this.return();
-        }
     }
-    return() {
-        switch (this._state) {
-            default:
-                IteratorClose(this._sourceIterator);
-                IteratorClose(this._axisIterator);
-                this._sourceIterator = undefined;
-                this._axisIterator = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class TopMostIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _hierarchy: HierarchyProviderView<T>;
+    private _source: Iterable<T>;
+    private _hierarchy: HierarchyProviderView<T>;
 
     constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>) {
         this._source = source;
         this._hierarchy = hierarchy;
     }
 
-    @iterator __iterator__() { return new TopMostIterableIterator<T>(this); }
-}
+    public *[Symbol.iterator](): Iterator<T> {
+        const topMostNodes = ToArray(this._source);
+        const ancestors = new Map<T, Set<T>>();
+        for (let i = topMostNodes.length - 1; i >= 1; i--) {
+            const node = topMostNodes[i];
+            for (let j = i - 1; j >= 0; j--) {
+                const other = topMostNodes[j];
+                let ancestorsOfNode = ancestors.get(node);
+                if (!ancestorsOfNode) {
+                    ancestorsOfNode = new Set(this._hierarchy.ancestors(node, /*self*/ false));
+                    ancestors.set(node, ancestorsOfNode);
+                }
 
-class TopMostIterableIterator<T> implements IterableIterator<T> {
-    private _iterable: TopMostIterable<T>;
-    private _topMostNodes: T[];
-    private _index: number;
-    private _state: string;
-    constructor(iterable: TopMostIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        while (true) {
-            switch (this._state) {
-                case "new":
-                    const topMostNodes = ToArray(this._iterable._source);
-                    const ancestors = new Map<T, Set<T>>();
-                    for (let i = topMostNodes.length - 1; i >= 1; i--) {
-                        const node = topMostNodes[i];
-                        for (let j = i - 1; j >= 0; j--) {
-                            const other = topMostNodes[j];
-                            let ancestorsOfNode = ancestors.get(node);
-                            if (!ancestorsOfNode) {
-                                ancestorsOfNode = new Set(this._iterable._hierarchy.ancestors(node, /*self*/ false));
-                                ancestors.set(node, ancestorsOfNode);
-                            }
+                if (ancestorsOfNode.has(other)) {
+                    topMostNodes.splice(i, 1);
+                    break;
+                }
 
-                            if (ancestorsOfNode.has(other)) {
-                                topMostNodes.splice(i, 1);
-                                break;
-                            }
+                let ancestorsOfOther = ancestors.get(other);
+                if (!ancestorsOfOther) {
+                    ancestorsOfOther = new Set(this._hierarchy.ancestors(other, /*self*/ false));
+                    ancestors.set(other, ancestorsOfOther);
+                }
 
-                            let ancestorsOfOther = ancestors.get(other);
-                            if (!ancestorsOfOther) {
-                                ancestorsOfOther = new Set(this._iterable._hierarchy.ancestors(other, /*self*/ false));
-                                ancestors.set(other, ancestorsOfOther);
-                            }
-
-                            if (ancestorsOfOther.has(node)) {
-                                topMostNodes.splice(j, 1);
-                                i--;
-                            }
-                        }
-                    }
-
-                    this._topMostNodes = topMostNodes;
-                    this._index = 0;
-                    this._state = "iterating";
-                case "iterating":
-                    if (this._index < this._topMostNodes.length) {
-                        return NextResult(this._topMostNodes[this._index++])
-                    }
-                case "done":
-                    return this.return();
+                if (ancestorsOfOther.has(node)) {
+                    topMostNodes.splice(j, 1);
+                    i--;
+                }
             }
         }
+
+        yield* topMostNodes;
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._topMostNodes = undefined;
-                this._index = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
 class BottomMostIterable<T> implements Iterable<T> {
-    _source: Iterable<T>;
-    _hierarchy: HierarchyProviderView<T>;
+    private _source: Iterable<T>;
+    private _hierarchy: HierarchyProviderView<T>;
 
     constructor(source: Iterable<T>, hierarchy: HierarchyProviderView<T>) {
         this._source = source;
         this._hierarchy = hierarchy;
     }
 
-    @iterator __iterator__() { return new BottomMostIterableIterator<T>(this); }
-}
+    public *[Symbol.iterator](): Iterator<T> {
+        const bottomMostNodes = ToArray(this._source);
+        const ancestors = new Map<T, Set<T>>();
+        for (let i = bottomMostNodes.length - 1; i >= 1; i--) {
+            const node = bottomMostNodes[i];
+            for (let j = i - 1; j >= 0; j--) {
+                const other = bottomMostNodes[j];
+                let ancestorsOfOther = ancestors.get(other);
+                if (!ancestorsOfOther) {
+                    ancestorsOfOther = new Set(this._hierarchy.ancestors(other, /*self*/ false));
+                    ancestors.set(other, ancestorsOfOther);
+                }
 
-class BottomMostIterableIterator<T> implements IterableIterator<T> {
-    private _iterable: BottomMostIterable<T>;
-    private _bottomMostNodes: T[];
-    private _index: number;
-    private _state: string;
-    constructor(iterable: BottomMostIterable<T>) {
-        this._iterable = iterable;
-        this._state = "new";
-    }
-    next() {
-        while (true) {
-            switch (this._state) {
-                case "new":
-                    const bottomMostNodes = ToArray(this._iterable._source);
-                    const ancestors = new Map<T, Set<T>>();
-                    for (let i = bottomMostNodes.length - 1; i >= 1; i--) {
-                        const node = bottomMostNodes[i];
-                        for (let j = i - 1; j >= 0; j--) {
-                            const other = bottomMostNodes[j];
-                            let ancestorsOfOther = ancestors.get(other);
-                            if (!ancestorsOfOther) {
-                                ancestorsOfOther = new Set(this._iterable._hierarchy.ancestors(other, /*self*/ false));
-                                ancestors.set(other, ancestorsOfOther);
-                            }
+                if (ancestorsOfOther.has(node)) {
+                    bottomMostNodes.splice(i, 1);
+                    break;
+                }
 
-                            if (ancestorsOfOther.has(node)) {
-                                bottomMostNodes.splice(i, 1);
-                                break;
-                            }
+                let ancestorsOfNode = ancestors.get(node);
+                if (!ancestorsOfNode) {
+                    ancestorsOfNode = new Set(this._hierarchy.ancestors(node, /*self*/ false));
+                    ancestors.set(node, ancestorsOfNode);
+                }
 
-                            let ancestorsOfNode = ancestors.get(node);
-                            if (!ancestorsOfNode) {
-                                ancestorsOfNode = new Set(this._iterable._hierarchy.ancestors(node, /*self*/ false));
-                                ancestors.set(node, ancestorsOfNode);
-                            }
-
-                            if (ancestorsOfNode.has(other)) {
-                                bottomMostNodes.splice(j, 1);
-                                i--;
-                            }
-                        }
-                    }
-
-                    this._bottomMostNodes = bottomMostNodes;
-                    this._index = 0;
-                    this._state = "iterating";
-                case "iterating":
-                    if (this._index < this._bottomMostNodes.length) {
-                        return NextResult(this._bottomMostNodes[this._index++])
-                    }
-                case "done":
-                    return this.return();
+                if (ancestorsOfNode.has(other)) {
+                    bottomMostNodes.splice(j, 1);
+                    i--;
+                }
             }
         }
+
+        yield* bottomMostNodes;
     }
-    return() {
-        switch (this._state) {
-            default:
-                this._bottomMostNodes = undefined;
-                this._index = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-    @iterator __iterator__() { return this; }
 }
 
-namespace HierarchyAxis {
-    export function root<T>(provider: HierarchyProviderView<T>, element: T) {
-        return IterableIterator({
-            next() {
-                if (provider === undefined) return DoneResult<T>();
-                const root = provider.root(element);
-                provider = undefined;
-                element = undefined;
-                return root === undefined ? DoneResult<T>() : NextResult(root);
-            },
-            return() {
-                provider = undefined;
-                element = undefined;
-                return DoneResult<T>();
-            }
-        });
+namespace Axis {
+    export function* root<T>(provider: HierarchyProviderView<T>, element: T) {
+        const root = provider.root(element);
+        if (root !== undefined) {
+            yield provider.root(element);
+        }
     }
-
     export function ancestors<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.ancestors(element, false);
     }
-
     export function ancestorsAndSelf<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.ancestors(element, true);
     }
-
-    export function parents<T>(provider: HierarchyProviderView<T>, element: T) {
-        return IterableIterator({
-            next() {
-                if (provider === undefined) return DoneResult<T>();
-                const parent = provider.parent(element);
-                provider = undefined;
-                element = undefined;
-                return parent === undefined ? DoneResult<T>() : NextResult(parent);
-            },
-            return() {
-                provider = undefined;
-                element = undefined;
-                return DoneResult<T>();
-            }
-        });
+    export function* parents<T>(provider: HierarchyProviderView<T>, element: T) {
+        const parent = provider.parent(element);
+        if (parent !== undefined) {
+            yield provider.parent(element);
+        }
     }
-
-    export function self<T>(provider: HierarchyProviderView<T>, element: T) {
-        return IterableIterator({
-            next() {
-                if (element === undefined) return DoneResult<T>();
-                const value = element;
-                provider = undefined;
-                element = undefined;
-                return NextResult(value);
-            },
-            return() {
-                provider = undefined;
-                element = undefined;
-                return DoneResult<T>();
-            }
-        });
+    export function* self<T>(provider: HierarchyProviderView<T>, element: T) {
+        if (element !== undefined) {
+            yield element;
+        }
     }
-
     export function siblings<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.siblings(element, false);
     }
-
     export function siblingsAndSelf<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.siblings(element, true);
     }
-
     export function siblingsBeforeSelf<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.siblingsBeforeSelf(element);
     }
-
     export function siblingsAfterSelf<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.siblingsAfterSelf(element);
     }
-
     export function children<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.children(element);
     }
-
     export function descendants<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.descendants(element, false);
     }
-
     export function descendantsAndSelf<T>(provider: HierarchyProviderView<T>, element: T) {
         return provider.descendants(element, true);
     }
-}
-
-type Return<R> = { return: R };
-type LabeledBreak = { break: string };
-type LabeledContinue = { continue: string };
-type ForOfCompletion<R> = "break" | "continue" | Return<R> | LabeledBreak | LabeledContinue | void;
-
-function ForOf<T, R, Y>(source: Iterable<T>, cb: (value: T) => ForOfCompletion<R>): Return<R> | LabeledBreak | LabeledContinue {
-    let iterator = GetIterator(source);
-    try {
-        while (true) {
-            const { value, done } = iterator.next();
-            if (done) {
-                iterator = undefined;
-                return undefined;
-            }
-
-            const state = cb(value);
-            if (IsBreak(state)) break;
-            if (IsContinue(state)) continue;
-            if (IsReturn(state) || IsLabeledBreak(state) || IsLabeledContinue(state)) return state;
-        }
-    }
-    finally {
-        IteratorClose(iterator);
-        iterator = undefined;
-    }
-}
-
-function IsBreak<R, Y>(result: ForOfCompletion<R>): result is "break" {
-    return result === "break";
-}
-
-function IsContinue<R, Y>(result: ForOfCompletion<R>): result is "continue" {
-    return result === "continue";
-}
-
-function IsLabeledBreak<R, Y>(result: ForOfCompletion<R>): result is LabeledBreak {
-    return typeof result === "object" && (<Object>result).hasOwnProperty("break");
-}
-
-function IsLabeledContinue<R, Y>(result: ForOfCompletion<R>): result is LabeledContinue {
-    return typeof result === "object" && (<Object>result).hasOwnProperty("continue");
-}
-
-function IsReturn<R, Y>(result: ForOfCompletion<R>): result is Return<R> {
-    return typeof result === "object" && (<Object>result).hasOwnProperty("return");
-}
-
-function Break(): "break" {
-    return "break";
-}
-
-function Continue(): "continue" {
-    return "continue";
-}
-
-function LabeledBreak(label: string): LabeledBreak {
-    return { break: label };
-}
-
-function LabeledContinue(label: string): LabeledContinue {
-    return { continue: label };
-}
-
-function Return<R>(value?: R): Return<R> {
-    return { return: value };
-}
-
-function Identity<T>(x: T): T {
-    return x;
-}
-
-function True(x: any) {
-    return true;
-}
-
-function CompareValues<T>(x: T, y: T): number {
-    if (x < y) {
-        return -1;
-    }
-    else if (x > y) {
-        return +1;
-    }
-    return 0;
-}
-
-function MakeTuple<T, U>(x: T, y: U): [T, U] {
-    return [x, y];
-}
-
-function Iterable<T>(factory: () => Iterator<T>): Iterable<T> {
-    const iterable = {
-        __iterator__: () => IterableIterator(factory())
-    };
-    iterator(iterable, "__iterator__");
-    return iterable;
-}
-
-function IterableIterator<T>(iterable: Iterator<T>): IterableIterator<T>;
-function IterableIterator<T>(iterable: IterableIterator<T>): IterableIterator<T> {
-    iterable.__iterator__ = () => iterable;
-    iterator(iterable, "__iterator__");
-    return iterable;
 }
 
 function IsOrderedIterable<T>(source: Iterable<T>): source is OrderedIterableBase<T> {
@@ -5788,56 +3849,21 @@ function IsOrderedIterable<T>(source: Iterable<T>): source is OrderedIterableBas
 
 function CreateGroupings<T, K, V>(source: Iterable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V[]> {
     const map = new Map<K, V[]>();
-    let iterator = GetIterator(source);
-    try {
-        while (true) {
-            const { value, done } = iterator.next();
-            if (done) {
-                iterator = undefined;
-                break;
-            }
-
-            const key = keySelector(value);
-            const element = elementSelector(value);
-            let grouping = map.get(key);
-            if (grouping === undefined) {
-                grouping = [];
-                map.set(key, grouping);
-            }
-
-            grouping.push(element);
+    for (let item of source) {
+        let key = keySelector(item);
+        let element = elementSelector(item);
+        let grouping = map.get(key);
+        if (grouping == null) {
+            grouping = [];
+            map.set(key, grouping);
         }
+        grouping.push(element);
     }
-    finally {
-        IteratorClose(iterator);
-        iterator = undefined;
-    }
-
     return map;
-}
-
-function ToIterable<T>(queryable: Queryable<T>): Iterable<T> {
-    return IsIterable(queryable) ? queryable
-        : IsIterableShim(queryable) ? new IterableShimWrapper(queryable)
-        : new ArrayLikeIterable(queryable);
-}
-
-function ToArray<T>(source: Queryable<T>): T[];
-function ToArray<T, U>(source: Queryable<T>, elementSelector: (value: T) => U): U[];
-function ToArray<T, U>(source: Queryable<T>, elementSelector: (value: T) => T | U = Identity): (T | U)[] {
-    const array: (T | U)[] = [];
-    ForOf(ToIterable(source), element => {
-        array.push(elementSelector(element));
-    });
-    return array;
 }
 
 function ToGrouping<K, V>(key: K, elements: Iterable<V>): Grouping<K, V> {
     return new Grouping<K, V>(key, elements);
-}
-
-function IsIteratorResult<T>(result: IteratorResult<T> | void): result is IteratorResult<T> {
-    return result !== undefined;
 }
 
 function GetView<T>(hierarchy: HierarchyProvider<T>) {
@@ -5847,19 +3873,10 @@ function GetView<T>(hierarchy: HierarchyProvider<T>) {
 }
 
 namespace Assert {
-    interface ErrorConstructorWithStackTraceApi extends ErrorConstructor {
-        captureStackTrace(target: any, stackCrawlMark?: Function): void;
-    }
-
-    declare const Error: ErrorConstructorWithStackTraceApi;
-
     function assertType(condition: boolean, paramName: string, message: string, stackCrawlMark: Function) {
         if (!condition) {
             const error = new TypeError();
-            if (stackCrawlMark && Error.captureStackTrace) {
-                Error.captureStackTrace(error, stackCrawlMark || assertType);
-            }
-
+            Debug.captureStackTrace(error, stackCrawlMark || assertType);
             throw error;
         }
     }
@@ -5867,10 +3884,7 @@ namespace Assert {
     function assertRange(condition: boolean, paramName: string, message: string, stackCrawlMark: Function) {
         if (!condition) {
             const error = new RangeError();
-            if (stackCrawlMark && Error.captureStackTrace) {
-                Error.captureStackTrace(error, stackCrawlMark || assertType);
-            }
-
+            Debug.captureStackTrace(error, stackCrawlMark || assertType);
             throw error;
         }
     }

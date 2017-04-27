@@ -1,11 +1,11 @@
 import { createUUID, createBuffer, FixedBuffer } from "./uuid";
-declare const global: any;
-declare const self: any;
+import { injectGlobal, Shim } from "./shim";
 
-let isGlobal = false;
-let _Symbol: SymbolConstructor = typeof Symbol === "function" ? Symbol : createSymbolPolyfill();
+let symbolShim: Shim | undefined;
+let symbolPolyfill: SymbolConstructor;
+let _Symbol: SymbolConstructor = typeof Symbol === "function" ? Symbol : createSymbolPolyfill(true);
 
-function createSymbolPolyfill() {
+function createSymbolPolyfill(injectGlobals: boolean) {
     const SYMBOL_GLOBAL_NS = createBuffer([0x96, 0x89, 0x6a, 0xf3, 0xaf, 0xd9, 0x4e, 0xcc, 0xad, 0x7e, 0x53, 0x89, 0xd6, 0xe8, 0x21, 0x73]);
     const SYMBOL_INTERNAL_NS = createBuffer([0x96, 0x89, 0x6a, 0xf3, 0xaf, 0xd9, 0x4e, 0xcc, 0xad, 0x7e, 0x53, 0x89, 0xd6, 0xe8, 0x21, 0x75]);
     const SYMBOL_BUILTIN: (keyof SymbolConstructor)[] = ["hasInstance", "isConcatSpreadable", "iterator", "match", "replace", "search", "species", "split", "toPrimitive", "toStringTag", "unscopeables"];
@@ -24,22 +24,6 @@ function createSymbolPolyfill() {
         return match && symbolFor(match[1], SYMBOL_GLOBAL_NS) === symbol ? match[1] : undefined;
     };
 
-    for (const name of SYMBOL_BUILTIN) {
-        (<any>Symbol)[name] = symbolFor("Symbol." + name, SYMBOL_INTERNAL_NS);
-    }
-
-    if (typeof global !== "undefined" && global.Symbol === undefined) {
-        global.Symbol = Symbol;
-        isGlobal = true;
-    }
-
-    if (typeof self !== "undefined" && self.Symbol === undefined) {
-        self.Symbol = Symbol;
-        isGlobal = true;
-    }
-
-    return Symbol;
-
     function symbolFor(description?: string | number, ns?: FixedBuffer): any {
         return `Symbol(${ ns || description !== undefined ? String(description) : "" })@@${createUUID(description, ns)}`;
     }
@@ -47,25 +31,29 @@ function createSymbolPolyfill() {
     function setUint(buffer: number[], offset: number, size: number, value: number): void {
         for (let i = 0; i < size; ++i) buffer[offset + i] = (value >>> ((size - i - 1) * 8)) & 0xff;
     }
+
+    symbolShim = injectGlobal && injectGlobal("Symbol", Symbol);
+    return symbolPolyfill = Symbol as SymbolConstructor;
 }
 
 function noConflict() {
-    if (isGlobal) {
-        if (typeof global !== "undefined" && global.Symbol === Symbol) {
-            delete global.Symbol;
-        }
-        if (typeof self !== "undefined" && self.Symbol === Symbol) {
-            delete self.Symbol;
-        }
-        isGlobal = false;
+    if (symbolShim) {
+        symbolShim.restore();
+        symbolShim = undefined;
     }
+
+    _Symbol = symbolPolyfill || createSymbolPolyfill(false);
 }
 
 export { _Symbol as Symbol, noConflict }
 
 declare global {
+    interface ObjectConstructor {
+        defineProperty(o: any, p: symbol, attributes: PropertyDescriptor & ThisType<any>): any;
+    }
+
     interface SymbolConstructor {
-        readonly prototype: symbol;
+        readonly prototype: Symbol;
         (description?: string | number): symbol;
         for(key: string): symbol;
         keyFor(sym: symbol): string | undefined;
