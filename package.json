@@ -21,7 +21,7 @@
     "merge2": "^1.0.1",
     "mocha": "^2.4.5",
     "source-map-support": "^0.4.0",
-    "typescript": "^2.3.0-dev.20170426"
+    "typescript": "^2.3.1"
   },
   "scripts": {
     "build": "gulp build",

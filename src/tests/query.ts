@@ -726,8 +726,7 @@ for (const context of contexts) {
                     expect(received).to.deep.equal([1, 2, 3, 4]);
                 });
 
-                // node's for..of does not call return :/
-                it.skip("close iterator on error", () => {
+                it("close iterator on error", () => {
                     let returnWasCalled = false;
                     const iterator: IterableIterator<number> = {
                         [Symbol.iterator]() { return this; },

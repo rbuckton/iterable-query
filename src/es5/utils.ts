@@ -1,16 +1,5 @@
-import { Symbol as Sym } from  "./symbol";
+import "./symbol";
 import { Queryable } from "./query";
-
-// export const IteratorKey = "__iterator__";
-// export const ES6ShimIteratorKey = "_es6-shim iterator_";
-// export const IteratorSymbol = typeof Symbol === "function" && Symbol.iterator;
-
-// export function iterator(target: any, name: string) {
-//     const iterator = target[name];
-//     if (IteratorSymbol) target[IteratorSymbol] = iterator;
-//     if (name !== IteratorKey) target[IteratorKey] = iterator;
-//     if (name !== ES6ShimIteratorKey) target[ES6ShimIteratorKey] = iterator;
-// }
 
 export function IsObject(x: any): x is object {
     return x !== null && (typeof x === "object" || typeof x === "function");
@@ -19,7 +8,7 @@ export function IsObject(x: any): x is object {
 export function IsIterable<T>(x: Queryable<T>): x is Iterable<T>;
 export function IsIterable(x: any): x is Iterable<any>;
 export function IsIterable(x: any): x is Iterable<any> {
-    return IsObject(x) && Sym.iterator in x;
+    return IsObject(x) && Symbol.iterator in x;
 }
 
 export function ToIterable<T>(source: Queryable<T>) {
@@ -27,21 +16,22 @@ export function ToIterable<T>(source: Queryable<T>) {
 }
 
 export function GetIterator<T>(iterable: Iterable<T>): Iterator<T> {
-    return (<any>iterable)[Sym.iterator]();
+    return (<any>iterable)[Symbol.iterator]();
 }
 
-export function ToArray<T, U = T>(source: Queryable<T>, selector: (x: T) => U = Identity) {
+export function ToArray<T, U = T>(source: Iterable<T> | ArrayLike<T>, selector: (v: T, k: number) => U = Identity, thisArg?: any) {
     if (!IsIterable(source)) {
         const result: U[] = new Array<U>(source.length);
         for (let i = 0; i < source.length; i++) {
-            result[i] = selector(source[i]);
+            result[i] = selector.call(thisArg, source[i], i);
         }
         return result;
     }
     else {
         const result: U[] = [];
+        let i = 0;
         for (const item of source) {
-            result.push(selector(item));
+            result.push(selector.call(thisArg, item, i++));
         }
         return result;
     }
@@ -115,47 +105,8 @@ class ArrayLikeIterable<T> implements Iterable<T> {
         this._source = source;
     }
 
-    [Symbol.iterator]() {
-        return new ArrayLikeIterator<T>(this._source);
-    }
-}
-
-class ArrayLikeIterator<T> implements IterableIterator<T> {
-    private _source: ArrayLike<T>;
-    private _offset: number;
-    private _state: string;
-
-    constructor (source: ArrayLike<T>) {
-        this._source = source;
-        this._state = "new";
-    }
-
-    next() {
-        switch (this._state) {
-            case "new":
-                this._offset = 0;
-                this._state = "yielding";
-            case "yielding":
-                if (this._offset < this._source.length) {
-                    return NextResult(this._source[this._offset++]);
-                }
-            case "done":
-                return this.return();
-        }
-    }
-
-    return() {
-        switch (this._state) {
-            default:
-                this._source = undefined;
-                this._state = "done";
-            case "done":
-                return DoneResult<T>();
-        }
-    }
-
-    [Symbol.iterator]() {
-        return this;
+    * [Symbol.iterator](): IterableIterator<T> {
+        for (let i = 0; i < this._source.length; i++) yield this._source[i];
     }
 }
 

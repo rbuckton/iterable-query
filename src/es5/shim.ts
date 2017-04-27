@@ -7,14 +7,15 @@ export interface Shim {
     restore(): void;
 }
 
-export function injectGlobal(name: string, value: any): Shim | undefined {
-    if (root && name && value && root[name] === undefined) {
-        root[name] = value;
+export function inject(inject: (global: any) => void, restore: (global: any) => void): Shim | undefined {
+    if (root && inject && restore) {
+        inject(root);
         return {
             restore() {
-                if (value && root[name] === value) {
-                    delete root[name];
-                    value = undefined;
+                if (restore) {
+                    restore(root);
+                    restore = undefined;
+                    inject = undefined;
                 }
             }
         };

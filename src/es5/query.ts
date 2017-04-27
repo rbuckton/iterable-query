@@ -15,8 +15,8 @@
  */
 "use strict";
 
-import { Symbol as Sym } from "./symbol";
-import { Map, Set, WeakMap } from "./collections";
+import "./symbol";
+import "./collections";
 import { IsIterable, ToIterable, ToArray, GetIterator, Debug, MakeTuple, CompareValues, Identity, IteratorClose, True, SameValue, IsObject, IsArrayLike } from "./utils";
 
 /**
