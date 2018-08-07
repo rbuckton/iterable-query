@@ -556,6 +556,20 @@ for (const context of contexts) {
                 preconditions("keySelector", MustBeFunction, value => Query.from([]).groupBy(value));
                 preconditions("elementSelector", MustBeFunctionOrUndefined, value => Query.from([]).groupBy(x => x, value));
                 preconditions("resultSelector", MustBeFunctionOrUndefined, value => Query.from([]).groupBy(x => x, x => x, value));
+                it("group by symbol", () => {
+                    const sym = Symbol();
+                    const data = [
+                      { category: "a", value: 1 },
+                      { category: "a", value: 2 },
+                      { category: "a", value: 3 },
+                      { category: sym, value: 4 }
+                    ];
+                    expect(Query.from(data).groupBy(row => row.category, row => row.value, (category, values) => ({ category, values: values.toArray() })).toArray())
+                        .to.deep.equal([
+                            { category: "a", values: [1, 2, 3] },
+                            { category: sym, values: [4] }
+                        ]);
+                });
             });
             describe("groupJoin()", () => {
                 it("joins groups", () => expect(Query.from(roles).groupJoin(users, g => g.name, u => u.role, (role, users) => ({ role: role, users: users.toArray() })).toArray())
@@ -730,7 +744,7 @@ for (const context of contexts) {
                     const iterator: IterableIterator<number> = {
                         [Symbol.iterator]() { return this; },
                         next() { return { value: 1, done: false } },
-                        return() { returnWasCalled = true; return { done: true } }
+                        return() { returnWasCalled = true; return { value: undefined, done: true } }
                     };
                     const error = new Error();
                     expect(() => Query.from(iterator).forEach(x => { throw error; })).to.throw(error);

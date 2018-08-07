@@ -59,9 +59,9 @@ function build(opts) {
         var tee = gulp
             .src(opts.src, { base: opts.base || "src" })
             .pipe(sourcemaps.init())
-            .pipe(ts(ts.createProject(opts.project, {
+            .pipe(ts.createProject(opts.project, {
                 typescript: typescript
-            })));
+            })());
         var sourceRoot = opts.sourceRoot
             || path.posix.relative(opts.out || "out", opts.base || "src");
         return merge([

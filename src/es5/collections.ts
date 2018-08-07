@@ -6,9 +6,9 @@ const rootKey = uuid();
 const uniqueKey = uuid();
 
 export class Map<K, V> {
-    private _keys: { [key: string]: K; } = Object.create(null);
-    private _values: { [key: string]: V; } = Object.create(null);
-    private _size: number = 0;
+    private _keys = CreateHashMap<K>();
+    private _values = CreateHashMap<V>();
+    private _size = 0;
 
     constructor(iterable?: Iterable<[K, V]> | ArrayLike<[K, V]>) {
         if (iterable !== undefined) {
@@ -36,17 +36,17 @@ export class Map<K, V> {
     }
 
     public has(key: K) {
-        const id = GetUniqueKey(key);
+        const id = GetUniqueKey(key, this._keys, /*cacheSymbols*/ false);
         return id in this._keys;
     }
 
     public get(key: K): V {
-        const id = GetUniqueKey(key);
+        const id = GetUniqueKey(key, this._keys, /*cacheSymbols*/ false);
         return id in this._keys ? this._values[id] : undefined;
     }
 
     public set(key: K, value: V): Map<K, V> {
-        const id = GetUniqueKey(key);
+        const id = GetUniqueKey(key, this._keys, /*cacheSymbols*/ true);
         if (id in this._keys) {
             this._values[id] = value;
         }
@@ -60,10 +60,11 @@ export class Map<K, V> {
     }
 
     public delete(key: K): boolean {
-        const id = GetUniqueKey(key);
+        const id = GetUniqueKey(key, this._keys, /*cacheSymbols*/ false);
         if (id in this._keys) {
             delete this._keys[id];
             delete this._values[id];
+            if (typeof key === "symbol") RemoveSymbol(key, this._keys);
             this._size--;
             return true;
         }
@@ -72,8 +73,8 @@ export class Map<K, V> {
     }
 
     public clear(): void {
-        this._keys = Object.create(null);
-        this._values = Object.create(null);
+        this._keys = CreateHashMap();
+        this._values = CreateHashMap();
         this._size = 0;
     }
 
@@ -95,7 +96,7 @@ export class Map<K, V> {
 }
 
 export class Set<T> {
-    private _values: { [key: string]: T; } = Object.create(null);
+    private _values = CreateHashMap<T>();
     private _size: number = 0;
 
     constructor(iterable?: Iterable<T> | ArrayLike<T>) {
@@ -123,12 +124,12 @@ export class Set<T> {
     }
 
     public has(value: T) {
-        const id = GetUniqueKey(value);
+        const id = GetUniqueKey(value, this._values, /*cacheSymbols*/ false);
         return id in this._values;
     }
 
     public add(value: T): Set<T> {
-        const id = GetUniqueKey(value);
+        const id = GetUniqueKey(value, this._values, /*cacheSymbols*/ true);
         if (id in this._values) {
             return this;
         }
@@ -141,9 +142,10 @@ export class Set<T> {
     }
 
     public delete(value: T): boolean {
-        const id = GetUniqueKey(value);
+        const id = GetUniqueKey(value, this._values, /*cacheSymbols*/ false);
         if (id in this._values) {
             delete this._values[id];
+            if (typeof value === "symbol") RemoveSymbol(value, this._values);
             this._size--;
             return true;
         }
@@ -152,7 +154,7 @@ export class Set<T> {
     }
 
     public clear(): void {
-        this._values = Object.create(null);
+        this._values = CreateHashMap();
         this._size = 0;
     }
 
@@ -203,12 +205,12 @@ export class WeakMap<K, V> {
 }
 
 class KeyValueIterator<K, V> implements IterableIterator<K | V | [K, V]> {
-    private _keys: { [id: string]: K; };
-    private _values: { [id: string]: V; };
+    private _keys: HashMap<K>;
+    private _values: HashMap<V>;
     private _kind: "key" | "value" | "key+value";
     private _ids: string[];
 
-    constructor(keys: { [id: string]: K; }, values: { [id: string]: V; }, kind: "key" | "value" | "key+value") {
+    constructor(keys: HashMap<K>, values: HashMap<V>, kind: "key" | "value" | "key+value") {
         this._keys = keys;
         this._values = values;
         this._kind = kind;
@@ -263,7 +265,18 @@ class KeyValueIterator<K, V> implements IterableIterator<K | V | [K, V]> {
     }
 }
 
-function GetUniqueKey(target: any) {
+interface HashMap<T> {
+    [key: string]: T;
+}
+
+function CreateHashMap<T>(): HashMap<T> {
+    const hashMap = Object.create(null);
+    hashMap["__"] = undefined;
+    delete hashMap["__"];
+    return hashMap;
+}
+
+function GetUniqueKey(target: any, keys: any, cacheSymbols: boolean): string {
     if (target === null) {
         return `null@`;
     }
@@ -287,6 +300,13 @@ function GetUniqueKey(target: any) {
     else if (typeof target === "boolean") {
         return target ? `boolean@true` : `boolean@false`;
     }
+    else if (typeof target === "symbol") {
+        if (target in keys) return keys[target];
+        if (!cacheSymbols) return `no-key@`;
+        const key = uuid();
+        keys[target] = key;
+        return key;
+    }
     else {
         if (Object.prototype.hasOwnProperty.call(target, uniqueKey)) {
             return target[uniqueKey];
@@ -296,6 +316,10 @@ function GetUniqueKey(target: any) {
         Object.defineProperty(target, uniqueKey, { value: key });
         return key;
     }
+}
+
+function RemoveSymbol(target: symbol, keys: any) {
+    delete keys[target];
 }
 
 function GetWeakTable(target: any, create: boolean): { [key: string]: any; } {
@@ -308,7 +332,7 @@ function GetWeakTable(target: any, create: boolean): { [key: string]: any; } {
             return undefined;
         }
 
-        Object.defineProperty(target, rootKey, { value: Object.create(null) });
+        Object.defineProperty(target, rootKey, { value: CreateHashMap() });
     }
 
     return target[rootKey];

@@ -718,7 +718,7 @@ export class Query<T> implements Iterable<T> {
      * @param elementSelector An optional callback used to select a value for an element.
      * @param resultSelector An optional callback used to select a result from a contiguous range.
      */
-    public spanMap<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => V, spanSelector?: (key: K, span: Query<V>) => Grouping<K, T | V> | R): Query<Grouping<K, T | V> | R> {
+    public spanMap<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => T | V, spanSelector?: (key: K, span: Query<V>) => Grouping<K, T | V> | R): Query<Grouping<K, T | V> | R> {
         if (elementSelector === undefined) elementSelector = Identity;
         if (spanSelector === undefined) spanSelector = ToGrouping;
         Assert.mustBeFunction(keySelector, "keySelector");
@@ -758,7 +758,7 @@ export class Query<T> implements Iterable<T> {
      * @param elementSelector An optional callback used to select a value for an element.
      * @param resultSelector An optional callback used to select a result from a group.
      */
-    public groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => V, resultSelector?: (key: K, elements: Query<V>) => Grouping<K, T | V> | R): Query<Grouping<K, T | V> | R> {
+    public groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => T | V, resultSelector?: (key: K, elements: Query<V>) => Grouping<K, T | V> | R): Query<Grouping<K, T | V> | R> {
         if (elementSelector === undefined) elementSelector = Identity;
         if (resultSelector === undefined) resultSelector = ToGrouping;
         Assert.mustBeFunction(keySelector, "keySelector");

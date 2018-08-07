@@ -7,6 +7,7 @@ describe("es5", () => {
         describe("get()", () => {
             const key1 = {};
             const key2 = {};
+            const sym = Symbol();
             const data: [any, any][] = [
                 [1, "number: 1"],
                 [0, "number: 0"],
@@ -21,7 +22,8 @@ describe("es5", () => {
                 [key1, "object: 1"],
                 [key2, "object: 2"],
                 [true, "boolean: true"],
-                [false, "boolean: false"]
+                [false, "boolean: false"],
+                [sym, "symbol"]
             ];
             it("missing", () => expect(new Map<any, any>().get(1)).to.be.undefined);
             theory("gets and sets", data, (key, value) => {
