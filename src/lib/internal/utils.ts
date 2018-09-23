@@ -14,10 +14,9 @@
   limitations under the License.
  */
 
-import * as assert from "./assert";
 import { Hierarchical, HierarchyProvider, PossiblyAsyncQueryable, Queryable, PossiblyAsyncIterator, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, QuerySource, AsyncQuerySource, OrderedHierarchyIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncOrderedHierarchyIterable } from "../types";
 import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
-import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
+import { IsAsyncIterable, IsIterable, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
 import { Query, HierarchyQuery, OrderedHierarchyQuery, OrderedQuery } from "../query";
 import { AsyncQuery, AsyncOrderedQuery, AsyncOrderedHierarchyQuery, AsyncHierarchyQuery } from "../asyncQuery";
@@ -48,14 +47,15 @@ export function GetAsyncIterator<T>(source: PossiblyAsyncIterable<T>): AsyncIter
 
 @ToStringTag("Async-from-sync Iterator")
 class AsyncFromSyncIterator<T> implements AsyncIterator<T> {
-    private _iterator: Iterator<T>;
+    private _iterator: Iterator<PromiseLike<T> | T>;
 
-    constructor(iterator: Iterator<T>) {
+    constructor(iterator: Iterator<PromiseLike<T> | T>) {
         this._iterator = iterator;
     }
     
     async next(value?: any): Promise<IteratorResult<T>> {
-        return this._iterator.next(value);
+        const { done, value: resultValue } = this._iterator.next(value);
+        return { done, value: await resultValue };
     }
     
     async return(value?: T): Promise<IteratorResult<T>> {
@@ -63,7 +63,8 @@ class AsyncFromSyncIterator<T> implements AsyncIterator<T> {
         if (returnMethod === undefined) {
             return { done: true, value: value! };
         }
-        return returnMethod.call(this._iterator, value);
+        const { done, value: resultValue } = returnMethod.call(this._iterator, value);
+        return { done, value: await resultValue };
     }
 
     async throw(value?: any): Promise<IteratorResult<T>> {
@@ -71,7 +72,8 @@ class AsyncFromSyncIterator<T> implements AsyncIterator<T> {
         if (throwMethod === undefined) {
             throw value;
         }
-        return throwMethod.call(this._iterator, value);
+        const { done, value: resultValue } = throwMethod.call(this._iterator, value);
+        return { done, value: await resultValue };
     }
 }
 
