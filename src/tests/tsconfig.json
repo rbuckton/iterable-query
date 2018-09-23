@@ -1,15 +1,21 @@
 {
     "compilerOptions": {
         "target": "es6",
+        "lib": ["esnext"],
         "module": "commonjs",
+        "outDir": "../../out/tests",
         "noImplicitAny": true,
         "sourceMap": true,
         "stripInternal": true,
         "declaration": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "rootDirs": ["../lib", "../es5", "../lib"]
     },
-    "exclude": [
-        "typings/browser.d.ts",
-        "typings/browser"
+    "references": [
+        { "path": "../lib/tsconfig.json" },
+        { "path": "../lib/tsconfig.es5.json" },
+    ],
+    "include": [
+        "**/*.ts"
     ]
 }

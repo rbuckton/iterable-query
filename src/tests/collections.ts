@@ -1,8 +1,8 @@
-import { assert, expect } from "chai";
-import { theory, preconditions } from "./test-utils";
-import { Map, Set, WeakMap } from "../es5/collections";
+import { expect } from "chai";
+import { theory } from "./test-utils";
+import { Map, Set, WeakMap, WeakSet } from "../lib/collections";
 
-describe("es5", () => {
+describe("collections", () => {
     describe("Map", () => {
         describe("get()", () => {
             const key1 = {};
@@ -46,9 +46,9 @@ describe("es5", () => {
         });
     });
     describe("Set", () => {
-
     });
     describe("WeakMap", () => {
-
+    });
+    describe("WeakSet", () => {
     });
 });

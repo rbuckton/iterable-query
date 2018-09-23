@@ -2,9 +2,20 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
+        "lib": ["esnext"],
+        "outDir": "../../out/lib",
+        "experimentalDecorators": true,
         "noImplicitAny": true,
         "sourceMap": true,
         "stripInternal": true,
-        "declaration": true
-    }
+        "declaration": true,
+        "declarationMap": true,
+        "strict": true,
+        "composite": true,
+        // "noUnusedLocals": true,
+        // "noUnusedParameters": true
+    },
+    "include": [
+        "**/*.ts"
+    ]
 }
