@@ -21,18 +21,18 @@ import { Queryable, HierarchyIterable } from "../types";
  * Creates a subquery containing all elements except the first elements that match
  * the supplied predicate.
  *
+ * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
  */
 export function skipWhile<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery containing all elements except the first elements that match
  * the supplied predicate.
  *
+ * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
  */
 export function skipWhile<T>(source: Queryable<T>, predicate: (element: T) => boolean): Iterable<T>;
-
 export function skipWhile<T>(source: Queryable<T>, predicate: (element: T) => boolean): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");

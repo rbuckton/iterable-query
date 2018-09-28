@@ -6,9 +6,9 @@ const ts = require("typescript");
 const gulp = require("gulp");
 const gulpif = require("gulp-if");
 const sourcemaps = require("gulp-sourcemaps");
-const upToDate = require("./upToDate");
 const log = require("fancy-log");
 const merge2 = require("merge2");
+const upToDate = require("./upToDate");
 
 // patch gulp-typescript
 const tsc_host = require("gulp-typescript/release/host");

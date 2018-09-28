@@ -15,9 +15,8 @@
  */
 
 import { assert, ToIterable, CreateGroupings, Identity, ToStringTag, Registry, CreateSubquery, GetSource } from "../internal";
-import { Queryable, QuerySource } from "../types";
+import { Queryable } from "../types";
 import { empty } from "./empty";
-import { Query } from "../query";
 
 /**
  * Creates a grouped subquery for the correlated elements between an outer `Queryable` object and an inner `Queryable` object.

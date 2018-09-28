@@ -22,8 +22,7 @@ import { Queryable } from "../types";
  * 
  * @param source A `Queryable` object.
  */
-export function toArray<T>(source: Queryable<T>, elementSelector?: (element: T) => T): T[];
-
+export function toArray<T>(source: Queryable<T>): T[];
 /**
  * Creates an Array for the elements of the `Queryable`.
  *
@@ -31,7 +30,6 @@ export function toArray<T>(source: Queryable<T>, elementSelector?: (element: T) 
  * @param elementSelector A callback that selects a value for each element.
  */
 export function toArray<T, V>(source: Queryable<T>, elementSelector: (element: T) => V): V[];
-
 export function toArray<T>(source: Queryable<T>, elementSelector: (element: T) => T = Identity): T[] {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");

@@ -15,60 +15,65 @@
  */
 
 import * as fn from "./fn";
-import { assert, IsPossiblyAsyncHierarchyIterable, GetHierarchy, ToPossiblyAsyncIterable, ThenByAsync, ToAsyncOrderedIterable, MakeAsyncHierarchyIterable, ToAsyncOrderedHierarchyIterable, IsPossiblyAsyncOrderedIterable, Registry, IsPossiblyAsyncOrderedHierarchyIterable, GetAsyncSource, GetAsyncIterator } from "./internal";
-import { OrderedHierarchyIterable, HierarchyIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable, PossiblyAsyncIterator, AsyncQuerySource, QuerySource, AsyncOrderedQuerySource, OrderedIterable, Page, KeyValuePair } from "./types";
+import { assert, IsPossiblyAsyncHierarchyIterable, GetHierarchy, ToPossiblyAsyncIterable, ThenByAsync, ToAsyncOrderedIterable, MakeAsyncHierarchyIterable, ToAsyncOrderedHierarchyIterable, IsPossiblyAsyncOrderedIterable, Registry, IsPossiblyAsyncOrderedHierarchyIterable, GetAsyncSource, GetAsyncIterator, AsyncQuerySource } from "./internal";
+import { OrderedHierarchyIterable, HierarchyIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable, Page, KeyValuePair, AsyncHierarchyIterable, AsyncChoice } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeAsyncOptions } from "./fn";
-import { Query, from, OrderedHierarchyQuery, OrderedQuery, HierarchyQuery } from "./query";
+import { Query, from, HierarchyQuery } from "./query";
+
+Registry.addRegistry(fn);
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
  */
 export function fromAsync<TNode, T extends TNode>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyQuery<TNode, T>;
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
  */
 export function fromAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyQuery<TNode, T>;
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
  */
 export function fromAsync<T>(source: PossiblyAsyncOrderedIterable<T>): AsyncOrderedQuery<T>;
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
  */
-export function fromAsync<T>(source: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+export function fromAsync<T>(source: AsyncQueryable<T>): AsyncQuery<T>;
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncHierarchyQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
+ * @param hierarchy A `HierarchyProvider` object.
  */
 export function fromAsync<TNode, T extends TNode>(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyQuery<TNode, T>;
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncHierarchyQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
+ * @param hierarchy A `HierarchyProvider` object.
  */
-export function fromAsync<TNode, T extends TNode>(source: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
+export function fromAsync<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
 
 /**
- * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+ * Creates an `AsyncHierarchyQuery` from an `AsyncQueryable` source.
  *
- * @param source A `Queryable` or `AsyncQueryable` object.
+ * @param source An `AsyncQueryable` object.
+ * @param hierarchy A `HierarchyProvider` object.
  */
-export function fromAsync<T>(source: PossiblyAsyncQueryable<T>, hierarchy?: HierarchyProvider<T>): AsyncQuery<T> {
+export function fromAsync<T>(source: AsyncQueryable<T> | PossiblyAsyncOrderedHierarchyIterable<T> | PossiblyAsyncOrderedIterable<T> | PossiblyAsyncHierarchyIterable<T>, hierarchy?: HierarchyProvider<T>): AsyncQuery<T> {
     if (hierarchy) source = MakeAsyncHierarchyIterable(source, hierarchy);
     return IsPossiblyAsyncOrderedHierarchyIterable(source) ? new AsyncOrderedHierarchyQuery(source) :
         IsPossiblyAsyncHierarchyIterable(source) ? new AsyncHierarchyQuery(source) :
@@ -85,7 +90,6 @@ function ofAsync<T>(): AsyncQuery<T> {
 
 Registry.AsyncQuery.registerStatic("of", ofAsync);
 
-Registry.addRegistry(fn);
 Registry.addRegistry({ from: fromAsync, of: ofAsync });
 
 /**
@@ -94,16 +98,16 @@ Registry.addRegistry({ from: fromAsync, of: ofAsync });
  * requested from the `AsyncQuery` or the `AsyncQuery` is iterated.
  */
 @Registry.QueryConstructor("AsyncQuery")
-export class AsyncQuery<T> implements AsyncQuerySource<T> {
-    private _source: PossiblyAsyncQueryable<T>;
+export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/ {
+    private _source: AsyncQueryable<T>;
 
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
      */
-    constructor(source: PossiblyAsyncQueryable<T>) {
-        assert.mustBePossiblyAsyncQueryable(source, "source");
+    constructor(source: AsyncQueryable<T>) {
+        assert.mustBeAsyncQueryable(source, "source");
         this._source = source instanceof AsyncQuery
             ? source._source
             : source;
@@ -113,91 +117,85 @@ export class AsyncQuery<T> implements AsyncQuerySource<T> {
         return GetAsyncIterator(ToPossiblyAsyncIterable(GetAsyncSource(this)));
     }
 
-    [AsyncQuerySource.source]() {
+    /** @internal */ [AsyncQuerySource.source]() {
         return this._source;
     }
 
-    [AsyncQuerySource.create]<UNode, U extends UNode>(source: PossiblyAsyncOrderedHierarchyIterable<UNode, U>): AsyncOrderedHierarchyQuery<UNode, U>;
-    [AsyncQuerySource.create]<UNode, U extends UNode>(source: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
-    [AsyncQuerySource.create]<U>(source: PossiblyAsyncOrderedIterable<U>): AsyncOrderedQuery<U>;
-    [AsyncQuerySource.create]<U>(source: PossiblyAsyncQueryable<U>): AsyncQuery<U>;
-    [AsyncQuerySource.create]<U>(source: PossiblyAsyncQueryable<U>): AsyncQuerySource<U> {
+    /** @internal */ [AsyncQuerySource.create]<U>(source: AsyncQueryable<U>): AsyncQuery<U> {
         return fromAsync(source);
     }
 
-    [AsyncQuerySource.createSync]<UNode, U extends UNode>(value: OrderedHierarchyIterable<UNode, U>): OrderedHierarchyQuery<UNode, U>;
-    [AsyncQuerySource.createSync]<UNode, U extends UNode>(value: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
-    [AsyncQuerySource.createSync]<U>(value: OrderedIterable<U>): OrderedQuery<U>;
-    [AsyncQuerySource.createSync]<U>(value: Queryable<U>): Query<U>;
-    [AsyncQuerySource.createSync]<U>(source: Queryable<U>): QuerySource<U> {
+    /** @internal */ [AsyncQuerySource.createSync]<U>(source: Queryable<U>): Query<U> {
         return from(source);
     }
 }
 
 export declare namespace AsyncQuery {
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
      */
     export function from<TNode, T extends TNode>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyQuery<TNode, T>;
 
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
      */
     export function from<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
      */
     export function from<T>(source: PossiblyAsyncOrderedIterable<T>): AsyncOrderedQuery<T>;
 
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
      */
-    export function from<T>(source: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    export function from<T>(source: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncHierarchyQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
+     * @param hierarchy A `HierarchyProvider` object.
      */
     export function from<TNode, T extends TNode>(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyQuery<TNode, T>;
 
     /**
-     * Creates an `AsyncQuery` from a `Queryable` or `AsyncIterable` source.
+     * Creates an `AsyncHierarchyQuery` from an `AsyncQueryable` source.
      *
-     * @param source A `Queryable` or `AsyncQueryable` object.
+     * @param source An `AsyncQueryable` object.
+     * @param hierarchy A `HierarchyProvider` object.
      */
-    export function from<TNode, T extends TNode>(source: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
+    export function from<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a `Query` for the provided elements.
+     * Creates an `AsyncQuery` for the provided elements.
      *
      * @param elements The elements of the `Query`.
      */
     export function of<T>(...elements: (PromiseLike<T> | T)[]): AsyncQuery<T>;
 
     /**
-     * Creates a `Query` with no elements.
+     * Creates an `AsyncQuery` with no elements.
      */
     export function empty<T>(): AsyncQuery<T>;
 
     /**
-     * Creates a `Query` over a single element.
+     * Creates an `AsyncQuery` over a single element.
      *
      * @param value The only element for the `Query`.
      */
     export function once<T>(value: PromiseLike<T> | T): AsyncQuery<T>;
 
     /**
-     * Creates a `Query` for a value repeated a provided number of times.
+     * Creates an `AsyncQuery` for a value repeated a provided number of times.
      *
      * @param value The value for each element of the `Query`.
      * @param count The number of times to repeat the value.
@@ -205,14 +203,14 @@ export declare namespace AsyncQuery {
     export function repeat<T>(value: PromiseLike<T> | T, count: number): AsyncQuery<T>;
 
     /**
-     * Creates a `Query` that repeats the provided value forever.
+     * Creates an `AsyncQuery` that repeats the provided value forever.
      *
      * @param value The value for each element of the `Query`.
      */
     export function continuous<T>(value: PromiseLike<T> | T): AsyncQuery<T>;
 
     /**
-     * Creates a `Query` whose values are provided by a callback executed a provided number of
+     * Creates an `AsyncQuery` whose values are provided by a callback executed a provided number of
      * times.
      *
      * @param count The number of times to execute the callback.
@@ -221,7 +219,7 @@ export declare namespace AsyncQuery {
     export function generate<T>(count: number, generator: (offset: number) => PromiseLike<T> | T): AsyncQuery<T>;
 
     /**
-     * Creates a HierarchyQuery from a root node and a HierarchyProvider.
+     * Creates an `AsyncHierarchyQuery` from a root node and a `HierarchyProvider`.
      *
      * @param root The root node of the hierarchy.
      * @param hierarchy A `HierarchyProvider` object.
@@ -229,49 +227,50 @@ export declare namespace AsyncQuery {
     export function hierarchy<TNode, T extends TNode>(root: PromiseLike<T> | T, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a `Query` that, when iterated, consumes the provided `Iterator`.
+     * Creates an `AsyncQuery` that, when iterated, consumes the provided `AsyncIterator`.
      *
-     * @param iterator An `Iterator` object.
+     * @param iterator An `AsyncIterator` object.
      */
-    export function consume<T>(iterator: PossiblyAsyncIterator<T>, options?: ConsumeAsyncOptions): AsyncQuery<T>;
+    export function consume<T>(iterator: AsyncIterator<T>, options?: ConsumeAsyncOptions): AsyncQuery<T>;
 
     /**
-     * Creates a `Query` that iterates the elements from one of two sources based on the result of a
+     * Creates an `AsyncQuery` that iterates the elements from one of two sources based on the result of a
      * lazily evaluated condition.
      *
      * @param condition A callback used to choose a source.
      * @param thenQueryable The source to use when the callback evaluates to `true`.
      * @param elseQueryable The source to use when the callback evaluates to `false`.
      */
-    function _if<T>(condition: () => boolean, thenQueryable: PossiblyAsyncQueryable<T>, elseQueryable?: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    function _if<T>(condition: () => PromiseLike<boolean> | boolean, thenQueryable: AsyncQueryable<T>, elseQueryable?: AsyncQueryable<T>): AsyncQuery<T>;
+
     export { _if as if };
 
     /**
-     * Creates a `Query` that iterates the elements from sources picked from a list based on the
+     * Creates an `AsyncQuery` that iterates the elements from sources picked from a list based on the
      * result of a lazily evaluated choice.
      *
      * @param chooser A callback used to choose a source.
      * @param choices A list of sources
      * @param otherwise A default source to use when another choice could not be made.
      */
-    export function choose<K, T>(chooser: () => K, choices: PossiblyAsyncQueryable<[K, PossiblyAsyncQueryable<T>]>, otherwise?: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    export function choose<K, V>(chooser: () => PromiseLike<K> | K, choices: AsyncQueryable<AsyncChoice<K, V>>, otherwise?: AsyncQueryable<V>): AsyncQuery<V>;
 
     /**
-     * Creates a `Query` for the own property keys of an object.
+     * Creates an `AsyncQuery` for the own property keys of an object.
      *
      * @param source An object.
      */
     export function objectKeys<T extends object>(source: PromiseLike<T> | T): AsyncQuery<Extract<keyof T, string>>;
 
     /**
-     * Creates a `Query` for the own property values of an object.
+     * Creates an `AsyncQuery` for the own property values of an object.
      *
      * @param source An object.
      */
     export function objectValues<T extends object>(source: PromiseLike<T> | T): AsyncQuery<T[Extract<keyof T, string>]>;
 
     /**
-     * Creates a `Query` for the own property key-value pairs of an object.
+     * Creates an `AsyncQuery` for the own property key-value pairs of an object.
      *
      * @param source An object.
      */
@@ -331,7 +330,7 @@ export interface AsyncQuery<T> {
      *
      * @param projection A callback used to map each element into an iterable.
      */
-    flatMap<U>(projection: (element: T) => PossiblyAsyncQueryable<U>): AsyncQuery<U>;
+    flatMap<U>(projection: (element: T) => AsyncQueryable<U>): AsyncQuery<U>;
 
     /**
      * Creates a subquery that iterates the results of applying a callback to each element.
@@ -339,7 +338,7 @@ export interface AsyncQuery<T> {
      *
      * @param projection A callback used to map each element into an iterable.
      */
-    selectMany<U>(projection: (element: T) => PossiblyAsyncQueryable<U>): AsyncQuery<U>;
+    selectMany<U>(projection: (element: T) => AsyncQueryable<U>): AsyncQuery<U>;
 
     /**
      * Creates a subquery that iterates the results of recursively expanding the
@@ -347,7 +346,7 @@ export interface AsyncQuery<T> {
      *
      * @param projection A callback used to recusively expand each element.
      */
-    expand(projection: (element: T) => PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    expand(projection: (element: T) => AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -358,11 +357,41 @@ export interface AsyncQuery<T> {
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
+     *
+     * @param callback The callback to invoke.
+     */
+    do(callback: (element: T, offset: number) => PromiseLike<void>): AsyncQuery<T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     *
+     * @param callback The callback to invoke.
+     */
+    do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncQuery<T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
      */
     tap(callback: (element: T, offset: number) => void): AsyncQuery<T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    tap(callback: (element: T, offset: number) => PromiseLike<void>): AsyncQuery<T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncQuery<T>;
 
     /**
      * Pass the entire query to the provided callback, creating a new query from the result.
@@ -390,7 +419,7 @@ export interface AsyncQuery<T> {
      *
      * @param callback A callback function.
      */
-    through<U>(callback: (source: this) => PossiblyAsyncQueryable<U>): AsyncQuery<U>;
+    through<U>(callback: (source: this) => AsyncQueryable<U>): AsyncQuery<U>;
 
     /**
      * Creates a subquery whose elements are in the reverse order.
@@ -420,6 +449,14 @@ export interface AsyncQuery<T> {
      * @param predicate A callback used to match each element.
      */
     skipWhile(predicate: (element: T) => boolean): AsyncQuery<T>;
+
+    /**
+     * Creates a subquery containing all elements except the first elements that do not match
+     * the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     */
+    skipUntil(predicate: (element: T) => boolean): AsyncQuery<T>;
 
     /**
      * Creates a subquery containing the first elements up to the supplied
@@ -452,57 +489,80 @@ export interface AsyncQuery<T> {
     takeWhile(predicate: (element: T) => boolean): AsyncQuery<T>;
 
     /**
-     * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
+     * Creates a subquery containing the first elements that do not match the supplied predicate.
      *
-     * @param right A `Queryable` object.
+     * @param predicate A callback used to match each element.
      */
-    intersect(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    takeUntil(predicate: (element: T) => boolean): AsyncQuery<T>;
 
     /**
-     * Creates a subquery for the set union of this `Query` and another `Queryable`.
+     * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    union(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    intersect<R extends PossiblyAsyncHierarchyIterable<unknown, T>>(right: R): R extends PossiblyAsyncHierarchyIterable<infer UNode, infer U>
+        ? AsyncHierarchyQuery<UNode, U>
+        : AsyncQuery<T>;
 
     /**
-     * Creates a subquery for the set difference between this and another Queryable.
+     * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    except(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    intersect<U extends T>(right: AsyncQueryable<U>): AsyncQuery<U>;
 
     /**
-     * Creates a subquery for the set difference between this and another Queryable.
+     * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    intersect(right: AsyncQueryable<T>): AsyncQuery<T>;
+
+    /**
+     * Creates a subquery for the set union of this `AsyncQuery` and another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    union(right: AsyncQueryable<T>): AsyncQuery<T>;
+
+    /**
+     * Creates a subquery for the set difference (a.k.a. 'relative complement') between this `AsyncQuery` and another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    except(right: AsyncQueryable<T>): AsyncQuery<T>;
+
+    /**
+     * Creates a subquery for the set difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * This is an alias for `except`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    relativeComplement(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    relativeComplement(right: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    symmetricDifference(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    symmetricDifference(right: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * This is an alias for `symmetricDifference`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    xor(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    xor(right: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
-     * Creates a subquery that concatenates this Query with another Queryable.
+     * Creates a subquery that concatenates this Query with another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    concat(right: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    concat(right: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
      * Creates a subquery for the distinct elements of this Query.
@@ -514,14 +574,14 @@ export interface AsyncQuery<T> {
      *
      * @param value The value to append.
      */
-    append(value: T): AsyncQuery<T>;
+    append(value: PromiseLike<T> | T): AsyncQuery<T>;
 
     /**
      * Creates a subquery for the elements of this Query with the provided value prepended to the beginning.
      *
      * @param value The value to prepend.
      */
-    prepend(value: T): AsyncQuery<T>;
+    prepend(value: PromiseLike<T> | T): AsyncQuery<T>;
 
     /**
      * Creates a subquery for the elements of this Query with the provided range
@@ -531,7 +591,7 @@ export interface AsyncQuery<T> {
      * @param skipCount The number of elements to skip from start.
      * @param range The range to patch into the result.
      */
-    patch(start: number, skipCount: number, range: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
+    patch(start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
      * Creates a subquery that contains the provided default value if this Query
@@ -539,7 +599,7 @@ export interface AsyncQuery<T> {
      *
      * @param defaultValue The default value.
      */
-    defaultIfEmpty(defaultValue: T): AsyncQuery<T>;
+    defaultIfEmpty(defaultValue: PromiseLike<T> | T): AsyncQuery<T>;
 
     /**
      * Creates a subquery that splits this Query into one or more pages.
@@ -551,21 +611,21 @@ export interface AsyncQuery<T> {
     pageBy(pageSize: number): AsyncQuery<Page<T>>;
 
     /**
-     * Creates a subquery that combines this Query with another Queryable by combining elements
+     * Creates a subquery that combines this Query with another `AsyncQueryable` by combining elements
      * in tuples.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    zip<U>(right: PossiblyAsyncQueryable<U>): AsyncQuery<[T, U]>;
+    zip<U>(right: AsyncQueryable<U>): AsyncQuery<[T, U]>;
 
     /**
-     * Creates a subquery that combines this Query with another Queryable by combining elements
+     * Creates a subquery that combines this Query with another `AsyncQueryable` by combining elements
      * using the supplied callback.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      * @param selector A callback used to combine two elements.
      */
-    zip<U, R>(right: PossiblyAsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncQuery<R>;
+    zip<U, R>(right: AsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncQuery<R>;
 
     /**
      * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
@@ -632,34 +692,34 @@ export interface AsyncQuery<T> {
     groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R): AsyncQuery<R>;
 
     /**
-     * Creates a grouped subquery for the correlated elements of this `Query` and another `Queryable` object.
+     * Creates a grouped subquery for the correlated elements of this `AsyncQuery` and another `AsyncQueryable` object.
      *
      * @param inner A `Queryable` object.
-     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
+     * @param outerKeySelector A callback used to select the key for an element in this `AsyncQuery`.
      * @param innerKeySelector A callback used to select the key for an element in the other `Queryable` object.
      * @param resultSelector A callback used to select the result for the correlated elements.
      */
-    groupJoin<I, K, R>(inner: PossiblyAsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): AsyncQuery<R>;
+    groupJoin<I, K, R>(inner: AsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): AsyncQuery<R>;
 
     /**
-     * Creates a subquery for the correlated elements of this `Query` and another `Queryable`.
+     * Creates a subquery for the correlated elements of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param inner A `Queryable` object.
      * @param outerKeySelector A callback used to select the key for an element in this Query.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
      */
-    join<I, K, R>(inner: PossiblyAsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): AsyncQuery<R>;
+    join<I, K, R>(inner: AsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): AsyncQuery<R>;
 
     /**
-     * Creates a subquery for the correlated elements of this `Query` and another `Queryable`.
+     * Creates a subquery for the correlated elements of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param inner A `Queryable` object.
      * @param outerKeySelector A callback used to select the key for an element in this Query.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
      */
-    fullJoin<I, K, R>(inner: PossiblyAsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): AsyncQuery<R>;
+    fullJoin<I, K, R>(inner: AsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): AsyncQuery<R>;
 
     /**
      * Creates a subquery containing the cumulative results of applying the provided callback to each element.
@@ -844,12 +904,20 @@ export interface AsyncQuery<T> {
 
     /**
      * Computes a scalar value indicating whether every element in this Query corresponds to a matching element
-     * in another Queryable at the same position.
+     * in another `AsyncQueryable` at the same position.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
+     */
+    corresponds(right: AsyncQueryable<T>): Promise<boolean>;
+
+    /**
+     * Computes a scalar value indicating whether every element in this Query corresponds to a matching element
+     * in another `AsyncQueryable` at the same position.
+     *
+     * @param right An `AsyncQueryable` object.
      * @param equalityComparison An optional callback used to compare the equality of two elements.
      */
-    corresponds(right: PossiblyAsyncQueryable<T>, equalityComparison?: (left: T, right: T) => boolean): Promise<boolean>;
+    corresponds<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
     /**
      * Computes a scalar value indicating whether the provided value is included in the query.
@@ -860,54 +928,54 @@ export interface AsyncQuery<T> {
 
     /**
      * Computes a scalar value indicating whether the elements of this Query include
-     * an exact sequence of elements from another Queryable.
+     * an exact sequence of elements from another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    includesSequence(right: PossiblyAsyncQueryable<T>): Promise<boolean>;
+    includesSequence(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
      * Computes a scalar value indicating whether the elements of this Query include
-     * an exact sequence of elements from another Queryable.
+     * an exact sequence of elements from another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
      */
-    includesSequence<U>(right: PossiblyAsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+    includesSequence<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
     /**
      * Computes a scalar value indicating whether the elements of this Query start
-     * with the same sequence of elements in another Queryable.
+     * with the same sequence of elements in another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    startsWith(right: PossiblyAsyncQueryable<T>): Promise<boolean>;
+    startsWith(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
      * Computes a scalar value indicating whether the elements of this Query start
-     * with the same sequence of elements in another Queryable.
+     * with the same sequence of elements in another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
      */
-    startsWith<U>(right: PossiblyAsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+    startsWith<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
     /**
      * Computes a scalar value indicating whether the elements of this Query end
-     * with the same sequence of elements in another Queryable.
+     * with the same sequence of elements in another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    endsWith(right: PossiblyAsyncQueryable<T>): Promise<boolean>;
+    endsWith(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
      * Computes a scalar value indicating whether the elements of this Query end
-     * with the same sequence of elements in another Queryable.
+     * with the same sequence of elements in another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
      */
-    endsWith<U>(right: PossiblyAsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+    endsWith<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
     /**
      * Finds the value in the Query at the provided offset. A negative offset starts from the
@@ -983,7 +1051,7 @@ export interface AsyncQuery<T> {
     /**
      * Creates an Array for the elements of the Query.
      */
-    toArray(elementSelector?: (element: T) => T): Promise<T[]>;
+    toArray(): Promise<T[]>;
 
     /**
      * Creates an Array for the elements of the Query.
@@ -995,7 +1063,7 @@ export interface AsyncQuery<T> {
     /**
      * Creates a `Set` for the elements of the `Query`.
      */
-    toSet(elementSelector?: (element: T) => T): Promise<Set<T>>;
+    toSet(): Promise<Set<T>>;
 
     /**
      * Creates a `Set` for the elements of the `Query`.
@@ -1009,7 +1077,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select a key for each element.
      */
-    toMap<K>(keySelector: (element: T) => K, elementSelector?: (element: T) => T): Promise<Map<K, T>>;
+    toMap<K>(keySelector: (element: T) => K, ): Promise<Map<K, T>>;
 
     /**
      * Creates a `Map` for the elements of the `Query`.
@@ -1024,7 +1092,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select a key for each element.
      */
-    toLookup<K>(keySelector: (element: T) => K, elementSelector?: (element: T) => T): Promise<Lookup<K, T>>;
+    toLookup<K>(keySelector: (element: T) => K, ): Promise<Lookup<K, T>>;
 
     /**
      * Creates a `Lookup` for the elements of the `Query`.
@@ -1058,12 +1126,12 @@ export interface AsyncQuery<T> {
  * Represents a sequence of hierarchically organized values.
  */
 @Registry.QueryConstructor("AsyncHierarchyQuery")
-export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQuery<T> implements AsyncHierarchyQuery<TNode, T> {
+export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQuery<T> implements AsyncHierarchyIterable<TNode, T> /*, AsyncHierarchyQuerySource<TNode, T> */ {
     constructor(source: PossiblyAsyncHierarchyIterable<TNode, T>);
-    constructor(source: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>);
-    constructor(source: PossiblyAsyncQueryable<T> | HierarchyIterable<TNode, T>, hierarchy?: HierarchyProvider<TNode>) {
+    constructor(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>);
+    constructor(source: AsyncQueryable<T> | HierarchyIterable<TNode, T>, hierarchy?: HierarchyProvider<TNode>) {
         if (hierarchy) {
-            assert.mustBePossiblyAsyncQueryable(source, "source");
+            assert.mustBeAsyncQueryable(source, "source");
             assert.mustBeHierarchyProvider(hierarchy, "hierarchy");
             source = MakeAsyncHierarchyIterable(source, hierarchy);
         }
@@ -1121,11 +1189,41 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
+     *
+     * @param callback The callback to invoke.
+     */
+    do(callback: (element: T, offset: number) => PromiseLike<void>): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     *
+     * @param callback The callback to invoke.
+     */
+    do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
      */
     tap(callback: (element: T, offset: number) => void): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    tap(callback: (element: T, offset: number) => PromiseLike<void>): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Lazily invokes a callback as each element of the query is iterated.
+     * This is an alias for `do`.
+     *
+     * @param callback The callback to invoke.
+     */
+    tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery whose elements are in the reverse order.
@@ -1187,86 +1285,123 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
     takeWhile(predicate: (element: T) => boolean): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
+     * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    intersect(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    intersect<U extends T>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, U>;
 
     /**
-     * Creates a subquery for the set union of this `Query` and another `Queryable`.
+     * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    union(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    intersect(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set difference between this `Query` and another `Queryable`.
+     * Creates a subquery for the set union of this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    except(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    union<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
+    
+    /**
+     * Creates a subquery for the set union of this `AsyncQuery` and another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    union(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set difference between this `Query` and another `Queryable`.
+     * Creates a subquery for the set difference between this `AsyncQuery` and another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    except(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery for the set difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * This is an alias for `except`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    relativeComplement(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    relativeComplement(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    symmetricDifference(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    symmetricDifference<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    symmetricDifference(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * This is an alias for `symmetricDifference`.
      *
-     * @param right A `Queryable` object.
+     * @param right An `AsyncQueryable` object.
      */
-    xor(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    xor<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
 
     /**
-     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
-     * @param right A `Queryable` object.
+     * This is an alias for `symmetricDifference`.
+     *
+     * @param right An `AsyncQueryable` object.
      */
-    concat(right: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    xor(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     * Creates a subquery that concatenates this `AsyncQuery` with another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    concat<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
+
+    /**
+     * Creates a subquery that concatenates this `AsyncQuery` with another `AsyncQueryable`.
+     *
+     * @param right An `AsyncQueryable` object.
+     */
+    concat(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery that concatenates this `AsyncQuery` with another `AsyncQueryable`.
      */
     distinct(): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the elements of this `Query` with the provided value appended to the end.
+     * Creates a subquery for the elements of this `AsyncQuery` with the provided value appended to the end.
      *
      * @param value The value to append.
      */
-    append(value: T): AsyncHierarchyQuery<TNode, T>;
+    append(value: PromiseLike<T> | T): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the elements of this `Query` with the provided value prepended to the beginning.
+     * Creates a subquery for the elements of this `AsyncQuery` with the provided value prepended to the beginning.
      *
      * @param value The value to prepend.
      */
-    prepend(value: T): AsyncHierarchyQuery<TNode, T>;
+    prepend(value: PromiseLike<T> | T): AsyncHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the elements of this `Query` with the provided range
+     * Creates a subquery for the elements of this `AsyncQuery` with the provided range
      * patched into the results.
      *
      * @param start The offset at which to patch the range.
      * @param skipCount The number of elements to skip from start.
      * @param range The range to patch into the result.
      */
-    patch(start: number, skipCount: number, range: PossiblyAsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    patch(start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery that contains the provided default value if this Query
@@ -1274,7 +1409,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      *
      * @param defaultValue The default value.
      */
-    defaultIfEmpty(defaultValue: T): AsyncHierarchyQuery<TNode, T>;
+    defaultIfEmpty(defaultValue: PromiseLike<T> | T): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
@@ -1503,14 +1638,14 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
  * Represents an ordered sequence of elements.
  */
 @Registry.QueryConstructor("AsyncOrderedQuery")
-export class AsyncOrderedQuery<T> extends AsyncQuery<T> implements AsyncOrderedQuerySource<T> {
+export class AsyncOrderedQuery<T> extends AsyncQuery<T> implements AsyncOrderedIterable<T> /*, AsyncOrderedQuerySource<T>*/ {
     constructor(source: PossiblyAsyncOrderedIterable<T>) {
         assert.mustBePossiblyAsyncOrderedIterable(source, "source");
         super(ToAsyncOrderedIterable(source));
     }
 
     [AsyncOrderedIterable.thenByAsync]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T> {
-        return ThenByAsync(this["_source"] as AsyncOrderedIterable<T>, keySelector, comparison, descending);
+        return ThenByAsync(GetAsyncSource(this), keySelector, comparison, descending);
     }
 }
 
@@ -1539,7 +1674,7 @@ export interface AsyncOrderedQuery<T> {
  * Represents an ordered sequence of hierarchically organized values.
  */
 @Registry.QueryConstructor("AsyncOrderedHierarchyQuery")
-export class AsyncOrderedHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncHierarchyQuery<TNode, T> implements AsyncOrderedHierarchyIterable<TNode, T> {
+export class AsyncOrderedHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncHierarchyQuery<TNode, T> implements AsyncOrderedHierarchyIterable<TNode, T> /*, AsyncOrderedHierarchyQuerySource<TNode, T> */ {
     constructor(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>);
     constructor(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>);
     constructor(source: PossiblyAsyncOrderedIterable<T> | OrderedHierarchyIterable<TNode, T>, hierarchy?: HierarchyProvider<TNode>) {
@@ -1553,7 +1688,7 @@ export class AsyncOrderedHierarchyQuery<TNode, T extends TNode = TNode> extends 
     }
 
     [AsyncOrderedIterable.thenByAsync]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedHierarchyIterable<TNode, T> {
-        return ThenByAsync(this["_source"] as AsyncOrderedHierarchyIterable<TNode, T>, keySelector, comparison, descending);
+        return ThenByAsync(GetAsyncSource(this), keySelector, comparison, descending);
     }
 }
 

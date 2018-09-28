@@ -15,28 +15,26 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 import { Map } from "../collections";
 
 /**
- * Creates a Map for the elements of the Query.
+ * Creates a Map for the elements of the source.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select a key for each element.
  */
-export function toMapAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector?: (element: T) => T): Promise<Map<K, T>>;
-
+export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K): Promise<Map<K, T>>;
 /**
- * Creates a Map for the elements of the Query.
+ * Creates a Map for the elements of the source.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
  */
-export function toMapAsync<T, K, V>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V>>;
-
-export async function toMapAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Map<K, T>> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function toMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V>>;
+export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Map<K, T>> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const map = new Map<K, T>();

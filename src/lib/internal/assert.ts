@@ -13,11 +13,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+
 import * as Debug from "./debug";
 import { IsObject, SameValue, IsArrayLike, IsIterable, IsOrderedIterable, IsHierarchyIterable, IsAsyncIterable, IsAsyncOrderedIterable, IsPossiblyAsyncHierarchyIterable, IsOrderedHierarchyIterable } from ".";
-import { Queryable, HierarchyProvider, AsyncOrderedIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, QuerySource, AsyncQuerySource } from "../types";
+import { Queryable, HierarchyProvider, AsyncOrderedIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { OrderedIterable, HierarchyIterable } from "../types";
-import { IsQuerySource, IsAsyncQuerySource } from "./guards";
+import { QuerySource, AsyncQuerySource } from "./types";
+import { IsQuerySource, IsAsyncQuerySource, IsAsyncHierarchyIterable } from "./guards";
 
 /** @internal */
 export function fail(ErrorType: new (message?: string) => Error, paramName: string | undefined, message: string | undefined, stackCrawlMark: Function = fail): never {
@@ -128,6 +130,12 @@ export function mustBePossiblyAsyncQueryable<T>(value: Queryable<T> | AsyncItera
 }
 
 /** @internal */
+export function mustBeAsyncQueryable<T>(value: AsyncQueryable<T>, paramName?: string, message: string = "AsyncIterable or Iterable or Array-like object expected", stackCrawlMark: Function = mustBeQueryable) {
+    mustBeObject(value, paramName, message, stackCrawlMark);
+    assertType(IsArrayLike(value) || IsIterable(value) || IsAsyncIterable(value), paramName, message, stackCrawlMark);
+}
+
+/** @internal */
 export function mustBeArrayLike<T>(value: ArrayLike<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeArrayLike) {
     mustBeObject(value, paramName, message, stackCrawlMark);
     assertType(IsArrayLike(value), paramName, message, stackCrawlMark);
@@ -148,6 +156,13 @@ export function mustBeQueryableOrUndefined<T>(value: Queryable<T> | undefined, p
 
 /** @internal */
 export function mustBePossiblyAsyncQueryableOrUndefined<T>(value: Queryable<T> | AsyncIterable<T> | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mustBeQueryableOrUndefined) {
+    if (value === undefined) return;
+    mustBeObject(value, paramName, message, stackCrawlMark);
+    assertType(IsArrayLike(value) || IsIterable(value) || IsAsyncIterable(value), paramName, message, stackCrawlMark);
+}
+
+/** @internal */
+export function mustBeAsyncQueryableOrUndefined<T>(value: AsyncQueryable<T> | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mustBeQueryableOrUndefined) {
     if (value === undefined) return;
     mustBeObject(value, paramName, message, stackCrawlMark);
     assertType(IsArrayLike(value) || IsIterable(value) || IsAsyncIterable(value), paramName, message, stackCrawlMark);
@@ -186,7 +201,12 @@ export function mustBeHierarchyIterable<T>(value: HierarchyIterable<T>, paramNam
 }
 
 /** @internal */
-export function mustBePossiblyAsyncHierarchyIterable<T>(value: PossiblyAsyncHierarchyIterable<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeHierarchyIterable) {
+export function mustBeAsyncHierarchyIterable<T>(value: AsyncHierarchyIterable<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeHierarchyIterable) {
+    assertType(IsAsyncHierarchyIterable(value), paramName, message, stackCrawlMark);
+}
+
+/** @internal */
+export function mustBePossiblyAsyncHierarchyIterable<TNode, T extends TNode>(value: PossiblyAsyncHierarchyIterable<TNode, T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeHierarchyIterable) {
     assertType(IsPossiblyAsyncHierarchyIterable(value), paramName, message, stackCrawlMark);
 }
 

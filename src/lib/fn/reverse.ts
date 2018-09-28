@@ -22,12 +22,10 @@ import { toArray } from "./toArray";
  * Creates a subquery whose elements are in the reverse order.
  */
 export function reverse<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery whose elements are in the reverse order.
  */
 export function reverse<T>(source: Queryable<T>): Iterable<T>;
-
 export function reverse<T>(source: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     return FlowHierarchy(new ReverseIterable(ToIterable(source)), source);

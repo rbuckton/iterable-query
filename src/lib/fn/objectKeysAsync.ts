@@ -17,7 +17,7 @@
 import { assert, Registry, ToStringTag } from "../internal";
 
 /**
- * Creates an `Iterable` for the own property keys of an object.
+ * Creates an `AsyncIterable` for the own property keys of an object.
  *
  * @param source An object.
  */

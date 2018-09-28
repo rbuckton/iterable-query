@@ -154,3 +154,113 @@ export function preconditions(name: string, data: [any, ErrorConstructorLike][],
         }
     });
 }
+
+export type Not<A extends boolean> = A extends true ? false : A extends false ? true : boolean;
+export type And<A extends boolean, B extends boolean> = A extends true ? B extends true ? true : false : false;
+export type Or<A extends boolean, B extends boolean> = A extends false ? B extends false ? false : true : true;
+export type IsNever<T> = [T] extends [never] ? true : false;
+export type IsAny<T> = T extends unknown ? boolean extends (T extends never ? true : false) ? true : false : never;
+export type IsVoid<T> = T extends unknown ? IsAny<T> extends true ? false : [T] extends [void] ? [void] extends [T] ? true : false : false : never;
+export type IsUnknown<T> = T extends unknown ? unknown extends T ? Not<IsAny<T>> : false : false;
+export type IsSubTypeOf<A, B> = [A] extends [B] ? true : false;
+export type IsSuperTypeOf<A, B> = [B] extends [A] ? true : false;
+export type IsExactly<A, B> = 
+    Or<IsAny<A>, IsAny<B>> extends true ? And<IsAny<B>, IsAny<A>> :
+    Or<IsUnknown<A>, IsUnknown<B>> extends true ? And<IsUnknown<B>, IsUnknown<A>> :
+    Or<IsNever<A>, IsNever<B>> extends true ? And<IsNever<A>, IsNever<B>> :
+    Or<IsVoid<A>, IsVoid<B>> extends true ? And<IsVoid<A>, IsVoid<B>> :
+    And<IsSubTypeOf<A, B>, IsSuperTypeOf<A, B>>;
+export type IsRelatedTo<A, B> =
+    IsExactly<A, B> extends true ? true :
+    IsSuperTypeOf<A, B> extends true ? true :
+    IsSubTypeOf<A, B> extends true ? true :
+    false;
+
+// test the above conditional types:
+type MustBeTrue<_ extends true> = true;
+type MustBeFalse<_ extends false> = true;
+type A1 = { a: number }
+type A2 = { a: number }
+type AB = { a: number, b: string }
+type R = MustBeTrue<
+    | MustBeFalse<IsNever<any>>
+    | MustBeFalse<IsNever<unknown>>
+    | MustBeTrue<IsNever<never>>
+    | MustBeFalse<IsNever<void>>
+    | MustBeTrue<IsAny<any>>
+    | MustBeFalse<IsAny<unknown>>
+    | MustBeFalse<IsAny<never>>
+    | MustBeFalse<IsAny<void>>
+    | MustBeFalse<IsVoid<any>>
+    | MustBeFalse<IsVoid<unknown>>
+    | MustBeFalse<IsVoid<never>>
+    | MustBeTrue<IsVoid<void>>
+    | MustBeFalse<IsUnknown<any>>
+    | MustBeTrue<IsUnknown<unknown>>
+    | MustBeFalse<IsUnknown<never>>
+    | MustBeFalse<IsUnknown<void>>
+    | MustBeTrue<IsExactly<A1, A1>>
+    | MustBeTrue<IsExactly<A1, A2>>
+    | MustBeFalse<IsExactly<A1, AB>>
+    | MustBeFalse<IsExactly<A1, any>>
+    | MustBeFalse<IsExactly<A1, never>>
+    | MustBeFalse<IsExactly<A1, void>>
+    | MustBeFalse<IsExactly<A1, unknown>>
+    | MustBeFalse<IsExactly<AB, A1>>
+    | MustBeFalse<IsExactly<any, A1>>
+    | MustBeFalse<IsExactly<never, A1>>
+    | MustBeFalse<IsExactly<void, A1>>
+    | MustBeFalse<IsExactly<unknown, A1>>
+    >;
+
+export function typeOnly(_: () => void) { /*do nothing*/ }
+
+export declare function type<T>(): T;
+
+export declare namespace type {
+    export {};
+
+    const expectedExactType: unique symbol;
+    const expectedSuperType: unique symbol;
+    const expectedSubType: unique symbol;
+    const expectedTypeRelatedTo: unique symbol;
+
+    interface ExpectedExactType<E> { readonly [expectedExactType]: E; }
+    interface ExpectedSuperTypeOf<E> { readonly [expectedSuperType]: E; }
+    interface ExpectedSubTypeOf<E> { readonly [expectedSubType]: E; }
+    interface ExpectedTypeRelatedTo<E> { readonly [expectedTypeRelatedTo]: E; }
+
+    type ExpectExactType<TExpected, TActual> = IsExactly<TExpected, TActual> extends true ? TActual : ExpectedExactType<TExpected>;
+    type ExpectSubTypeOf<TExpected, TActual> = IsSubTypeOf<TActual, TExpected> extends true ? TActual : ExpectedSubTypeOf<TExpected>;
+    type ExpectSuperTypeOf<TExpected, TActual> = IsSuperTypeOf<TActual, TExpected> extends true ? TActual : ExpectedSuperTypeOf<TExpected>;
+    type ExpectTypeRelatedTo<TExpected, TActual> = IsRelatedTo<TExpected, TActual> extends true ? TActual: ExpectedTypeRelatedTo<TExpected>;
+    
+    export function exact<TExpected, TActual>(expected: TExpected, actual: ExpectExactType<TExpected, TActual>): void;
+    export function subtype<TExpected, TActual>(expected: TExpected, actual: ExpectSubTypeOf<TExpected, TActual>): void;
+    export function supertype<TExpected, TActual>(expected: TExpected, actual: ExpectSuperTypeOf<TExpected, TActual>): void;
+    export function related<TExpected, TActual>(expected: TExpected, actual: ExpectTypeRelatedTo<TExpected, TActual>): void;
+
+    export namespace not {
+        export {};
+
+        const notExpectedExactType: unique symbol;
+        const notExpectedSuperType: unique symbol;
+        const notExpectedSubType: unique symbol;
+        const notExpectedTypeRelatedTo: unique symbol;
+        
+        interface ExpectedNotExactType<E> { readonly [notExpectedExactType]: E; }
+        interface ExpectedNotSuperTypeOf<E> { readonly [notExpectedSuperType]: E; }
+        interface ExpectedNotSubTypeOf<E> { readonly [notExpectedSubType]: E; }
+        interface ExpectedTypeNotRelatedTo<E> { readonly [notExpectedTypeRelatedTo]: E; }
+
+        type ExpectNotExactType<TExpected, TActual> = IsExactly<TExpected, TActual> extends false ? TActual : ExpectedNotExactType<TExpected>;
+        type ExpectNotSubTypeOf<TExpected, TActual> = IsSubTypeOf<TActual, TExpected> extends false ? TActual : ExpectedNotSubTypeOf<TExpected>;
+        type ExpectNotSuperTypeOf<TExpected, TActual> = IsSuperTypeOf<TActual, TExpected> extends false ? TActual : ExpectedNotSuperTypeOf<TExpected>;
+        type ExpectTypeNotRelatedTo<TExpected, TActual> = IsRelatedTo<TExpected, TActual> extends false ? TActual: ExpectedTypeNotRelatedTo<TExpected>;
+    
+        export function exact<TExpected, TActual>(expected: TExpected, actual: ExpectNotExactType<TExpected, TActual>): void;
+        export function subtype<TExpected, TActual>(expected: TExpected, actual: ExpectNotSubTypeOf<TExpected, TActual>): void;
+        export function supertype<TExpected, TActual>(expected: TExpected, actual: ExpectNotSuperTypeOf<TExpected, TActual>): void;
+        export function related<TExpected, TActual>(expected: TExpected, actual: ExpectTypeNotRelatedTo<TExpected, TActual>): void;
+    }
+}

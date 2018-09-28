@@ -15,12 +15,24 @@
  */
 
 import { assert, MakeAsyncHierarchyIterable, Registry } from "../internal";
-import { HierarchyProvider, PossiblyAsyncQueryable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable } from "../types";
+import { HierarchyProvider, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncQueryable } from "../types";
 
+/**
+ * Creates an `AsyncHierarchyIterable` using the provided `HierarchyProvider`.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param hierarchy A `HierarchyProvider`.
+ */
 export function toHierarchyAsync<TNode, T extends TNode>(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyIterable<TNode, T>;
-export function toHierarchyAsync<TNode, T extends TNode>(source: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T>;
-export function toHierarchyAsync<TNode, T extends TNode>(source: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+/**
+ * Creates an `AsyncHierarchyIterable` using the provided `HierarchyProvider`.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param hierarchy A `HierarchyProvider`.
+ */
+export function toHierarchyAsync<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T>;
+export function toHierarchyAsync<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeHierarchyProvider(hierarchy, "hierarchy");
     return MakeAsyncHierarchyIterable(source, hierarchy);
 }

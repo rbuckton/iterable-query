@@ -19,9 +19,9 @@ import { MakeAsyncHierarchyIterable, MakeHierarchyIterable } from "./conversion"
 import { GetHierarchy } from "./utils";
 import { ToStringTag } from "./decorators";
 import { Set } from "../collections";
-import { PossiblyAsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, OrderedHierarchyIterable, OrderedIterable, HierarchyIterable, PossiblyAsyncIterable, HierarchyProvider, Hierarchical, Grouping, HierarchyGrouping } from "../types";
+import { AsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, OrderedHierarchyIterable, OrderedIterable, HierarchyIterable, HierarchyProvider, Hierarchical, Grouping, HierarchyGrouping } from "../types";
 
-/** @internal */ type WithHierarchy<S extends PossiblyAsyncIterable<unknown>> =
+/** @internal */ type WithHierarchy<S extends AsyncIterable<any> | Iterable<any>> =
     S extends AsyncOrderedIterable<infer T> ? AsyncOrderedHierarchyIterable<T> :
     S extends AsyncIterable<infer T> ? AsyncHierarchyIterable<T> :
     S extends OrderedIterable<infer T> ? OrderedHierarchyIterable<T> :
@@ -29,22 +29,21 @@ import { PossiblyAsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIter
     S extends Iterable<infer T> ? HierarchyIterable<T> :
     never;
 
-/** @internal */ type PossiblyWithHierarchy<T, R extends PossiblyAsyncIterable<T>, FlowLeft extends PossiblyAsyncQueryable<T> | undefined, FlowRight extends PossiblyAsyncQueryable<T> | undefined> =
+/** @internal */ type PossiblyWithHierarchy<T, R extends AsyncIterable<T> | Iterable<T>, FlowLeft extends AsyncQueryable<T> | undefined, FlowRight extends AsyncQueryable<T> | undefined> =
     R extends Hierarchical<T> ? R :
     FlowLeft extends Hierarchical<T> ? WithHierarchy<R> :
     FlowRight extends Hierarchical<T> ? WithHierarchy<R> :
     R;
 
-/** @internal */ export function FlowHierarchy<T, R extends PossiblyAsyncIterable<T>, FlowLeft extends PossiblyAsyncQueryable<T>, FlowRight extends PossiblyAsyncQueryable<T> | undefined>(result: R, flowLeft: FlowLeft, flowRight?: FlowRight): PossiblyWithHierarchy<T, R, FlowLeft, FlowRight>;
-/** @internal */ export function FlowHierarchy<T>(result: Iterable<T>, flowLeft: PossiblyAsyncQueryable<T>, flowRight?: PossiblyAsyncQueryable<T>): Iterable<T>;
-/** @internal */ export function FlowHierarchy<T>(result: Grouping<unknown, T> | PossiblyAsyncIterable<T>, flowLeft: PossiblyAsyncQueryable<T>, flowRight?: PossiblyAsyncQueryable<T>): AsyncIterable<T> | Iterable<T> {
+/** @internal */ export function FlowHierarchy<T, R extends AsyncIterable<T> | Iterable<T>, FlowLeft extends AsyncQueryable<T>, FlowRight extends AsyncQueryable<T> | undefined>(result: R, flowLeft: FlowLeft, flowRight?: FlowRight): PossiblyWithHierarchy<T, R, FlowLeft, FlowRight>;
+/** @internal */ export function FlowHierarchy<T>(result: Iterable<T>, flowLeft: AsyncQueryable<T>, flowRight?: AsyncQueryable<T>): Iterable<T>;
+/** @internal */ export function FlowHierarchy<T>(result: Grouping<unknown, T> | AsyncIterable<T> | Iterable<T>, flowLeft: AsyncQueryable<T>, flowRight?: AsyncQueryable<T>): AsyncIterable<T> | Iterable<T> {
     if (IsPossiblyAsyncHierarchyIterable(result)) return result;
     const leftHierarchy = IsPossiblyAsyncHierarchyIterable(flowLeft) ? GetHierarchy(flowLeft) : undefined;
     const rightHierarchy = IsPossiblyAsyncHierarchyIterable(flowRight) ? GetHierarchy(flowRight) : undefined;
     const hierarchy = CombineHierarchies(leftHierarchy, rightHierarchy);
     if (hierarchy) {
         if (IsAsyncIterable(result)) {
-            result;
             return MakeAsyncHierarchyIterable(result, hierarchy);
         }
     }
@@ -73,16 +72,29 @@ class CompositeHierarchyProvider<T> {
     }
 
     owns(value: T) {
-        return this._hierarchies.some(hierarchy => hierarchy.owns(value));
+        return findOwner(this._hierarchies, value) !== undefined;
     }
 
     parent(value: T) {
-        const hierarchy = this._hierarchies.find(hierarchy => hierarchy.owns(value));
+        const hierarchy = findOwner(this._hierarchies, value);
         return hierarchy && hierarchy.parent(value);
     }
 
     children(value: T) {
-        const hierarchy = this._hierarchies.find(hierarchy => hierarchy.owns(value));
+        const hierarchy = findOwner(this._hierarchies, value);
         return hierarchy ? hierarchy.children(value) : [];
     }
+}
+
+function findOwner<T>(hierarchies: ReadonlyArray<HierarchyProvider<T>>, value: T) {
+    let bestMatch: HierarchyProvider<T> | undefined;
+    for (const hierarchy of hierarchies) {
+        if (hierarchy.owns) {
+            if (hierarchy.owns(value)) return hierarchy;
+        }
+        else if (!bestMatch) {
+            bestMatch = hierarchy;
+        }
+    }
+    return bestMatch;
 }

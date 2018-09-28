@@ -14,8 +14,5 @@
   limitations under the License.
  */
 
-import { Registry } from "../internal";
 import { if as _if } from "./if";
 export { _if as conditional };
-
-// Registry.Query.registerAlias("conditional", _if);

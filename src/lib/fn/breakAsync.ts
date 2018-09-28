@@ -14,8 +14,8 @@
   limitations under the License.
  */
 
-import { assert, GetAsyncIterator, ToAsyncIterable, FlowHierarchy, Registry, GetAsyncSource, CreateAsyncSubquery, CreateSubquery, MakeTuple, ToPossiblyAsyncIterable } from "../internal";
-import { AsyncHierarchyIterable, HierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, AsyncQuerySource } from "../types";
+import { assert, GetAsyncIterator, FlowHierarchy, Registry, GetAsyncSource, CreateAsyncSubquery, CreateSubquery, MakeTuple, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncHierarchyIterable, HierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { prependAsync } from "./prependAsync";
 import { consumeAsync, ConsumeAsyncOptions } from "./consumeAsync";
 import { emptyAsync } from "./emptyAsync";
@@ -28,14 +28,13 @@ const cacheAndClose: ConsumeAsyncOptions = { cacheElements: true, leaveOpen: fal
  * elements that do not match the supplied predicate, and whose second element is an `AsyncIterable`
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `AsyncIterable` is lazily
+ * The first `Iterable` is eagerly evaluated, while the second `ASyncIterable` is lazily
  * evaluated.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
  */
-export function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
-
+export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that do not match the supplied predicate, and whose second element is an `AsyncIterable`
@@ -44,13 +43,12 @@ export function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarch
  * The first `Iterable` is eagerly evaluated, while the second `ASyncIterable` is lazily
  * evaluated.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
  */
-export function breakAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
-
-export async function breakAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
+export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     const prefix: T[] = [];
     const iterator = GetAsyncIterator(ToPossiblyAsyncIterable(source));

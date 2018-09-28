@@ -15,38 +15,38 @@
  */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
  */
 export function takeWhileAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): AsyncHierarchyIterable<TNode, U>;
-
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
  */
 export function takeWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
  */
-export function takeWhileAsync<T, U extends T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => element is U): AsyncIterable<U>;
-
+export function takeWhileAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T) => element is U): AsyncIterable<U>;
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
  */
-export function takeWhileAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
-
-export function takeWhileAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function takeWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
+export function takeWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     return FlowHierarchy(new AsyncTakeWhileIterable(ToPossiblyAsyncIterable(source), predicate), source);
 }

@@ -20,7 +20,7 @@ import { HierarchyProvider } from "../types";
 /** @internal */
 export namespace Axis {
     export function * root<T>(provider: HierarchyProvider<T>, element: T) {
-        if (element === undefined) return;
+        if (element === undefined || !owns(provider, element)) return;
         let hasRoot = false;
         let root: T;
         for (const ancestor of ancestorsAndSelf(provider, element)) {
@@ -32,12 +32,14 @@ export namespace Axis {
         }
     }
 
-    export function ancestors<T>(provider: HierarchyProvider<T>, element: T) {
-        return ancestorsWorker(provider, element, /*self*/ false);
+    export function * ancestors<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* ancestorsWorker(provider, element, /*self*/ false);
     }
 
-    export function ancestorsAndSelf<T>(provider: HierarchyProvider<T>, element: T) {
-        return ancestorsWorker(provider, element, /*self*/ true);
+    export function * ancestorsAndSelf<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* ancestorsWorker(provider, element, /*self*/ true);
     }
 
     function * ancestorsWorker<T>(provider: HierarchyProvider<T>, element: T, self: boolean) {
@@ -49,12 +51,14 @@ export namespace Axis {
         }
     }
 
-    export function descendants<T>(provider: HierarchyProvider<T>, element: T) {
-        return descendantsWorker(provider, element, /*self*/ false);
+    export function * descendants<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* descendantsWorker(provider, element, /*self*/ false);
     }
 
-    export function descendantsAndSelf<T>(provider: HierarchyProvider<T>, element: T) {
-        return descendantsWorker(provider, element, /*self*/ true);
+    export function * descendantsAndSelf<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* descendantsWorker(provider, element, /*self*/ true);
     }
 
     function * descendantsWorker<T>(provider: HierarchyProvider<T>, element: T, self: boolean): IterableIterator<T> {
@@ -62,37 +66,39 @@ export namespace Axis {
         if (self) {
             yield element;
         }
-        for (const child of children(provider, element)) {
+        for (const child of childrenWorker(provider, element)) {
             yield* descendantsWorker(provider, child, /*self*/ true);
         }
     }
 
     export function * parents<T>(provider: HierarchyProvider<T>, element: T) {
-        if (element === undefined) return;
+        if (element === undefined || !owns(provider, element)) return;
         const parent = provider.parent(element);
         if (parent !== undefined) {
             yield parent;
         }
     }
 
-    export function * self<T>(_provider: HierarchyProvider<T>, element: T) {
-        if (element === undefined) return;
+    export function * self<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
         yield element;
     }
 
-    export function siblings<T>(provider: HierarchyProvider<T>, element: T) {
-        return siblingsWorker(provider, element, /*self*/ false);
+    export function * siblings<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* siblingsWorker(provider, element, /*self*/ false);
     }
 
-    export function siblingsAndSelf<T>(provider: HierarchyProvider<T>, element: T) {
-        return siblingsWorker(provider, element, /*self*/ true);
+    export function * siblingsAndSelf<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* siblingsWorker(provider, element, /*self*/ true);
     }
 
     function * siblingsWorker<T>(provider: HierarchyProvider<T>, element: T, self: boolean) {
         if (element === undefined) return;
         const parent = provider.parent(element);
         if (parent !== undefined) {
-            for (const child of children(provider, parent)) {
+            for (const child of childrenWorker(provider, parent)) {
                 if (self || !SameValue(child, element)) {
                     yield child;
                 }
@@ -101,8 +107,8 @@ export namespace Axis {
     }
 
     export function * siblingsBeforeSelf<T>(provider: HierarchyProvider<T>, element: T) {
-        if (element === undefined) return;
-        for (const sibling of siblingsAndSelf(provider, element)) {
+        if (element === undefined || !owns(provider, element)) return;
+        for (const sibling of siblingsWorker(provider, element, /*self*/ true)) {
             if (SameValue(sibling, element)) {
                 return;
             }
@@ -111,9 +117,9 @@ export namespace Axis {
     }
     
     export function * siblingsAfterSelf<T>(provider: HierarchyProvider<T>, element: T) {
-        if (element === undefined) return;
+        if (element === undefined || !owns(provider, element)) return;
         let hasSeenSelf = false;
-        for (const sibling of siblingsAndSelf(provider, element)) {
+        for (const sibling of siblingsWorker(provider, element, /*self*/ true)) {
             if (hasSeenSelf) {
                 yield sibling;
             }
@@ -124,6 +130,11 @@ export namespace Axis {
     }
 
     export function * children<T>(provider: HierarchyProvider<T>, element: T) {
+        if (element === undefined || !owns(provider, element)) return;
+        yield* childrenWorker(provider, element);
+    }
+    
+    function * childrenWorker<T>(provider: HierarchyProvider<T>, element: T) {
         if (element === undefined) return;
         const children = provider.children(element);
         if (children === undefined) return;
@@ -131,5 +142,8 @@ export namespace Axis {
             if (child !== undefined) yield child;
         }
     }
-}
 
+    function owns<T>(hierarchy: HierarchyProvider<T>, value: T) {
+        return hierarchy.owns === undefined || hierarchy.owns(value);
+    }
+}

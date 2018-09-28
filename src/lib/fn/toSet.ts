@@ -23,8 +23,7 @@ import { Set } from "../collections";
  * 
  * @param source A `Queryable` object.
  */
-export function toSet<T>(source: Queryable<T>, elementSelector?: (element: T) => T): Set<T>;
-
+export function toSet<T>(source: Queryable<T>): Set<T>;
 /**
  * Creates a Set for the elements of the Query.
  *
@@ -32,7 +31,6 @@ export function toSet<T>(source: Queryable<T>, elementSelector?: (element: T) =>
  * @param elementSelector A callback that selects a value for each element.
  */
 export function toSet<T, V>(source: Queryable<T>, elementSelector: (element: T) => V): Set<V>;
-
 export function toSet<T>(source: Queryable<T>, elementSelector: (element: T) => T = Identity): Set<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");

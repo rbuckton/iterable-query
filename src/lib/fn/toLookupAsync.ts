@@ -15,28 +15,26 @@
  */
 
 import { assert, Identity, CreateGroupingsAsync, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 import { Lookup } from "../lookup";
 
 /**
- * Creates a Lookup for the elements of the Query.
+ * Creates a Lookup for the elements of the source.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select a key for each element.
  */
-export function toLookupAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector?: (element: T) => T): Promise<Lookup<K, T>>;
-
+export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K): Promise<Lookup<K, T>>;
 /**
- * Creates a Lookup for the elements of the Query.
+ * Creates a Lookup for the elements of the source.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
  */
-export function toLookupAsync<T, K, V>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Lookup<K, V>>;
-
-export async function toLookupAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Lookup<K, T>> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Lookup<K, V>>;
+export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Lookup<K, T>> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
     return new Lookup(await CreateGroupingsAsync(source, keySelector, elementSelector));

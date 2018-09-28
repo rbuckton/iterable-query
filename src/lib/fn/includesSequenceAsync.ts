@@ -15,40 +15,29 @@
  */
 
 import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison A callback used to compare the equality of two elements.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function includesSequenceAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>, equalityComparison?: (left: T, right: T) => boolean): Promise<boolean>;
-
+export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
 /**
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  * @param equalityComparison A callback used to compare the equality of two elements.
  */
-export function includesSequenceAsync<T, U>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
-
-/**
- * Computes a scalar value indicating whether the elements of `left` include
- * an exact sequence of elements from `right`.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
- */
-export async function includesSequenceAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): Promise<boolean> {
-    assert.mustBePossiblyAsyncQueryable(left, "source");
-    assert.mustBePossiblyAsyncQueryable(right, "other");
+export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean = SameValue): Promise<boolean> {
+    assert.mustBeAsyncQueryable<T>(left, "source");
+    assert.mustBeAsyncQueryable<U>(right, "other");
     assert.mustBeFunction(equalityComparison, "equalityComparison");
     const rightArray = await toArrayAsync(right);
     const numRightElements = rightArray.length;

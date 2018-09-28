@@ -1,18 +1,20 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es2017",
         "module": "commonjs",
         "lib": ["esnext"],
         "outDir": "../../out/lib",
         "experimentalDecorators": true,
+        "noEmitOnError": true,
         "noImplicitAny": true,
         "sourceMap": true,
         "stripInternal": true,
         "declaration": true,
         "declarationMap": true,
+        "skipLibCheck": true,
         "strict": true,
         "composite": true,
-        // "noUnusedLocals": true,
+        "noUnusedLocals": true,
         // "noUnusedParameters": true
     },
     "include": [

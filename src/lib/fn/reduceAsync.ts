@@ -15,49 +15,38 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param accumulator the callback used to compute the result.
  */
-export function reduceAsync<T>(source: PossiblyAsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): Promise<T>;
-
+export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): Promise<T>;
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  */
-export function reduceAsync<T, U>(source: PossiblyAsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): Promise<U>;
-
+export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): Promise<U>;
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.
  */
-export function reduceAsync<T, U, R>(source: PossiblyAsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): Promise<R>;
-
-/**
- * Computes a scalar value by applying an accumulator callback over each element.
- *
- * @param source A `Queryable` object.
- * @param accumulator the callback used to compute the result.
- * @param seed An optional seed value.
- * @param resultSelector An optional callback used to compute the final result.
- */
-export function reduceAsync<T>(source: PossiblyAsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): Promise<T> {
+export function reduceAsync<T, U, R>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): Promise<R>;
+export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): Promise<T> {
     return reduceAsyncCore(source, accumulator, seed, arguments.length > 2, resultSelector);
 }
 
-async function reduceAsyncCore<T>(source: PossiblyAsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, current: T | undefined, hasCurrent: boolean, resultSelector: (result: T, count: number) => T): Promise<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+async function reduceAsyncCore<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, current: T | undefined, hasCurrent: boolean, resultSelector: (result: T, count: number) => T): Promise<T> {
+    assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");
     assert.mustBeFunction(resultSelector, "resultSelector");
     let count = 0;

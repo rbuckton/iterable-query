@@ -15,16 +15,16 @@
  */
 
 import { assert, CompareValues, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Gets the minimum element, comparing elements using the supplied callback.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param comparison An optional callback used to compare two elements.
  */
-export async function minAsync<T>(source: PossiblyAsyncQueryable<T>, comparison: (x: T, y: T) => number = CompareValues): Promise<T | undefined> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function minAsync<T>(source: AsyncQueryable<T>, comparison: (x: T, y: T) => number = CompareValues): Promise<T | undefined> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(comparison, "comparison");
     let hasResult = false;
     let result: T | undefined;

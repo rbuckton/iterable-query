@@ -25,7 +25,6 @@ import { Queryable, Page, HierarchyIterable, HierarchyPage } from "../types";
  * @param pageSize The number of elements per page.
  */
 export function pageBy<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, pageSize: number): Iterable<HierarchyPage<TNode, T>>;
-
 /**
  * Creates a subquery that splits this Query into one or more pages.
  * While advancing from page to page is evaluated lazily, the elements of the page are

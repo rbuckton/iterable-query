@@ -15,12 +15,20 @@
  */
 
 import { assert, Registry, GetAsyncSource, CreateAsyncSubquery } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
-export function throughAsync<T, U, S extends PossiblyAsyncQueryable<T> = PossiblyAsyncQueryable<T>, R extends PossiblyAsyncQueryable<U> = PossiblyAsyncQueryable<U>>(source: S, callback: (source: S) => R): R {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+/**
+ * Pass the entire source to the provided callback, returning an `AsyncQueryable` from the result.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param callback A callback function.
+ */
+export function throughAsync<T, U, S extends AsyncQueryable<T> = AsyncQueryable<T>, R extends AsyncQueryable<U> = AsyncQueryable<U>>(source: S, callback: (source: S) => R): R {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(callback, "callback");
-    return callback(source);
+    const result = callback(source);
+    assert.mustBeAsyncQueryable(result);
+    return result;
 }
 
 Registry.AsyncQuery.registerCustom("through", throughAsync, function (callback) {

@@ -15,7 +15,7 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 
 /**
  * Creates a subquery that contains the provided default value if the source
@@ -23,27 +23,25 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQu
  *
  * @param defaultValue The default value.
  */
-export function defaultIfEmptyAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, defaultValue: T): AsyncHierarchyIterable<TNode, T>;
-
+export function defaultIfEmptyAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, defaultValue: PromiseLike<T> | T): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery that contains the provided default value if the source
  * contains no elements.
  *
  * @param defaultValue The default value.
  */
-export function defaultIfEmptyAsync<T>(source: PossiblyAsyncQueryable<T>, defaultValue: T): AsyncIterable<T>;
-
-export function defaultIfEmptyAsync<T>(source: PossiblyAsyncQueryable<T>, defaultValue: T): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function defaultIfEmptyAsync<T>(source: AsyncQueryable<T>, defaultValue: PromiseLike<T> | T): AsyncIterable<T>;
+export function defaultIfEmptyAsync<T>(source: AsyncQueryable<T>, defaultValue: PromiseLike<T> | T): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable(source, "source");
     return FlowHierarchy(new AsyncDefaultIfEmptyIterable(ToPossiblyAsyncIterable(source), defaultValue), source);
 }
 
 @ToStringTag("AsyncDefaultIfEmptyIterable")
 class AsyncDefaultIfEmptyIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _defaultValue: T;
+    private _defaultValue: PromiseLike<T> | T;
 
-    constructor(source: PossiblyAsyncIterable<T>, defaultValue: T) {
+    constructor(source: PossiblyAsyncIterable<T>, defaultValue: PromiseLike<T> | T) {
         this._source = source;
         this._defaultValue = defaultValue;
     }

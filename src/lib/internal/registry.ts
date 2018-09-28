@@ -1,7 +1,25 @@
+/*!
+  Copyright 2018 Ron Buckton (rbuckton@chronicles.org)
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+ */
+
+/** @internal */
 import "../compat";
-import { QuerySource, AsyncQuerySource, Queryable, PossiblyAsyncQueryable, HierarchyIterable, OrderedIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncHierarchyIterable, QuerySourceConstructor, OrderedQuerySourceConstructor, HierarchyQuerySourceConstructor, AsyncQuerySourceConstructor, AsyncOrderedQuerySourceConstructor, AsyncHierarchyQuerySourceConstructor, OrderedHierarchyIterable, OrderedHierarchyQuerySourceConstructor, PossiblyAsyncOrderedHierarchyIterable, AsyncOrderedHierarchyQuerySourceConstructor, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable } from "../types";
+import { Queryable, HierarchyIterable, OrderedIterable, OrderedHierarchyIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable } from "../types";
 import { GetSource, CreateSubquery, GetAsyncSource, CreateAsyncSubquery } from "./utils";
 import { Set } from "../collections";
+import { QuerySourceConstructor, HierarchyQuerySourceConstructor, OrderedQuerySourceConstructor, OrderedHierarchyQuerySourceConstructor, AsyncQuerySourceConstructor, AsyncHierarchyQuerySourceConstructor, AsyncOrderedQuerySourceConstructor, AsyncOrderedHierarchyQuerySourceConstructor, QuerySource, AsyncQuerySource } from "./types";
 
 type QueryKind =
     | "Query"
@@ -131,32 +149,32 @@ export namespace Registry {
 
     export namespace AsyncQuery {
         export function registerAlias<K extends MethodKeys<AsyncQuery<unknown>>>(name: K, fn: Function) { registerMethodName("AsyncQuery", fn, name); }
-        export function registerScalar<K extends MethodKeys<AsyncQuery<unknown>>>(name: K, fn: <T>(this: AsyncQuery<T>, source: PossiblyAsyncQueryable<T>, ...args: ParameterTypes<AsyncQuery<T>[K]>) => ReturnType<AsyncQuery<T>[K]>) { registerScalarMethod("AsyncQuery", fn, name); }
-        export function registerSubquery<K extends MethodKeys<AsyncQuery<unknown>>>(name: K, fn: <T>(this: AsyncQuery<T>, source: PossiblyAsyncQueryable<T>, ...args: ParameterTypes<AsyncQuery<T>[K]>) => IterableReturnType<AsyncQuery<T>[K]>) { registerSubqueryMethod("AsyncQuery", fn, name); }
+        export function registerScalar<K extends MethodKeys<AsyncQuery<unknown>>>(name: K, fn: <T>(this: AsyncQuery<T>, source: AsyncIterable<T>, ...args: ParameterTypes<AsyncQuery<T>[K]>) => ReturnType<AsyncQuery<T>[K]>) { registerScalarMethod("AsyncQuery", fn, name); }
+        export function registerSubquery<K extends MethodKeys<AsyncQuery<unknown>>>(name: K, fn: <T>(this: AsyncQuery<T>, source: AsyncIterable<T>, ...args: ParameterTypes<AsyncQuery<T>[K]>) => IterableReturnType<AsyncQuery<T>[K]>) { registerSubqueryMethod("AsyncQuery", fn, name); }
         export function registerCustom<K extends MethodKeys<AsyncQuery<unknown>>>(name: K, fn: Function, custom: <T>(this: AsyncQuery<T>, ...args: ParameterTypes<AsyncQuery<T>[K]>) => ReturnType<AsyncQuery<T>[K]>) { registerCustomMethod("AsyncQuery", fn, custom, name); }
         export function registerStatic<K extends MethodKeys<AsyncQueryConstructor>>(name: K, fn: (this: AsyncQueryConstructor, ...args: ParameterTypes<AsyncQueryConstructor[K]>) => IterableReturnType<AsyncQueryConstructor[K]>) { registerStaticMethod("AsyncQuery", fn, name); }
     }
 
     export namespace AsyncHierarchyQuery {
         export function registerAlias<K extends MethodKeys<AsyncHierarchyQuery<unknown>>>(name: K, fn: Function) { registerMethodName("AsyncHierarchyQuery", fn, name); }
-        export function registerScalar<K extends MethodKeys<AsyncHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncHierarchyQuery<T>, source: PossiblyAsyncHierarchyIterable<T>, ...args: ParameterTypes<AsyncHierarchyQuery<T>[K]>) => ReturnType<AsyncHierarchyQuery<T>[K]>) { registerScalarMethod("AsyncHierarchyQuery", fn, name); }
-        export function registerSubquery<K extends MethodKeys<AsyncHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncHierarchyQuery<T>, source: PossiblyAsyncHierarchyIterable<T>, ...args: ParameterTypes<AsyncHierarchyQuery<T>[K]>) => IterableReturnType<AsyncHierarchyQuery<T>[K]>) { registerSubqueryMethod("AsyncHierarchyQuery", fn, name); }
+        export function registerScalar<K extends MethodKeys<AsyncHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncHierarchyQuery<T>, source: AsyncHierarchyIterable<T>, ...args: ParameterTypes<AsyncHierarchyQuery<T>[K]>) => ReturnType<AsyncHierarchyQuery<T>[K]>) { registerScalarMethod("AsyncHierarchyQuery", fn, name); }
+        export function registerSubquery<K extends MethodKeys<AsyncHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncHierarchyQuery<T>, source: AsyncHierarchyIterable<T>, ...args: ParameterTypes<AsyncHierarchyQuery<T>[K]>) => IterableReturnType<AsyncHierarchyQuery<T>[K]>) { registerSubqueryMethod("AsyncHierarchyQuery", fn, name); }
         export function registerCustom<K extends MethodKeys<AsyncHierarchyQuery<unknown>>>(name: K, fn: Function, custom: <T>(this: AsyncHierarchyQuery<T>, ...args: ParameterTypes<AsyncHierarchyQuery<T>[K]>) => ReturnType<AsyncHierarchyQuery<T>[K]>) { registerCustomMethod("AsyncHierarchyQuery", fn, custom, name); }
         export function registerStatic<K extends MethodKeys<AsyncHierarchyQueryConstructor>>(name: K, fn: (this: AsyncHierarchyQueryConstructor, ...args: ParameterTypes<AsyncHierarchyQueryConstructor[K]>) => IterableReturnType<AsyncHierarchyQueryConstructor[K]>) { registerStaticMethod("AsyncHierarchyQuery", fn, name); }
     }
 
     export namespace AsyncOrderedQuery {
         export function registerAlias<K extends MethodKeys<AsyncOrderedQuery<unknown>>>(name: K, fn: Function) { registerMethodName("AsyncOrderedQuery", fn, name); }
-        export function registerScalar<K extends MethodKeys<AsyncOrderedQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedQuery<T>, source: PossiblyAsyncOrderedIterable<T>, ...args: ParameterTypes<AsyncOrderedQuery<T>[K]>) => ReturnType<AsyncOrderedQuery<T>[K]>) { registerScalarMethod("AsyncOrderedQuery", fn, name); }
-        export function registerSubquery<K extends MethodKeys<AsyncOrderedQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedQuery<T>, source: PossiblyAsyncOrderedIterable<T>, ...args: ParameterTypes<AsyncOrderedQuery<T>[K]>) => IterableReturnType<AsyncOrderedQuery<T>[K]>) { registerSubqueryMethod("AsyncOrderedQuery", fn, name); }
+        export function registerScalar<K extends MethodKeys<AsyncOrderedQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedQuery<T>, source: AsyncOrderedIterable<T>, ...args: ParameterTypes<AsyncOrderedQuery<T>[K]>) => ReturnType<AsyncOrderedQuery<T>[K]>) { registerScalarMethod("AsyncOrderedQuery", fn, name); }
+        export function registerSubquery<K extends MethodKeys<AsyncOrderedQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedQuery<T>, source: AsyncOrderedIterable<T>, ...args: ParameterTypes<AsyncOrderedQuery<T>[K]>) => IterableReturnType<AsyncOrderedQuery<T>[K]>) { registerSubqueryMethod("AsyncOrderedQuery", fn, name); }
         export function registerCustom<K extends MethodKeys<AsyncOrderedQuery<unknown>>>(name: K, fn: Function, custom: <T>(this: AsyncOrderedQuery<T>, ...args: ParameterTypes<AsyncOrderedQuery<T>[K]>) => ReturnType<AsyncOrderedQuery<T>[K]>) { registerCustomMethod("AsyncOrderedQuery", fn, custom, name); }
         export function registerStatic<K extends MethodKeys<AsyncOrderedQueryConstructor>>(name: K, fn: (this: AsyncOrderedQueryConstructor, ...args: ParameterTypes<AsyncOrderedQueryConstructor[K]>) => IterableReturnType<AsyncOrderedQueryConstructor[K]>) { registerStaticMethod("AsyncOrderedQuery", fn, name); }
     }
 
     export namespace AsyncOrderedHierarchyQuery {
         export function registerAlias<K extends MethodKeys<AsyncOrderedHierarchyQuery<unknown>>>(name: K, fn: Function) { registerMethodName("AsyncOrderedHierarchyQuery", fn, name); }
-        export function registerScalar<K extends MethodKeys<AsyncOrderedHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedHierarchyQuery<T>, source: PossiblyAsyncOrderedHierarchyIterable<T>, ...args: ParameterTypes<AsyncOrderedHierarchyQuery<T>[K]>) => ReturnType<AsyncOrderedHierarchyQuery<T>[K]>) { registerScalarMethod("AsyncOrderedHierarchyQuery", fn, name); }
-        export function registerSubquery<K extends MethodKeys<AsyncOrderedHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedHierarchyQuery<T>, source: PossiblyAsyncOrderedHierarchyIterable<T>, ...args: ParameterTypes<AsyncOrderedHierarchyQuery<T>[K]>) => IterableReturnType<AsyncOrderedHierarchyQuery<T>[K]>) { registerSubqueryMethod("AsyncOrderedHierarchyQuery", fn, name); }
+        export function registerScalar<K extends MethodKeys<AsyncOrderedHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedHierarchyQuery<T>, source: AsyncOrderedHierarchyIterable<T>, ...args: ParameterTypes<AsyncOrderedHierarchyQuery<T>[K]>) => ReturnType<AsyncOrderedHierarchyQuery<T>[K]>) { registerScalarMethod("AsyncOrderedHierarchyQuery", fn, name); }
+        export function registerSubquery<K extends MethodKeys<AsyncOrderedHierarchyQuery<unknown>>>(name: K, fn: <T>(this: AsyncOrderedHierarchyQuery<T>, source: AsyncOrderedHierarchyIterable<T>, ...args: ParameterTypes<AsyncOrderedHierarchyQuery<T>[K]>) => IterableReturnType<AsyncOrderedHierarchyQuery<T>[K]>) { registerSubqueryMethod("AsyncOrderedHierarchyQuery", fn, name); }
         export function registerCustom<K extends MethodKeys<AsyncOrderedHierarchyQuery<unknown>>>(name: K, fn: Function, custom: <T>(this: AsyncOrderedHierarchyQuery<T>, ...args: ParameterTypes<AsyncOrderedHierarchyQuery<T>[K]>) => ReturnType<AsyncOrderedHierarchyQuery<T>[K]>) { registerCustomMethod("AsyncOrderedHierarchyQuery", fn, custom, name); }
         export function registerStatic<K extends MethodKeys<AsyncOrderedHierarchyQueryConstructor>>(name: K, fn: (this: AsyncOrderedHierarchyQueryConstructor, ...args: ParameterTypes<AsyncOrderedHierarchyQueryConstructor[K]>) => IterableReturnType<AsyncOrderedHierarchyQueryConstructor[K]>) { registerStaticMethod("AsyncOrderedHierarchyQuery", fn, name); }
     }

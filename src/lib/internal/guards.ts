@@ -14,22 +14,34 @@
   limitations under the License.
  */
 
-import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncQueryable, PossiblyAsyncOrderedHierarchyIterable, QuerySource, AsyncQuerySource } from "../types";
+import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncOrderedHierarchyIterable } from "../types";
+import { QuerySource, AsyncQuerySource } from "./types";
 
 type Primitive = string | number | boolean | symbol;
 type Other = Primitive | object | null | undefined;
 
 /** @internal */
-export function IsObject<T>(value: any): value is T & object {
+export function IsObject<T>(value: T): value is T & object {
     return typeof value === "object" && value !== null
         || typeof value === "function";
+}
+
+function IsFunctionOrUndefined(value: any): value is Function | undefined {
+    return typeof value === "function" || value === undefined;
+}
+
+/** @internal */
+export function IsPromiseLike(value: any): value is PromiseLike<any> {
+    return IsObject(value)
+        && "then" in value && typeof value.then === "function";
 }
 
 /** @internal */
 export function IsHierarchyProvider<TNode>(value: HierarchyProvider<TNode> | Other): value is HierarchyProvider<TNode> {
     return IsObject(value)
         && "parent" in value && typeof value.parent === "function"
-        && "children" in value && typeof value.children === "function";
+        && "children" in value && typeof value.children === "function"
+        && IsFunctionOrUndefined(value.owns);
 }
 
 /** @internal */
@@ -129,12 +141,6 @@ export function IsPossiblyAsyncOrderedHierarchyIterable<T>(value: PossiblyAsyncI
 export function IsQueryable<T>(value: Queryable<T> | Other): value is Queryable<T> {
     return IsIterable(value)
         || IsArrayLike(value);
-}
-
-/** @internal */
-export function IsPossiblyAsyncQueryable<T>(value: PossiblyAsyncQueryable<T> | Other): value is PossiblyAsyncQueryable<T> {
-    return IsAsyncIterable(value)
-        || IsQueryable(value);
 }
 
 /** @internal */

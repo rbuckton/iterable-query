@@ -15,18 +15,18 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 import { lastAsync } from "./lastAsync";
 
 /**
  * Finds the value at the provided offset. A negative offset starts from the
  * last element.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param offset An offset.
  */
-export async function elementAtAsync<T>(source: PossiblyAsyncQueryable<T>, offset: number): Promise<T | undefined> {
-    assert.mustBePossiblyAsyncQueryable(source, "source")
+export async function elementAtAsync<T>(source: AsyncQueryable<T>, offset: number): Promise<T | undefined> {
+    assert.mustBeAsyncQueryable<T>(source, "source")
     assert.mustBeInteger(offset, "offset");
     if (offset === -1) {
         return await lastAsync(source);

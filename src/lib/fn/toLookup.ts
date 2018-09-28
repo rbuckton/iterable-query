@@ -24,8 +24,7 @@ import { Lookup } from "../lookup";
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select a key for each element.
  */
-export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector?: (element: T) => T): Lookup<K, T>;
-
+export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Lookup<K, T>;
 /**
  * Creates a Lookup for the elements of the Query.
  *
@@ -34,7 +33,6 @@ export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) =
  * @param elementSelector A callback that selects a value for each element.
  */
 export function toLookup<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Lookup<K, V>;
-
 export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Lookup<K, T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");

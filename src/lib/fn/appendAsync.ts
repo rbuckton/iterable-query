@@ -14,38 +14,36 @@
   limitations under the License.
  */
 
-import { assert, FlowHierarchy, ToStringTag, ToAsyncIterable, Registry } from "../internal";
-import { AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncHierarchyIterable } from "../types";
-
-/**
- * Creates a `AsyncHierarchyIterable` for the elements of `source` with the provided `value` appended to the
- * end.
- *
- * @param source An `AsyncHierarchyIterable` or `HierarchyIterable` value.
- * @param value The value to append.
- */
-export function appendAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, value: PromiseLike<T> | T): AsyncHierarchyIterable<TNode, T>;
+import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates an `AsyncIterable` for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source An `AsyncIterable` or `Queryable` value.
+ * @param source An `AsyncQueryable` value.
  * @param value The value to append.
  */
-export function appendAsync<T>(source: PossiblyAsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T>;
-
-export function appendAsync<T>(source: PossiblyAsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
-    return FlowHierarchy(new AsyncAppendIterable(ToAsyncIterable(source), value), source);
+export function appendAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, value: PromiseLike<T> | T): AsyncHierarchyIterable<TNode, T>;
+/**
+ * Creates an `AsyncIterable` for the elements of `source` with the provided `value` appended to the
+ * end.
+ *
+ * @param source An `AsyncQueryable` value.
+ * @param value The value to append.
+ */
+export function appendAsync<T>(source: AsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T>;
+export function appendAsync<T>(source: AsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
+    return FlowHierarchy(new AsyncAppendIterable(ToPossiblyAsyncIterable(source), value), source);
 }
 
 @ToStringTag("AsyncAppendIterable")
 class AsyncAppendIterable<T> implements AsyncIterable<T> {
-    private _source: AsyncIterable<T>;
+    private _source: PossiblyAsyncIterable<T>;
     private _value: PromiseLike<T> | T;
 
-    constructor(source: AsyncIterable<T>, value: PromiseLike<T> | T) {
+    constructor(source: PossiblyAsyncIterable<T>, value: PromiseLike<T> | T) {
         this._source = source;
         this._value = value;
     }

@@ -15,7 +15,7 @@
  */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
 import { toSetAsync } from "./toSetAsync";
 
@@ -24,34 +24,31 @@ import { toSetAsync } from "./toSetAsync";
  * The result is an `AsyncIterable` containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: PossiblyAsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
-
+export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two `Queryable` objects.
  * The result is an `AsyncIterable` containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-
+export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two `Queryable` objects.
  * The result is an `AsyncIterable` containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function symmetricDifferenceAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function symmetricDifferenceAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
+export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
+export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(left, "left");
+    assert.mustBeAsyncQueryable<T>(right, "right");
     return FlowHierarchy(new AsyncSymmetricDifferenceIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
 }
 

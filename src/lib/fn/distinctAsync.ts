@@ -15,22 +15,19 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 import { Set } from "../collections";
-
 
 /**
  * Creates a subquery for the distinct elements of the source.
  */
 export function distinctAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the distinct elements of the source.
  */
-export function distinctAsync<T>(source: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function distinctAsync<T>(source: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
+export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable(source, "source");
     return FlowHierarchy(new AsyncDistinctIterable(ToPossiblyAsyncIterable(source)), source);
 }
 

@@ -15,7 +15,7 @@
  */
 
 import { assert, ToStringTag, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "./empty";
 
 /**
@@ -26,10 +26,10 @@ import { empty } from "./empty";
  * @param thenQueryable The source to use when the callback evaluates to `true`.
  * @param elseQueryable The source to use when the callback evaluates to `false`.
  */
-export function ifAsync<T>(condition: () => PromiseLike<boolean> | boolean, thenQueryable: PossiblyAsyncQueryable<T>, elseQueryable?: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
+export function ifAsync<T>(condition: () => PromiseLike<boolean> | boolean, thenQueryable: AsyncQueryable<T>, elseQueryable?: AsyncQueryable<T>): AsyncIterable<T> {
     assert.mustBeFunction(condition, "condition");
-    assert.mustBePossiblyAsyncQueryable(thenQueryable, "thenQueryable");
-    assert.mustBePossiblyAsyncQueryableOrUndefined(elseQueryable, "elseQueryable");
+    assert.mustBeAsyncQueryable<T>(thenQueryable, "thenQueryable");
+    assert.mustBeAsyncQueryableOrUndefined<T>(elseQueryable, "elseQueryable");
     return new AsyncIfIterable(condition, ToPossiblyAsyncIterable(thenQueryable), elseQueryable && ToPossiblyAsyncIterable(elseQueryable));
 }
 

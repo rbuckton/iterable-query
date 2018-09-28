@@ -14,34 +14,36 @@
   limitations under the License.
  */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery for the elements of the source with the provided value prepended to the beginning.
+ * Creates an `AsyncIterable` for the elements of `source` with the provided `value` prepended to the
+ * beginning.
  *
+ * @param source An `AsyncQueryable` value.
  * @param value The value to prepend.
  */
-export function prependAsync<TNode, T extends TNode>(source: AsyncHierarchyIterable<TNode, T>, value: T): AsyncHierarchyIterable<TNode, T>;
-
+export function prependAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, value: T): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the elements of the source with the provided value prepended to the beginning.
+ * Creates an `AsyncIterable` for the elements of `source` with the provided `value` prepended to the
+ * beginning.
  *
+ * @param source An `AsyncQueryable` value.
  * @param value The value to prepend.
  */
-export function prependAsync<T>(source: PossiblyAsyncQueryable<T>, value: T): AsyncIterable<T>;
-
-export function prependAsync<T>(source: PossiblyAsyncQueryable<T>, value: T): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function prependAsync<T>(source: AsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T>;
+export function prependAsync<T>(source: AsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     return FlowHierarchy(new AsyncPrependIterable(value, ToPossiblyAsyncIterable(source)), source);
 }
 
 @ToStringTag("AsyncPrependIterable")
 class AsyncPrependIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _value: T;
+    private _value: PromiseLike<T> | T;
 
-    constructor(value: T, source: PossiblyAsyncIterable<T>) {
+    constructor(value: PromiseLike<T> | T, source: PossiblyAsyncIterable<T>) {
         this._value = value;
         this._source = source;
     }

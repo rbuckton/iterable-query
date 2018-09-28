@@ -1,11 +1,17 @@
 import "../lib/compat";
 import { expect } from "chai";
-import { theory } from "./test-utils";
-import { AsyncQuery, fromAsync } from "../lib";
+import { theory, typeOnly, type } from "./test-utils";
+import { AsyncQuery, fromAsync, AsyncOrderedIterable, AsyncOrderedQuery, AsyncHierarchyIterable, AsyncHierarchyQuery, AsyncOrderedHierarchyQuery, AsyncOrderedHierarchyIterable, OrderedIterable, HierarchyIterable, OrderedHierarchyIterable, HierarchyProvider, AsyncChoice } from "../lib";
 import * as users from "./data/users";
 import * as nodes from "./data/nodes";
 import * as books from "./data/books";
 import * as numbers from "./data/numbers";
+
+interface A { kind: "A", a: number }
+interface B { kind: "B", b: number }
+interface C { kind: "c", c: number }
+type ABC = A | B | C;
+type AB = A | B;
 
 describe("AsyncQuery", () => {
     describe("new()", () => {
@@ -16,6 +22,17 @@ describe("AsyncQuery", () => {
             "null": [TypeError, undefined],
             "function": [TypeError, () => {}],
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<Iterable<Promise<number> | number>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<ArrayLike<number>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<ArrayLike<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<ArrayLike<Promise<number> | number>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<AsyncIterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<AsyncIterable<number> | Iterable<Promise<number> | number>>()));
+            type.not.exact(type<AsyncQuery<number>>(), new AsyncQuery(type<AsyncIterable<Promise<number>>>()));
+        });
     });
     describe("from()", () => {
         it("Iterable", () => expect(AsyncQuery.from([1, 2, 3])).to.equalSequenceAsync([1, 2, 3]));
@@ -25,20 +42,54 @@ describe("AsyncQuery", () => {
             "null": [TypeError, undefined],
             "function": [TypeError, () => {}],
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<Iterable<Promise<number> | number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<ArrayLike<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<ArrayLike<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<ArrayLike<Promise<number> | number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<AsyncIterable<number>>()));
+            type.exact(type<AsyncOrderedQuery<number>>(), AsyncQuery.from(type<OrderedIterable<number>>()));
+            type.exact(type<AsyncOrderedQuery<number>>(), AsyncQuery.from(type<AsyncOrderedIterable<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<Iterable<number>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<Iterable<Promise<number>>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<Iterable<Promise<number> | number>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<ArrayLike<number>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<ArrayLike<Promise<number>>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<ArrayLike<Promise<number> | number>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncHierarchyQuery<number>>(), AsyncQuery.from(type<AsyncIterable<number>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncOrderedHierarchyQuery<number>>(), AsyncQuery.from(type<OrderedIterable<number>>(), type<HierarchyProvider<number>>()));
+            type.exact(type<AsyncOrderedHierarchyQuery<number>>(), AsyncQuery.from(type<AsyncOrderedIterable<number>>(), type<HierarchyProvider<number>>()));
+            type.not.exact(type<AsyncQuery<number>>(), AsyncQuery.from(type<AsyncIterable<Promise<number>>>()));
+        });
     });
     describe("of()", () => {
         it("no arguments", () => expect(AsyncQuery.of()).to.equalSequenceAsync([]));
         it("multiple arguments", () => expect(AsyncQuery.of(1, 2, 3)).to.equalSequenceAsync([1, 2, 3]));
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.of(type<number>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.of(type<Promise<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.of(type<Promise<number> | number>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.of(type<Promise<number>>(), type<number>()));
+        });
     });
     describe("empty()", () => {
         it("is empty", () => expect(AsyncQuery.empty()).to.equalSequenceAsync([]));
     });
     describe("once()", () => {
         it("is once", () => expect(AsyncQuery.once(1)).to.equalSequenceAsync([1]));
+        it("is once (promise)", () => expect(AsyncQuery.once(Promise.resolve(1))).to.equalSequenceAsync([1]));
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.once(type<number>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.once(type<Promise<number>>()));
+        });
     });
     describe("repeat()", () => {
         it("0 times", () => expect(AsyncQuery.repeat("a", 0)).to.equalSequenceAsync([]));
+        it("0 times (promise)", () => expect(AsyncQuery.repeat(Promise.resolve("a"), 0)).to.equalSequenceAsync([]));
         it("5 times", () => expect(AsyncQuery.repeat("a", 5)).to.equalSequenceAsync(["a", "a", "a", "a", "a"]));
+        it("5 times (promise)", () => expect(AsyncQuery.repeat(Promise.resolve("a"), 5)).to.equalSequenceAsync(["a", "a", "a", "a", "a"]));
         theory.throws("throws if 'count' is", (count: any) => AsyncQuery.repeat("a", count), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
@@ -47,13 +98,26 @@ describe("AsyncQuery", () => {
             "NaN": [RangeError, NaN],
             "Infinity": [RangeError, Infinity]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.repeat(type<string>(), type<number>()));
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.repeat(type<Promise<string>>(), type<number>()));
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.repeat(type<Promise<string> | string>(), type<number>()));
+        });
     });
     describe("continuous()", () => {
         it("after 5 elements", () => expect(AsyncQuery.continuous(1)).to.startWithSequenceAsync([1, 1, 1, 1, 1]));
+        it("after 5 elements (promise)", () => expect(AsyncQuery.continuous(Promise.resolve(1))).to.startWithSequenceAsync([1, 1, 1, 1, 1]));
         it("after 10 elements", () => expect(AsyncQuery.continuous(1)).to.startWithSequenceAsync([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]));
+        it("after 10 elements (promise)", () => expect(AsyncQuery.continuous(Promise.resolve(1))).to.startWithSequenceAsync([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]));
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.continuous(type<string>()));
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.continuous(type<Promise<string>>()));
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.continuous(type<Promise<string> | string>()));
+        });
     });
     describe("generate()", () => {
         it("even numbers", () => expect(AsyncQuery.generate(3, i => i * 2)).to.equalSequenceAsync([0, 2, 4]));
+        it("even numbers (async)", () => expect(AsyncQuery.generate(3, i => Promise.resolve(i * 2))).to.equalSequenceAsync([0, 2, 4]));
         theory.throws("throws if 'count' is", (count: any) => AsyncQuery.generate(count, () => {}), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
@@ -67,6 +131,10 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.generate(type<number>(), type<(i: number) => string>()));
+            type.exact(type<AsyncQuery<string>>(), AsyncQuery.generate(type<number>(), type<(i: number) => Promise<string>>()));
+        });
     });
     describe("hierarchy()", () => {
         theory.throws("throws if 'hierarchy' is", (hierarchy: any) => AsyncQuery.hierarchy({}, hierarchy), {
@@ -75,12 +143,16 @@ describe("AsyncQuery", () => {
             "non-object": [TypeError, ""],
             "non-provider": [TypeError, {}],
         });
+        typeOnly(() => {
+            type.exact(type<AsyncHierarchyQuery<ABC>>(), AsyncQuery.hierarchy(type<ABC>(), type<HierarchyProvider<ABC>>()));
+            type.exact(type<AsyncHierarchyQuery<ABC, A>>(), AsyncQuery.hierarchy(type<A>(), type<HierarchyProvider<ABC>>()));
+        });
     });
     describe("consume()", () => {
-        it("consumes", () => {
-            const q = AsyncQuery.consume(function* () { yield 1; } ());
-            expect(q).to.equalSequenceAsync([1]);
-            expect(q).to.equalSequenceAsync([]);
+        it("consumes", async () => {
+            const q = AsyncQuery.consume(async function* () { yield 1; } ());
+            await expect(q).to.equalSequenceAsync([1]);
+            await expect(q).to.equalSequenceAsync([]);
         });
         theory.throws("throws if 'iterator' is", (iterator: any) => AsyncQuery.consume(iterator), {
             "undefined": [TypeError, undefined],
@@ -91,10 +163,15 @@ describe("AsyncQuery", () => {
     });
     describe("objectKeys()", () => {
         it("gets keys", () => expect(AsyncQuery.objectKeys({ a: 1, b: 2 })).to.equalSequenceAsync(["a", "b"]));
+        it("gets keys (promise)", () => expect(AsyncQuery.objectKeys(Promise.resolve({ a: 1, b: 2 }))).to.equalSequenceAsync(["a", "b"]));
         theory.throws("throws if 'source' is", (source: any) => AsyncQuery.objectKeys(source)[Symbol.asyncIterator]().next(), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-object": [TypeError, ""]
+        });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<"a" | "b">>(), AsyncQuery.objectKeys(type<{ a: 1, b: 2 }>()));
+            type.exact(type<AsyncQuery<"a" | "b">>(), AsyncQuery.objectKeys(type<Promise<{ a: 1, b: 2 }>>()));
         });
     });
     describe("objectValues()", () => {
@@ -104,6 +181,10 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-object": [TypeError, ""]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<1 | 2>>(), AsyncQuery.objectValues(type<{ a: 1, b: 2 }>()));
+            type.exact(type<AsyncQuery<1 | 2>>(), AsyncQuery.objectValues(type<Promise<{ a: 1, b: 2 }>>()));
+        });
     });
     describe("objectEntries()", () => {
         it("gets keys", async () => expect(await AsyncQuery.objectEntries({ a: 1, b: 2 }).toArray()).to.deep.equal([["a", 1], ["b", 2]]));
@@ -111,6 +192,10 @@ describe("AsyncQuery", () => {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-object": [TypeError, ""]
+        });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<["a", 1] | ["b", 2]>>(), AsyncQuery.objectEntries(type<{ a: 1, b: 2 }>()));
+            type.exact(type<AsyncQuery<["a", 1] | ["b", 2]>>(), AsyncQuery.objectEntries(type<Promise<{ a: 1, b: 2 }>>()));
         });
     });
     describe("if()", () => {
@@ -129,6 +214,14 @@ describe("AsyncQuery", () => {
         theory.throws("throws if 'elseQueryable' is", (elseQueryable: any) => AsyncQuery.if(() => true, [], elseQueryable), {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
+        });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.if(type<() => boolean>(), type<Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.if(type<() => boolean>(), type<Iterable<number>>(), type<Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.if(type<() => boolean>(), type<Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.if(type<() => boolean>(), type<Iterable<Promise<number>>>(), type<Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.if(type<() => boolean>(), type<AsyncIterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.if(type<() => boolean>(), type<AsyncIterable<number>>(), type<AsyncIterable<number>>()));
         });
     });
     describe("choose()", () => {
@@ -150,6 +243,18 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-queryable": [TypeError, 0]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<Iterable<[number, Iterable<number>]>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<Iterable<[number, Iterable<number>]>>(), type<Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<Iterable<[Promise<number>, Iterable<Promise<number>>]>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<Iterable<[Promise<number>, Iterable<Promise<number>>]>>(), type<Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<ArrayLike<[number, ArrayLike<number>]>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<ArrayLike<[number, ArrayLike<number>]>>(), type<ArrayLike<number>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<ArrayLike<[Promise<number>, ArrayLike<Promise<number>>]>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<ArrayLike<[Promise<number>, ArrayLike<Promise<number>>]>>(), type<ArrayLike<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<AsyncIterable<[number, AsyncIterable<number>]>>()));
+            type.exact(type<AsyncQuery<number>>(), AsyncQuery.choose(type<() => number>(), type<AsyncIterable<[number, AsyncIterable<number>]>>(), type<AsyncIterable<number>>()));
+        });
     });
     describe("filter()", () => {
         it("filters", () => expect(AsyncQuery.from([1, 2, 3]).filter(x => x >= 2)).to.equalSequenceAsync([2, 3]));
@@ -158,6 +263,10 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<A>>(), type<AsyncQuery<AB>>().filter(type<(ab: AB) => ab is A>()));
+            type.exact(type<AsyncQuery<AB>>(), type<AsyncQuery<AB>>().filter(type<(ab: AB) => boolean>()));
+        });
     });
     describe("where()", () => {
         it("filters", () => expect(AsyncQuery.from([1, 2, 3]).where(x => x >= 2)).to.equalSequenceAsync([2, 3]));
@@ -165,6 +274,10 @@ describe("AsyncQuery", () => {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
+        });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<A>>(), type<AsyncQuery<AB>>().where(type<(ab: AB) => ab is A>()));
+            type.exact(type<AsyncQuery<AB>>(), type<AsyncQuery<AB>>().where(type<(ab: AB) => boolean>()));
         });
     });
     describe("map()", () => {
@@ -190,6 +303,13 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().flatMap(type<(_: number) => Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().flatMap(type<(_: number) => Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().flatMap(type<(_: number) => ArrayLike<number>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().flatMap(type<(_: number) => ArrayLike<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().flatMap(type<(_: number) => AsyncIterable<number>>()));
+        });
     });
     describe("selectMany()", () => {
         it("flatMaps", () => expect(AsyncQuery.from([1, 2, 3]).selectMany(x => [x, 0])).to.equalSequenceAsync([1, 0, 2, 0, 3, 0]));
@@ -197,6 +317,13 @@ describe("AsyncQuery", () => {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
+        });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().selectMany(type<(_: number) => Iterable<number>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().selectMany(type<(_: number) => Iterable<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().selectMany(type<(_: number) => ArrayLike<number>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().selectMany(type<(_: number) => ArrayLike<Promise<number>>>()));
+            type.exact(type<AsyncQuery<number>>(), type<AsyncQuery<number>>().selectMany(type<(_: number) => AsyncIterable<number>>()));
         });
     });
     describe("do()", () => {
@@ -299,6 +426,10 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<A>>(), type<AsyncQuery<AB>>().takeWhile(type<(ab: AB) => ab is A>()));
+            type.exact(type<AsyncQuery<AB>>(), type<AsyncQuery<AB>>().takeWhile(type<(ab: AB) => boolean>()));
+        });
     });
     describe("intersect()", () => {
         it("intersects", () => expect(AsyncQuery.from([1, 1, 2, 3, 4]).intersect([1, 3, 3, 5, 7])).to.equalSequenceAsync([1, 3]));
@@ -309,6 +440,15 @@ describe("AsyncQuery", () => {
             "non-object": [TypeError, 0],
             "non-queryable": [TypeError, {}]
         });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<AB>>(), type<AsyncQuery<ABC>>().intersect(type<Iterable<AB>>()));
+            type.exact(type<AsyncHierarchyQuery<ABC>>(), type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<ABC>>()));
+            type.exact(type<AsyncHierarchyQuery<ABC, A>>(), type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<ABC, A>>()));
+            type.exact(type<AsyncHierarchyQuery<AB, A>>(), type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<AB, A>>()));
+            type.exact(type<AsyncHierarchyQuery<ABC>>(), type<AsyncQuery<ABC>>().intersect(type<AsyncHierarchyIterable<ABC>>()));
+            type.exact(type<AsyncHierarchyQuery<ABC, A>>(), type<AsyncQuery<ABC>>().intersect(type<AsyncHierarchyIterable<ABC, A>>()));
+            type.exact(type<AsyncHierarchyQuery<AB, A>>(), type<AsyncQuery<ABC>>().intersect(type<AsyncHierarchyIterable<AB, A>>()));
+        });
     });
     describe("union()", () => {
         it("unions", () => expect(AsyncQuery.from([1, 1, 2, 3, 4]).union([1, 3, 3, 5, 7])).to.equalSequenceAsync([1, 2, 3, 4, 5, 7]));
@@ -317,6 +457,13 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-object": [TypeError, 0],
             "non-queryable": [TypeError, {}]
+        });
+        typeOnly(() => {
+            type.exact(type<AsyncQuery<ABC>>(), type<AsyncQuery<ABC>>().union(type<Iterable<AB>>()));
+            type.exact(type<AsyncQuery<ABC>>(), type<AsyncQuery<ABC>>().union(type<HierarchyIterable<ABC>>()));
+            type.exact(type<AsyncQuery<ABC>>(), type<AsyncQuery<ABC>>().union(type<HierarchyIterable<ABC, A>>()));
+            type.exact(type<AsyncQuery<ABC>>(), type<AsyncQuery<ABC>>().union(type<AsyncHierarchyIterable<ABC>>()));
+            type.exact(type<AsyncQuery<ABC>>(), type<AsyncQuery<ABC>>().union(type<AsyncHierarchyIterable<ABC, A>>()));
         });
     });
     describe("except()", () => {
@@ -365,7 +512,6 @@ describe("AsyncQuery", () => {
             "Infinity": [RangeError, Infinity]
         });
         theory.throws("throws if 'skipCount' is", (skipCount: any) => AsyncQuery.from([]).patch(0, skipCount, []), {
-            "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-number": [TypeError, ""],
             "negative": [RangeError, -1],
@@ -373,7 +519,6 @@ describe("AsyncQuery", () => {
             "Infinity": [RangeError, Infinity]
         });
         theory.throws("throws if 'range' is", (range: any) => AsyncQuery.from([]).patch(0, 0, range), {
-            "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-object": [TypeError, 0],
             "non-queryable": [TypeError, {}]

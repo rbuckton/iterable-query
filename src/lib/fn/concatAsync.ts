@@ -14,45 +14,42 @@
   limitations under the License.
  */
 
-import { assert, FlowHierarchy, ToAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, AsyncHierarchyIterable } from "../types";
+import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery that concatenates two Queryables.
+ * Creates a `AsyncIterable` that concatenates two `AsyncQueryable` sources.
  *
- * @param left An `AsyncIterable` or `Queryable` value.
- * @param right An `AsyncIterable` or `Queryable` value.
+ * @param left An `AsyncQueryable` value.
+ * @param right An `AsyncQueryable` value.
  */
-export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: PossiblyAsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
-
+export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery that concatenates two Queryables.
+ * Creates a `AsyncIterable` that concatenates two `AsyncQueryable` sources.
  *
- * @param left An `AsyncIterable` or `Queryable` value.
- * @param right An `AsyncIterable` or `Queryable` value.
+ * @param left An `AsyncQueryable` value.
+ * @param right An `AsyncQueryable` value.
  */
-export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-
+export function concatAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery that concatenates two Queryables.
+ * Creates a `AsyncIterable` that concatenates two `AsyncQueryable` sources.
  *
- * @param left An `AsyncIterable` or `Queryable` value.
- * @param right An `AsyncIterable` or `Queryable` value.
+ * @param left An `AsyncQueryable` value.
+ * @param right An `AsyncQueryable` value.
  */
-export function concatAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function concatAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
-    return FlowHierarchy(new AsyncConcatIterable(ToAsyncIterable(left), ToAsyncIterable(right)), left, right);
+export function concatAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
+export function concatAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(left, "left");
+    assert.mustBeAsyncQueryable<T>(right, "right");
+    return FlowHierarchy(new AsyncConcatIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
 }
 
 @ToStringTag("AsyncConcatIterable")
 class AsyncConcatIterable<T> implements AsyncIterable<T> {
-    private _left: AsyncIterable<T>;
-    private _right: AsyncIterable<T>;
+    private _left: PossiblyAsyncIterable<T>;
+    private _right: PossiblyAsyncIterable<T>;
 
-    constructor(left: AsyncIterable<T>, right: AsyncIterable<T>) {
+    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>) {
         this._left = left;
         this._right = right;
     }

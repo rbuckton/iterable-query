@@ -15,21 +15,19 @@
  */
 
 import { assert, FlowHierarchy, ToStringTag, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
  * Creates a subquery whose elements are in the reverse order.
  */
 export function reverseAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery whose elements are in the reverse order.
  */
-export function reverseAsync<T>(source: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function reverseAsync<T>(source: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function reverseAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
+export function reverseAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     return FlowHierarchy(new AsyncReverseIterable(ToPossiblyAsyncIterable(source)), source);
 }
 

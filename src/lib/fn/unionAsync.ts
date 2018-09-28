@@ -15,36 +15,33 @@
  */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
 
 /**
- * Creates a subquery for the set union of two Queryables.
+ * Creates a subquery for the set union of two `AsyncQueryable` objects.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: PossiblyAsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
-
+export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set union of two Queryables.
+ * Creates a subquery for the set union of two `AsyncQueryable` objects.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-
+export function unionAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set union of two Queryables.
+ * Creates a subquery for the set union of two `AsyncQueryable` objects.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function unionAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function unionAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
+export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
+export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable(left, "left");
+    assert.mustBeAsyncQueryable(right, "right");
     return FlowHierarchy(new AsyncUnionIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left);
 }
 

@@ -25,7 +25,6 @@ import { toSet } from "./toSet";
  * @param right A `Queryable` object.
  */
 export function intersect<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the set intersection of two Queryables.
  *
@@ -33,7 +32,6 @@ export function intersect<TNode, T extends TNode>(left: HierarchyIterable<TNode,
  * @param right A `Queryable` object.
  */
 export function intersect<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the set intersection of two Queryables.
  *
@@ -41,7 +39,6 @@ export function intersect<TNode, T extends TNode>(left: Queryable<T>, right: Hie
  * @param right A `Queryable` object.
  */
 export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-
 export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

@@ -2,5 +2,6 @@
 node_modules
 coverage
 src
+scripts
 out/tests
 gulpfile.js

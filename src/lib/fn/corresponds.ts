@@ -23,10 +23,8 @@ import { Queryable } from "../types";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
  */
-export function corresponds<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
-
+export function corresponds<T>(left: Queryable<T>, right: Queryable<T>): boolean;
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
@@ -36,15 +34,6 @@ export function corresponds<T>(left: Queryable<T>, right: Queryable<T>, equality
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  */
 export function corresponds<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-
-/**
- * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
- * in `right` at the same position.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
- */
 export function corresponds<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

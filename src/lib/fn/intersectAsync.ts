@@ -15,36 +15,33 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { toSetAsync } from "./toSetAsync";
 
 /**
- * Creates a subquery for the set intersection of two Queryables.
+ * Creates a subquery for the set intersection of two `AsyncQueryable` objects.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function intersectAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: PossiblyAsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
-
+export function intersectAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set intersection of two Queryables.
+ * Creates a subquery for the set intersection of two `AsyncQueryable` objects.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function intersectAsync<TNode, T extends TNode>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-
+export function intersectAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set intersection of two Queryables.
+ * Creates a subquery for the set intersection of two `AsyncQueryable` objects.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function intersectAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function intersectAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
+export function intersectAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
+export function intersectAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(left, "left");
+    assert.mustBeAsyncQueryable<T>(right, "right");
     return FlowHierarchy(new AsyncIntersectIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
 }
 

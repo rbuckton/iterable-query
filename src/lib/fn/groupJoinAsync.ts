@@ -15,21 +15,21 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, Registry, GetAsyncSource, CreateSubquery, CreateAsyncSubquery } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "../fn/empty";
 
 /**
- * Creates a grouped subquery for the correlated elements between an outer `Queryable` object and an inner `Queryable` object.
+ * Creates a grouped subquery for the correlated elements between an outer `AsyncQueryable` object and an inner `AsyncQueryable` object.
  *
- * @param outer A `Queryable` object.
- * @param inner A `Queryable` object.
- * @param outerKeySelector A callback used to select the key for an element in this Query.
- * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+ * @param outer An `AsyncQueryable` object.
+ * @param inner An `AsyncQueryable` object.
+ * @param outerKeySelector A callback used to select the key for an element in `outer`.
+ * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.
  */
-export function groupJoinAsync<O, I, K, R>(outer: PossiblyAsyncQueryable<O>, inner: PossiblyAsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Iterable<I>) => R): AsyncIterable<R> {
-    assert.mustBePossiblyAsyncQueryable(outer, "outer");
-    assert.mustBePossiblyAsyncQueryable(inner, "inner");
+export function groupJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Iterable<I>) => R): AsyncIterable<R> {
+    assert.mustBeAsyncQueryable<O>(outer, "outer");
+    assert.mustBeAsyncQueryable<I>(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
     assert.mustBeFunction(innerKeySelector, "innerKeySelector");
     assert.mustBeFunction(resultSelector, "resultSelector");
@@ -66,7 +66,7 @@ class AsyncGroupJoinIterable<O, I, K, R> implements AsyncIterable<R> {
 
 Registry.AsyncQuery.registerCustom("groupJoin", groupJoinAsync, function (inner, outerKeySelector, innerKeySelector, resultSelector) {
     assert.mustBeAsyncQuerySource(this, "this");
-    assert.mustBePossiblyAsyncQueryable(inner, "inner");
+    assert.mustBeAsyncQueryable(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
     assert.mustBeFunction(innerKeySelector, "innerKeySelector");
     assert.mustBeFunction(resultSelector, "resultSelector");

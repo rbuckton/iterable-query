@@ -15,16 +15,16 @@
  */
 
 import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Computes a scalar value indicating whether the provided value is included in the query.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param value A value.
  */
-export async function includesAsync<T>(source: PossiblyAsyncQueryable<T>, value: T): Promise<boolean> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function includesAsync<T>(source: AsyncQueryable<T>, value: T): Promise<boolean> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     for await (const element of ToPossiblyAsyncIterable(source)) {
         if (SameValue(value, element)) {
             return true;

@@ -14,8 +14,8 @@
   limitations under the License.
  */
 
-import { assert, ToIterable, GetHierarchy, IsHierarchyIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { Queryable, HierarchyProvider, HierarchyIterable } from "../types";
+import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
 import { toSet } from "./toSet";
 
@@ -28,7 +28,6 @@ import { toSet } from "./toSet";
  * @param right A `Queryable` object.
  */
 export function symmetricDifference<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the symmetric difference between two `Queryable` objects.
  * The result is an `Iterable` containings the elements that exist in only left or right, but not 
@@ -38,7 +37,6 @@ export function symmetricDifference<TNode, T extends TNode>(left: HierarchyItera
  * @param right A `Queryable` object.
  */
 export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the symmetric difference between two `Queryable` objects.
  * The result is an `Iterable` containings the elements that exist in only left or right, but not 
@@ -48,7 +46,6 @@ export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, 
  * @param right A `Queryable` object.
  */
 export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-
 export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

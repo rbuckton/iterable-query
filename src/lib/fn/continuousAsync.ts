@@ -17,9 +17,9 @@
 import { ToStringTag, Registry } from "../internal";
 
 /**
- * Creates an `Iterable` that repeats the provided value forever.
+ * Creates an `AsyncIterable` that repeats the provided value forever.
  *
- * @param value The value for each element of the `Iterable`.
+ * @param value The value for each element of the `AsyncIterable`.
  */
 export function continuousAsync<T>(value: PromiseLike<T> | T): AsyncIterable<T> {
     return new AsyncContinuousIterable(value);

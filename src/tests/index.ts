@@ -54,7 +54,20 @@ const es5 = new Sandbox(__dirname, {
     requires
 });
 
-const es6 = new Sandbox(__dirname, {
+const es2015 = new Sandbox(__dirname, {
+    context: {
+        ...globals,
+        ...es6Globals,
+        ...nodeGlobals,
+        ...mochaGlobals
+    },
+    paths: {
+        "../lib/*": ["../es2015/*"] // redirect 'lib' to 'es2015' build
+    },
+    requires
+});
+
+const es2017 = new Sandbox(__dirname, {
     context: {
         ...globals,
         ...es6Globals,
@@ -66,14 +79,21 @@ const es6 = new Sandbox(__dirname, {
     requires
 });
 
-describe("es6", () => {
-    es6.require("./chai-iterable");
-    es6.require("./query");
-    es6.require("./asyncQuery");
-});
 describe("es5", () => {
     es5.require("./chai-iterable");
     es5.require("./collections");
     es5.require("./query");
     es5.require("./asyncQuery");
+});
+
+describe("es2015", () => {
+    es2015.require("./chai-iterable");
+    es2015.require("./query");
+    es2015.require("./asyncQuery");
+});
+
+describe("es2017", () => {
+    es2017.require("./chai-iterable");
+    es2017.require("./query");
+    es2017.require("./asyncQuery");
 });

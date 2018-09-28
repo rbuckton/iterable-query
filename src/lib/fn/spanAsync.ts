@@ -15,7 +15,7 @@
  */
 
 import { assert, GetAsyncIterator, FlowHierarchy, ToAsyncIterable, Registry, MakeTuple, CreateSubquery, CreateAsyncSubquery, GetAsyncSource } from "../internal";
-import { HierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable } from "../types";
+import { HierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable } from "../types";
 import { prependAsync } from "./prependAsync";
 import { consumeAsync, ConsumeAsyncOptions } from "./consumeAsync";
 import { emptyAsync } from "./emptyAsync";
@@ -31,11 +31,10 @@ const cacheAndClose: ConsumeAsyncOptions = { cacheElements: true, leaveOpen: fal
  * The first `Iterable` is eagerly evaluated, while the second `AsyncIterable` is lazily
  * evaluated.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
  */
-export function spanAsync<TNode, T extends TNode, U extends T>(source: AsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): Promise<[HierarchyIterable<TNode, U>, AsyncHierarchyIterable<TNode, T>]>;
-
+export async function spanAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): Promise<[HierarchyIterable<TNode, U>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that match the supplied predicate, and whose second element is an `AsyncIterable`
@@ -44,11 +43,10 @@ export function spanAsync<TNode, T extends TNode, U extends T>(source: AsyncHier
  * The first `Iterable` is eagerly evaluated, while the second `AsyncIterable` is lazily
  * evaluated.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
  */
-export function spanAsync<TNode, T extends TNode>(source: AsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
-
+export async function spanAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that match the supplied predicate, and whose second element is an `AsyncIterable`
@@ -57,11 +55,10 @@ export function spanAsync<TNode, T extends TNode>(source: AsyncHierarchyIterable
  * The first `Iterable` is eagerly evaluated, while the second `AsyncIterable` is lazily
  * evaluated.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
  */
-export function spanAsync<T, U extends T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => element is U): Promise<[Iterable<U>, AsyncIterable<T>]>;
-
+export async function spanAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T) => element is U): Promise<[Iterable<U>, AsyncIterable<T>]>;
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that match the supplied predicate, and whose second element is an `AsyncIterable`
@@ -70,13 +67,12 @@ export function spanAsync<T, U extends T>(source: PossiblyAsyncQueryable<T>, pre
  * The first `Iterable` is eagerly evaluated, while the second `AsyncIterable` is lazily
  * evaluated.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
  */
-export function spanAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
-
-export async function spanAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
+export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     const prefix: T[] = [];
     const iterator = GetAsyncIterator(ToAsyncIterable(source));

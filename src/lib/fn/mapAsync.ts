@@ -15,16 +15,16 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates a subquery by applying a callback to each element.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param selector A callback used to map each element.
  */
-export function mapAsync<T, U>(source: PossiblyAsyncQueryable<T>, selector: (element: T, offset: number) => U): AsyncIterable<U> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function mapAsync<T, U>(source: AsyncQueryable<T>, selector: (element: T, offset: number) => U): AsyncIterable<U> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(selector, "selector");
     return new AsyncMapIterable(ToPossiblyAsyncIterable(source), selector);
 }

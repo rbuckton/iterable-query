@@ -14,8 +14,5 @@
   limitations under the License.
  */
 
-import { Registry } from "../internal";
 import { ifAsync } from "./ifAsync";
 export { ifAsync as conditionalAsync };
-
-// Registry.AsyncQuery.registerAlias("conditional", ifAsync);

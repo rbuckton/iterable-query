@@ -32,7 +32,7 @@ export interface HierarchyProvider<TNode> {
     /**
      * Indicates whether the supplied element is contained within a hierarchy.
      */
-    owns(element: TNode): boolean;
+    owns?(element: TNode): boolean;
 
     /**
      * Gets the parent element for the supplied element.
@@ -45,153 +45,132 @@ export interface HierarchyProvider<TNode> {
     children(element: TNode): Queryable<TNode> | undefined;
 }
 
+/**
+ * Describes an object that has a navigable hierarchy.
+ */
+export interface Hierarchical<TNode> {
+    /**
+     * Gets an object that provides hierarchical relationships.
+     */
+    [Hierarchical.hierarchy](): HierarchyProvider<TNode>;
+}
+
 export namespace Hierarchical {
     export const hierarchy = Symbol("Hierarchical.hierarchy");
 }
 
-export interface Hierarchical<TNode> {
-    [Hierarchical.hierarchy](): HierarchyProvider<TNode>;
-}
-
 // Grouping
 
+/**
+ * Represents a group of values associated with the same key.
+ */
 export interface Grouping<K, V> extends Iterable<V> {
+    /**
+     * The key associated with this group.
+     */
     readonly key: K;
 }
 
+/**
+ * Represents a group of hierarchical values associated with the same key.
+ */
 export interface HierarchyGrouping<K, VNode, V extends VNode = VNode> extends Grouping<K, V>, HierarchyIterable<VNode, V> {
 }
 
 // Paging
 
+/**
+ * Represents a page of values.
+ */
 export interface Page<T> extends Iterable<T> {
+    /**
+     * The page offset from the start of the source iterable.
+     */
     readonly page: number;
+
+    /**
+     * The element offset from the start of the source iterable.
+     */
     readonly offset: number;
 }
 
+/**
+ * Represents a page of hierarchical values.
+ */
 export interface HierarchyPage<TNode, T extends TNode = TNode> extends Page<T>, HierarchyIterable<TNode, T> {
 }
 
 // Iteration
 
+/**
+ * Represents an `Iterable` that is inherently ordered.
+ */
+export interface OrderedIterable<T> extends Iterable<T> {
+    /**
+     * Creates a subsequent `OrderedIterable` whose elements are also ordered by the provided key.
+     * @param keySelector A callback used to select the key for an element.
+     * @param comparison A callback used to compare two keys.
+     * @param descending A value indicating whether to sort in descending (`true`) or ascending (`false`) order.
+     */
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T>;
+}
+
 export namespace OrderedIterable {
     export const thenBy = Symbol.for("OrderedIterable.thenBy");
 }
 
-export interface OrderedIterable<T> extends Iterable<T> {
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T>;
-}
-
+/**
+ * Represents an `Iterable` with a navigable hierarchy.
+ */
 export interface HierarchyIterable<TNode, T extends TNode = TNode> extends Iterable<T>, Hierarchical<TNode> {
 }
 
+/**
+ * Represents an `Iterable` with a navigable hierarchy that is inherently ordered.
+ */
 export interface OrderedHierarchyIterable<TNode, T extends TNode = TNode> extends OrderedIterable<T>, HierarchyIterable<TNode, T> {
 }
 
+export type Choice<K, V> = [K, Queryable<V>];
+
 // Async iteration
+
+/**
+ * Represents an `AsyncIterable` that is inherently ordered.
+ */
+export interface AsyncOrderedIterable<T> extends AsyncIterable<T> {
+    /**
+     * Creates a subsequent `AsyncOrderedIterable` whose elements are also ordered by the provided key.
+     * @param keySelector A callback used to select the key for an element.
+     * @param comparison An optional callback used to compare two keys.
+     * @param descending A value indicating whether to sort in descending (`true`) or ascending (`false`) order.
+     */
+    [AsyncOrderedIterable.thenByAsync]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T>;
+}
 
 export namespace AsyncOrderedIterable {
     export const thenByAsync = Symbol.for("AsyncOrderedIterable.thenByAsync");
 }
 
-export interface AsyncOrderedIterable<T> extends AsyncIterable<T> {
-    [AsyncOrderedIterable.thenByAsync]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T>;
-}
-
+/**
+ * Represents an `AsyncIterable` with a navigable hierarchy.
+ */
 export interface AsyncHierarchyIterable<TNode, T extends TNode = TNode> extends AsyncIterable<T>, Hierarchical<TNode> {
 }
 
+/**
+ * Represents an `AsyncIterable` with a navigable hierarchy that is inherently ordered.
+ */
 export interface AsyncOrderedHierarchyIterable<TNode, T extends TNode = TNode> extends AsyncOrderedIterable<T>, AsyncHierarchyIterable<TNode, T> {
 }
+
+export type AsyncChoice<K, V> = [PromiseLike<K> | K, AsyncQueryable<V>];
 
 // Compatibility
 
 export type Queryable<T> = Iterable<T> | ArrayLike<T>;
-export type PossiblyAsyncIterator<T> = AsyncIterator<T> | Iterator<T>;
-export type PossiblyAsyncIterable<T> = AsyncIterable<T> | Iterable<T>;
-export type PossiblyAsyncQueryable<T> = AsyncIterable<T> | Queryable<T>;
+export type AsyncQueryable<T> = AsyncIterable<T> | Queryable<PromiseLike<T> | T>;
+export type PossiblyAsyncIterable<T> = AsyncIterable<T> | Iterable<PromiseLike<T> | T>;
+export type PossiblyAsyncHierarchyIterable<TNode, T extends TNode = TNode> = AsyncHierarchyIterable<TNode, T> | HierarchyIterable<TNode, T>;
 export type PossiblyAsyncOrderedIterable<T> = AsyncOrderedIterable<T> | OrderedIterable<T>;
 export type PossiblyAsyncOrderedHierarchyIterable<TNode, T extends TNode = TNode> = AsyncOrderedHierarchyIterable<TNode, T> | OrderedHierarchyIterable<TNode, T>;
-export type PossiblyAsyncHierarchyIterable<TNode, T extends TNode = TNode> = AsyncHierarchyIterable<TNode, T> | HierarchyIterable<TNode, T>;
-
-// Queries
-
-export namespace QuerySource {
-    export const source = Symbol("QuerySource.source");
-    export const create = Symbol("QuerySource.create");
-}
-
-export interface QuerySource<T> extends Iterable<T> {
-    [QuerySource.source](): Queryable<T>;
-    [QuerySource.create]<U>(value: Queryable<U>): QuerySource<U>;
-}
-
-export interface QuerySourceConstructor {
-    prototype: QuerySource<unknown>;
-    new <T>(source: Queryable<T>): QuerySource<T>;
-} 
-
-export interface HierarchyQuerySource<TNode, T extends TNode = TNode> extends QuerySource<T>, HierarchyIterable<TNode, T> {
-}
-
-export interface HierarchyQuerySourceConstructor {
-    prototype: HierarchyQuerySource<unknown>;
-    new <TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyQuerySource<TNode, T>;
-}
-
-export interface OrderedQuerySource<T> extends QuerySource<T>, OrderedIterable<T> {
-}
-
-export interface OrderedQuerySourceConstructor {
-    prototype: OrderedQuerySource<unknown>;
-    new <T>(source: OrderedIterable<T>): OrderedQuerySource<T>;
-}
-
-export interface OrderedHierarchyQuerySource<TNode, T extends TNode = TNode> extends QuerySource<T>, OrderedIterable<T>, HierarchyIterable<TNode, T> {
-}
-
-export interface OrderedHierarchyQuerySourceConstructor {
-    prototype: OrderedHierarchyQuerySource<unknown>;
-    new <TNode, T extends TNode>(source: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyQuerySource<TNode, T>;
-}
-
-export namespace AsyncQuerySource {
-    export const source = Symbol("AsyncQuerySource.source");
-    export const create = Symbol("AsyncQuerySource.create");
-    export const createSync = Symbol("AsyncQuerySource.createSync");
-}
-
-export interface AsyncQuerySource<T> extends AsyncIterable<T> {
-    [AsyncQuerySource.source](): PossiblyAsyncQueryable<T>;
-    [AsyncQuerySource.create]<U>(value: PossiblyAsyncQueryable<U>): AsyncQuerySource<U>;
-    [AsyncQuerySource.createSync]<U>(value: Queryable<U>): QuerySource<U>;
-}
-
-export interface AsyncQuerySourceConstructor {
-    prototype: AsyncQuerySource<unknown>;
-    new <T>(source: PossiblyAsyncQueryable<T>): AsyncQuerySource<T>;
-}
-
-export interface AsyncHierarchyQuerySource<TNode, T extends TNode = TNode> extends AsyncQuerySource<T>, AsyncHierarchyIterable<TNode, T> {
-}
-
-export interface AsyncHierarchyQuerySourceConstructor {
-    prototype: AsyncHierarchyQuerySource<unknown>;
-    new <TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyQuerySource<TNode, T>;
-}
-
-export interface AsyncOrderedQuerySource<T> extends AsyncQuerySource<T>, AsyncOrderedIterable<T> {
-}
-
-export interface AsyncOrderedQuerySourceConstructor {
-    prototype: AsyncOrderedQuerySource<unknown>;
-    new <T>(source: PossiblyAsyncOrderedIterable<T>): AsyncOrderedQuerySource<T>;
-}
-
-export interface AsyncOrderedHierarchyQuerySource<TNode, T extends TNode = TNode> extends AsyncQuerySource<T>, AsyncOrderedIterable<T>, AsyncHierarchyIterable<TNode, T> {
-}
-
-export interface AsyncOrderedHierarchyQuerySourceConstructor {
-    prototype: AsyncOrderedHierarchyQuerySource<unknown>;
-    new <TNode, T extends TNode>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyQuerySource<TNode, T>;
-}

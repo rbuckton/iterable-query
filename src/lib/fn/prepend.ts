@@ -23,14 +23,12 @@ import { Queryable, HierarchyIterable } from "../types";
  * @param value The value to prepend.
  */
 export function prepend<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, value: T): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the elements of the source with the provided value prepended to the beginning.
  *
  * @param value The value to prepend.
  */
 export function prepend<T>(source: Queryable<T>, value: T): Iterable<T>;
-
 export function prepend<T>(source: Queryable<T>, value: T): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     return FlowHierarchy(new PrependIterable(value, ToIterable(source)), source);

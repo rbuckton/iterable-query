@@ -15,7 +15,7 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates a subquery that iterates the results of applying a callback to each element.
@@ -23,8 +23,8 @@ import { PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
  * @param source A `Queryable` object.
  * @param projection A callback used to map each element into an iterable.
  */
-export function flatMapAsync<T, U>(source: PossiblyAsyncQueryable<T>, projection: (element: T) => PossiblyAsyncQueryable<U>): AsyncIterable<U> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function flatMapAsync<T, U>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<U>): AsyncIterable<U> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(projection, "projection");
     return new AsyncFlatMapIterable(ToPossiblyAsyncIterable(source), projection);
 }
@@ -32,9 +32,9 @@ export function flatMapAsync<T, U>(source: PossiblyAsyncQueryable<T>, projection
 @ToStringTag("AsyncFlatMapIterable")
 class AsyncFlatMapIterable<T, U> implements AsyncIterable<U> {
     private _source: PossiblyAsyncIterable<T>;
-    private _projection: (element: T) => PossiblyAsyncQueryable<U>;
+    private _projection: (element: T) => AsyncQueryable<U>;
 
-    constructor(source: PossiblyAsyncIterable<T>, projection: (element: T) => PossiblyAsyncQueryable<U>) {
+    constructor(source: PossiblyAsyncIterable<T>, projection: (element: T) => AsyncQueryable<U>) {
         this._source = source;
         this._projection = projection;
     }

@@ -14,13 +14,11 @@
   limitations under the License.
  */
 
-import { assert, PossiblyAsyncIteratorClose, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncIterator } from "../types";
+import { assert, ToStringTag, Registry, AsyncIteratorClose } from "../internal";
 
 export interface ConsumeAsyncOptions {
     /** Indicates whether iterated elements should be cached for subsequent iterations. */
     cacheElements?: boolean;
-
     /** Indicates whether to leave the iterator open when the iterable returns. */
     leaveOpen?: boolean;
 }
@@ -30,7 +28,7 @@ export interface ConsumeAsyncOptions {
  *
  * @param iterator An `AsyncIterator` object.
  */
-export function consumeAsync<T>(iterator: PossiblyAsyncIterator<T>, { cacheElements = false, leaveOpen = false }: ConsumeAsyncOptions = {}): AsyncIterable<T> {
+export function consumeAsync<T>(iterator: AsyncIterator<T>, { cacheElements = false, leaveOpen = false }: ConsumeAsyncOptions = {}): AsyncIterable<T> {
     assert.mustBeIterator(iterator, "iterator");
     assert.mustBeBoolean(cacheElements, "cacheElements");
     return new AsyncConsumeIterable(iterator, cacheElements, leaveOpen);
@@ -38,11 +36,11 @@ export function consumeAsync<T>(iterator: PossiblyAsyncIterator<T>, { cacheEleme
 
 @ToStringTag("AsyncConsumeIterable")
 class AsyncConsumeIterable<T> implements AsyncIterable<T> {
-    private _iterator: PossiblyAsyncIterator<T> | undefined;
+    private _iterator: AsyncIterator<T> | undefined;
     private _cache?: T[];
     private _leaveOpen: boolean;
     
-    constructor(iterator: PossiblyAsyncIterator<T>, cacheElements: boolean, leaveOpen: boolean) {
+    constructor(iterator: AsyncIterator<T>, cacheElements: boolean, leaveOpen: boolean) {
         this._iterator = iterator;
         this._cache = cacheElements ? [] : undefined;
         this._leaveOpen = leaveOpen;
@@ -71,7 +69,7 @@ class AsyncConsumeIterable<T> implements AsyncIterable<T> {
         }
         finally {
             if (!this._leaveOpen) {
-                await PossiblyAsyncIteratorClose(this._iterator);
+                await AsyncIteratorClose(this._iterator);
             }
         }
     }

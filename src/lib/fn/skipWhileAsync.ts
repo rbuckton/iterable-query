@@ -15,26 +15,26 @@
  */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates a subquery containing all elements except the first elements that match
  * the supplied predicate.
  *
+ * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
  */
 export function skipWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery containing all elements except the first elements that match
  * the supplied predicate.
  *
+ * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
  */
-export function skipWhileAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
-
-export function skipWhileAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function skipWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
+export function skipWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     return FlowHierarchy(new AsyncSkipWhileIterable(ToPossiblyAsyncIterable(source), predicate), source);
 }

@@ -17,7 +17,18 @@
 import { assert, Identity, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
 
+/**
+ * Computes the sum for a series of numbers.
+ * 
+ * @param source A `Queryable` object.
+ */
 export function sum(source: Queryable<number>): number;
+/**
+ * Computes the sum for a series of numbers.
+ * 
+ * @param source A `Queryable` object.
+ * @param elementSelector A callback used to convert a value in `source` to a number.
+ */
 export function sum<T>(source: Queryable<T>, elementSelector: (element: T) => number): number;
 export function sum(source: Queryable<number>, elementSelector: (element: number) => number = Identity): number {
     assert.mustBeQueryable(source, "source");

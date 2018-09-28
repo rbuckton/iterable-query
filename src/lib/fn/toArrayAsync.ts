@@ -15,25 +15,22 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Creates an Array for the elements of the `AsyncIterable`.
  * 
- * @param source An `AsyncIterable` object.
+ * @param source An `AsyncQueryable` object.
  */
-export function toArrayAsync<T>(source: PossiblyAsyncQueryable<T>, elementSelector?: (element: T) => T): Promise<T[]>;
-
+export async function toArrayAsync<T>(source: AsyncQueryable<T>): Promise<T[]>;
 /**
  * Creates an Array for the elements of the `AsyncIterable`.
- *
- * @param source An `AsyncIterable` object.
- * @param elementSelector A callback that selects a value for each element.
+ * 
+ * @param source An `AsyncQueryable` object.
  */
-export function toArrayAsync<T, V>(source: PossiblyAsyncQueryable<T>, elementSelector: (element: T) => V): Promise<V[]>;
-
-export async function toArrayAsync<T>(source: PossiblyAsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<T[]> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function toArrayAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V): Promise<V[]>;
+export async function toArrayAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<T[]> {
+    assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const result: T[] = [];
     for await (const item of ToPossiblyAsyncIterable(source)) {

@@ -20,24 +20,18 @@ import { Queryable } from "../types";
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
+ * @param source A `Queryable` object.
  * @param accumulator The callback used to compute each result.
  */
 export function scan<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T): Iterable<T>;
-
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
+ * @param source A `Queryable` object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
  */
 export function scan<T, U>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U): Iterable<U>;
-
-/**
- * Creates a subquery containing the cumulative results of applying the provided callback to each element.
- *
- * @param accumulator The callback used to compute each result.
- * @param seed An optional seed value.
- */
 export function scan<T, U>(source: Queryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, seed?: T | U): Iterable<T | U> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");

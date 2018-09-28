@@ -14,49 +14,40 @@
   limitations under the License.
  */
 
-import { assert, ToIterable, SameValue, Identity, CreateGrouping, ToGroupingWithFlow, ToStringTag, Registry, FlowHierarchy } from "../internal";
+import { assert, ToIterable, SameValue, Identity, CreateGrouping, ToStringTag, Registry, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
 
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
  *
+ * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
  */
 export function spanMap<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): Iterable<HierarchyGrouping<K, TNode, T>>;
-
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
  *
+ * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
  */
 export function spanMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Iterable<Grouping<K, T>>;
-
 /**
  * Creates a subquery whose values are computed from each element of the contiguous ranges of elements that share the same key.
  *
+ * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  */
 export function spanMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Iterable<Grouping<K, V>>;
-
 /**
  * Creates a subquery whose values are computed from the contiguous ranges of elements that share the same key.
  *
+ * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param spanSelector A callback used to select a result from a contiguous range.
  */
 export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Iterable<V>) => R): Iterable<R>;
-
-/** @internal */ export function spanMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector?: (element: T) => T, spanSelector?: (key: K, elements: Iterable<T>) => Grouping<K, T>): Iterable<Grouping<K, T>>;
-
-/**
- * Creates a subquery whose values are computed from the contiguous ranges of elements that share the same key.
- *
- * @param keySelector A callback used to select the key for an element.
- * @param elementSelector An optional callback used to select a value for an element.
- * @param spanSelector An optional callback used to select a result from a contiguous range.
- */
 export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = Identity, spanSelector: (key: K, span: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");

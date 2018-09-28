@@ -25,8 +25,7 @@ import { Queryable, HierarchyIterable } from "../types";
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
  */
-export function patch<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, start: number, skipCount: number, range: Queryable<T>): HierarchyIterable<TNode, T>;
-
+export function patch<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, start: number, skipCount?: number, range?: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the elements of the source with the provided range
  * patched into the results.
@@ -35,14 +34,13 @@ export function patch<TNode, T extends TNode>(source: HierarchyIterable<TNode, T
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
  */
-export function patch<T>(source: Queryable<T>, start: number, skipCount: number, range: Queryable<T>): Iterable<T>;
-
-export function patch<T>(source: Queryable<T>, start: number, skipCount: number, range: Queryable<T>): Iterable<T> {
+export function patch<T>(source: Queryable<T>, start: number, skipCount?: number, range?: Queryable<T>): Iterable<T>;
+export function patch<T>(source: Queryable<T>, start: number, skipCount: number = 0, range?: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBePositiveFiniteNumber(start, "start");
     assert.mustBePositiveFiniteNumber(skipCount, "skipCount");
-    assert.mustBeQueryable(range, "range");
-    return FlowHierarchy(new PatchIterable(ToIterable(source), start, skipCount, ToIterable(range)), source);
+    assert.mustBeQueryableOrUndefined(range, "range");
+    return FlowHierarchy(new PatchIterable(ToIterable(source), start, skipCount, range && ToIterable(range)), source);
 }
 
 @ToStringTag("PatchIterable")
@@ -50,9 +48,9 @@ class PatchIterable<T> implements Iterable<T> {
     private _source: Iterable<T>;
     private _start: number;
     private _skipCount: number;
-    private _range: Iterable<T>;
+    private _range: Iterable<T> | undefined;
 
-    constructor(source: Iterable<T>, start: number, skipCount: number, range: Iterable<T>) {
+    constructor(source: Iterable<T>, start: number, skipCount: number, range: Iterable<T> | undefined) {
         this._source = source;
         this._start = start;
         this._skipCount = skipCount;
@@ -73,14 +71,14 @@ class PatchIterable<T> implements Iterable<T> {
                 offset++;
             }
             else {
-                if (!hasYieldedRange) {
+                if (!hasYieldedRange && this._range) {
                     yield* this._range;
                     hasYieldedRange = true;
                 }
                 yield value;
             }
         }
-        if (!hasYieldedRange) {
+        if (!hasYieldedRange && this._range) {
             yield* this._range;
         }
     }

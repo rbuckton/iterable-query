@@ -14,46 +14,35 @@
   limitations under the License.
  */
 
-import { assert, SameValue, GetAsyncIterator, ToAsyncIterable, AsyncIteratorClose, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { assert, SameValue, GetAsyncIterator, AsyncIteratorClose, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncQueryable } from "../types";
 
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function correspondsAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>, equalityComparison?: (left: T, right: T) => boolean): Promise<boolean>;
-
+export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  */
-export function correspondsAsync<T, U>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
-
-/**
- * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
- * in `right` at the same position.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
- */
-export async function correspondsAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): Promise<boolean> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
+export async function correspondsAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): Promise<boolean> {
+    assert.mustBeAsyncQueryable<T>(left, "left");
+    assert.mustBeAsyncQueryable<T>(right, "right");
     assert.mustBeFunction(equalityComparison, "equalityComparison");
-    const leftIterator = GetAsyncIterator(ToAsyncIterable(left));
+    const leftIterator = GetAsyncIterator(ToPossiblyAsyncIterable(left));
     let leftDone = false;
     let leftValue: T;
     try {
-        const rightIterator = GetAsyncIterator(ToAsyncIterable(right));
+        const rightIterator = GetAsyncIterator(ToPossiblyAsyncIterable(right));
         let rightDone = false;
         let rightValue: T;
         try {

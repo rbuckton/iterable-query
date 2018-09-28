@@ -18,7 +18,13 @@ import { assert, FlowHierarchy, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { toArray } from "./toArray";
 
+/**
+ * Eagerly evaluate a `Queryable`, returning a new `Iterable`.
+ */
 function _eval<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
+/**
+ * Eagerly evaluate a `Queryable`, returning a new `Iterable`.
+ */
 function _eval<T>(source: Queryable<T>): Iterable<T>;
 function _eval<T>(source: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(source, "source");

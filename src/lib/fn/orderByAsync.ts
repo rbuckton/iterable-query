@@ -15,27 +15,27 @@
  */
 
 import { assert, CompareValues, FlowHierarchy, ThenByAsync, ToAsyncOrderedIterable, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncOrderedHierarchyIterable, PossiblyAsyncQueryable, AsyncOrderedIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncQueryable, AsyncOrderedIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
  * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
  *
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
 export function orderByAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
  *
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
-export function orderByAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-
-export function orderByAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function orderByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
+export function orderByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(comparison, "comparison");
     return FlowHierarchy(new AsyncOrderByIterable(ToPossiblyAsyncIterable(source), keySelector, comparison, /*descending*/ false), source);
@@ -44,21 +44,21 @@ export function orderByAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelecto
 /**
  * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
  *
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
 export function orderByDescendingAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
  *
+ * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
-export function orderByDescendingAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-
-export function orderByDescendingAsync<T, K>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function orderByDescendingAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
+export function orderByDescendingAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
+    assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(comparison, "comparison");
     return FlowHierarchy(new AsyncOrderByIterable(ToPossiblyAsyncIterable(source), keySelector, comparison, /*descending*/ true), source);
@@ -67,19 +67,19 @@ export function orderByDescendingAsync<T, K>(source: PossiblyAsyncQueryable<T>, 
 /**
  * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
  *
+ * @param source An `AsyncOrderedIterable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenByAsync<TNode, T extends TNode, K>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
  *
+ * @param source An `AsyncOrderedIterable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-
 export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
     assert.mustBePossiblyAsyncOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
@@ -90,19 +90,19 @@ export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySe
 /**
  * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
  *
+ * @param source An `AsyncOrderedIterable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenByDescendingAsync<TNode, T extends TNode, K>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
  *
+ * @param source An `AsyncOrderedIterable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenByDescendingAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-
 export function thenByDescendingAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
     assert.mustBePossiblyAsyncOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");

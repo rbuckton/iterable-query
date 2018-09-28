@@ -15,34 +15,34 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
+import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates a subquery for the elements of the source with the provided range
  * patched into the results.
  *
+ * @param source An `AsyncQueryable` object.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
  */
-export function patchAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, start: number, skipCount: number, range: PossiblyAsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
-
+export function patchAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the elements of the source with the provided range
  * patched into the results.
  *
+ * @param source An `AsyncQueryable` object.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
  */
-export function patchAsync<T>(source: PossiblyAsyncQueryable<T>, start: number, skipCount: number, range: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function patchAsync<T>(source: PossiblyAsyncQueryable<T>, start: number, skipCount: number, range: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function patchAsync<T>(source: AsyncQueryable<T>, start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncIterable<T>;
+export function patchAsync<T>(source: AsyncQueryable<T>, start: number, skipCount: number = 0, range?: AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBePositiveFiniteNumber(start, "start");
     assert.mustBePositiveFiniteNumber(skipCount, "skipCount");
-    assert.mustBePossiblyAsyncQueryable(range, "range");
-    return FlowHierarchy(new AsyncPatchIterable(ToPossiblyAsyncIterable(source), start, skipCount, ToPossiblyAsyncIterable(range)), source);
+    assert.mustBeAsyncQueryableOrUndefined<T>(range, "range");
+    return FlowHierarchy(new AsyncPatchIterable(ToPossiblyAsyncIterable(source), start, skipCount, range && ToPossiblyAsyncIterable(range)), source);
 }
 
 @ToStringTag("AsyncPatchIterable")
@@ -50,9 +50,9 @@ class AsyncPatchIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
     private _start: number;
     private _skipCount: number;
-    private _range: PossiblyAsyncIterable<T>;
+    private _range: PossiblyAsyncIterable<T> | undefined;
 
-    constructor(source: PossiblyAsyncIterable<T>, start: number, skipCount: number, range: PossiblyAsyncIterable<T>) {
+    constructor(source: PossiblyAsyncIterable<T>, start: number, skipCount: number, range: PossiblyAsyncIterable<T> | undefined) {
         this._source = source;
         this._start = start;
         this._skipCount = skipCount;
@@ -73,14 +73,14 @@ class AsyncPatchIterable<T> implements AsyncIterable<T> {
                 offset++;
             }
             else {
-                if (!hasYieldedRange) {
+                if (!hasYieldedRange && this._range) {
                     yield* this._range;
                     hasYieldedRange = true;
                 }
                 yield value;
             }
         }
-        if (!hasYieldedRange) {
+        if (!hasYieldedRange && this._range) {
             yield* this._range;
         }
     }

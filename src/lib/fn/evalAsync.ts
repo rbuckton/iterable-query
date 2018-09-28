@@ -15,13 +15,19 @@
  */
 
 import { assert, FlowHierarchy, Registry, CreateSubquery, GetAsyncSource } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyIterable } from "../types";
+import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
-export function evalAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): Promise<HierarchyIterable<TNode, T>>;
-export function evalAsync<T>(source: PossiblyAsyncQueryable<T>): Promise<Iterable<T>>;
-export async function evalAsync<T>(source: PossiblyAsyncQueryable<T>): Promise<Iterable<T>> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+/**
+ * Eagerly evaluate an `AsyncQueryable`, returning a new `AsyncIterable`.
+ */
+export async function evalAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): Promise<HierarchyIterable<TNode, T>>;
+/**
+ * Eagerly evaluate an `AsyncQueryable`, returning a new `AsyncIterable`.
+ */
+export async function evalAsync<T>(source: AsyncQueryable<T>): Promise<Iterable<T>>;
+export async function evalAsync<T>(source: AsyncQueryable<T>): Promise<Iterable<T>> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     return FlowHierarchy(await toArrayAsync(source), source);
 }
 

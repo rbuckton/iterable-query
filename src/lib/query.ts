@@ -15,10 +15,12 @@
  */
 
 import * as fn from "./fn";
-import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, IsPossiblyAsyncHierarchyIterable, GetHierarchy, ThenBy, attachMethods, MakeHierarchyIterable, GetSource, Registry, GetIterator } from "./internal";
-import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, QuerySource, KeyValuePair, Page } from "./types";
+import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, Registry, GetIterator, QuerySource } from "./internal";
+import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, KeyValuePair, Page, Choice } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeOptions } from "./fn";
+
+Registry.addRegistry(fn);
 
 /**
  * Creates a `Query` from a `Queryable` source.
@@ -52,6 +54,7 @@ export function from<T>(source: Queryable<T>): Query<T>;
  * Creates a `Query` from a `Queryable` source.
  *
  * @param source A `Queryable` object.
+ * @param hierarchy A `HierarchyProvider` object.
  */
 export function from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyQuery<TNode, T>;
 
@@ -59,6 +62,7 @@ export function from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarc
  * Creates a `Query` from a `Queryable` source.
  *
  * @param source A `Queryable` object.
+ * @param hierarchy A `HierarchyProvider` object.
  */
 export function from<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T>;
 
@@ -84,7 +88,6 @@ function of<T>(): Query<T> {
 
 Registry.Query.registerStatic("of", of);
 
-Registry.addRegistry(fn);
 Registry.addRegistry({ from, of });
 
 /**
@@ -93,7 +96,7 @@ Registry.addRegistry({ from, of });
  * `Query` is iterated.
  */
 @Registry.QueryConstructor("Query")
-export class Query<T> implements Iterable<T>, QuerySource<T> {
+export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     private _source: Queryable<T>;
 
     /**
@@ -112,12 +115,13 @@ export class Query<T> implements Iterable<T>, QuerySource<T> {
         return GetIterator(ToIterable(GetSource(this)));
     }
 
-    [QuerySource.source]() { return this._source; }
-    [QuerySource.create]<U>(value: OrderedHierarchyIterable<U>): OrderedHierarchyQuery<U>;
-    [QuerySource.create]<U>(value: OrderedIterable<U>): OrderedQuery<U>;
-    [QuerySource.create]<U>(value: HierarchyIterable<U>): HierarchyQuery<U>;
-    [QuerySource.create]<U>(value: Queryable<U>): Query<U>;
-    [QuerySource.create]<U>(value: Queryable<U>): QuerySource<U> { return from(value); }
+    /** @internal */ [QuerySource.source]() {
+        return this._source;
+    }
+
+    /** @internal */ [QuerySource.create]<U>(value: Queryable<U>): QuerySource<U> {
+        return from(value);
+    }
 }
 
 export declare namespace Query {
@@ -153,6 +157,7 @@ export declare namespace Query {
      * Creates a `Query` from a `Queryable` source.
      *
      * @param source A `Queryable` object.
+     * @param hierarchy A `HierarchyProvider` object.
      */
     export function from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyQuery<TNode, T>;
 
@@ -160,6 +165,7 @@ export declare namespace Query {
      * Creates a `Query` from a `Queryable` source.
      *
      * @param source A `Queryable` object.
+     * @param hierarchy A `HierarchyProvider` object.
      */
     export function from<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T>;
 
@@ -249,7 +255,7 @@ export declare namespace Query {
      * @param choices A list of sources
      * @param otherwise A default source to use when another choice could not be made.
      */
-    export function choose<K, T>(chooser: () => K, choices: Queryable<[K, Queryable<T>]>, otherwise?: Queryable<T>): Query<T>;
+    export function choose<K, V>(chooser: () => K, choices: Queryable<Choice<K, V>>, otherwise?: Queryable<V>): Query<V>;
 
     /**
      * Creates a `Query` for the own property keys of an object.
@@ -391,6 +397,14 @@ export interface Query<T> {
     skipWhile(predicate: (element: T) => boolean): Query<T>;
 
     /**
+     * Creates a subquery containing all elements except the first elements that don't match
+     * the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     */
+    skipUntil(predicate: (element: T) => boolean): Query<T>;
+
+    /**
      * Creates a subquery containing the first elements up to the supplied
      * count.
      *
@@ -421,6 +435,20 @@ export interface Query<T> {
     takeWhile(predicate: (element: T) => boolean): Query<T>;
 
     /**
+     * Creates a subquery containing the first elements that do not match the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     */
+    takeUntil(predicate: (element: T) => boolean): Query<T>;
+
+    /**
+     * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
+     *
+     * @param right A `Queryable` object.
+     */
+    intersect<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
+
+    /**
      * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
      *
      * @param right A `Queryable` object.
@@ -432,21 +460,35 @@ export interface Query<T> {
      *
      * @param right A `Queryable` object.
      */
+    union<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery for the set union of this `Query` and another `Queryable`.
+     *
+     * @param right A `Queryable` object.
+     */
     union(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the set difference between this and another Queryable.
+     * Creates a subquery for the set difference between this and another `Queryable`.
      *
      * @param right A `Queryable` object.
      */
     except(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the set difference between this and another Queryable.
+     * Creates a subquery for the set difference between this and another `Queryable`.
      *
      * @param right A `Queryable` object.
      */
     relativeComplement(right: Queryable<T>): Query<T>;
+
+    /**
+     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     *
+     * @param right A `Queryable` object.
+     */
+    symmetricDifference<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery for the symmetric difference between this and another `Queryable`.
@@ -462,29 +504,45 @@ export interface Query<T> {
      *
      * @param right A `Queryable` object.
      */
+    xor<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     *
+     * This is an alias for `symmetricDifference`.
+     *
+     * @param right A `Queryable` object.
+     */
     xor(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery that concatenates this Query with another Queryable.
+     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     *
+     * @param right A `Queryable` object.
+     */
+    concat<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery that concatenates this `Query` with another `Queryable`.
      *
      * @param right A `Queryable` object.
      */
     concat(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the distinct elements of this Query.
+     * Creates a subquery for the distinct elements of this `Query`.
      */
     distinct(): Query<T>;
 
     /**
-     * Creates a subquery for the elements of this Query with the provided value appended to the end.
+     * Creates a subquery for the elements of this `Query` with the provided value appended to the end.
      *
      * @param value The value to append.
      */
     append(value: T): Query<T>;
 
     /**
-     * Creates a subquery for the elements of this Query with the provided value prepended to the beginning.
+     * Creates a subquery for the elements of this `Query` with the provided value prepended to the beginning.
      *
      * @param value The value to prepend.
      */
@@ -496,17 +554,17 @@ export interface Query<T> {
     eval(): Query<T>;
 
     /**
-     * Creates a subquery for the elements of this Query with the provided range
+     * Creates a subquery for the elements of this `Query` with the provided range
      * patched into the results.
      *
      * @param start The offset at which to patch the range.
      * @param skipCount The number of elements to skip from start.
      * @param range The range to patch into the result.
      */
-    patch(start: number, skipCount: number, range: Queryable<T>): Query<T>;
+    patch(start: number, skipCount?: number, range?: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery that contains the provided default value if this Query
+     * Creates a subquery that contains the provided default value if this `Query`
      * contains no elements.
      *
      * @param defaultValue The default value.
@@ -514,7 +572,7 @@ export interface Query<T> {
     defaultIfEmpty(defaultValue: T): Query<T>;
 
     /**
-     * Creates a subquery that splits this Query into one or more pages.
+     * Creates a subquery that splits this `Query` into one or more pages.
      * While advancing from page to page is evaluated lazily, the elements of the page are
      * evaluated eagerly.
      *
@@ -523,7 +581,7 @@ export interface Query<T> {
     pageBy(pageSize: number): Query<Page<T>>;
 
     /**
-     * Creates a subquery that combines this Query with another Queryable by combining elements
+     * Creates a subquery that combines this `Query` with another `Queryable` by combining elements
      * in tuples.
      *
      * @param right A `Queryable` object.
@@ -531,7 +589,7 @@ export interface Query<T> {
     zip<U>(right: Queryable<U>): Query<[T, U]>;
 
     /**
-     * Creates a subquery that combines this Query with another Queryable by combining elements
+     * Creates a subquery that combines this `Query` with another `Queryable` by combining elements
      * using the supplied callback.
      *
      * @param right A `Queryable` object.
@@ -580,7 +638,7 @@ export interface Query<T> {
     spanMap<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Query<V>) => R): Query<R>;
 
     /**
-     * Groups each element of this Query by its key.
+     * Groups each element of this `Query` by its key.
      *
      * @param keySelector A callback used to select the key for an element.
      */
@@ -617,7 +675,7 @@ export interface Query<T> {
      * Creates a subquery for the correlated elements of this `Query` and another `Queryable`.
      *
      * @param inner A `Queryable` object.
-     * @param outerKeySelector A callback used to select the key for an element in this Query.
+     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
      */
@@ -627,7 +685,7 @@ export interface Query<T> {
      * Creates a subquery for the correlated elements of this `Query` and another `Queryable`.
      *
      * @param inner A `Queryable` object.
-     * @param outerKeySelector A callback used to select the key for an element in this Query.
+     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
      */
@@ -851,17 +909,16 @@ export interface Query<T> {
     every(predicate: (element: T) => boolean): boolean;
 
     /**
-     * Computes a scalar value indicating whether every element in this Query corresponds to a matching element
-     * in another Queryable at the same position.
+     * Computes a scalar value indicating whether every element in this `Query` corresponds to a matching element
+     * in another `Queryable` at the same position.
      *
      * @param right A `Queryable` object.
-     * @param equalityComparison An optional callback used to compare the equality of two elements.
      */
-    corresponds(right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
+    corresponds(right: Queryable<T>): boolean;
 
     /**
-     * Computes a scalar value indicating whether every element in this Query corresponds to a matching element
-     * in another Queryable at the same position.
+     * Computes a scalar value indicating whether every element in this `Query` corresponds to a matching element
+     * in another `Queryable` at the same position.
      *
      * @param right A `Queryable` object.
      * @param equalityComparison An optional callback used to compare the equality of two elements.
@@ -876,16 +933,16 @@ export interface Query<T> {
     includes(value: T): boolean;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query include
-     * an exact sequence of elements from another Queryable.
+     * Computes a scalar value indicating whether the elements of this `Query` include
+     * an exact sequence of elements from another `Queryable`.
      *
      * @param right A `Queryable` object.
      */
-    includesSequence(right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
+    includesSequence(right: Queryable<T>): boolean;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query include
-     * an exact sequence of elements from another Queryable.
+     * Computes a scalar value indicating whether the elements of this `Query` include
+     * an exact sequence of elements from another `Queryable`.
      *
      * @param right A `Queryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
@@ -893,16 +950,16 @@ export interface Query<T> {
     includesSequence<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query start
-     * with the same sequence of elements in another Queryable.
+     * Computes a scalar value indicating whether the elements of this `Query` start
+     * with the same sequence of elements in another `Queryable`.
      *
      * @param right A `Queryable` object.
      */
-    startsWith(right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
+    startsWith(right: Queryable<T>): boolean;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query start
-     * with the same sequence of elements in another Queryable.
+     * Computes a scalar value indicating whether the elements of this `Query` start
+     * with the same sequence of elements in another `Queryable`.
      *
      * @param right A `Queryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
@@ -910,16 +967,16 @@ export interface Query<T> {
     startsWith<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query end
-     * with the same sequence of elements in another Queryable.
+     * Computes a scalar value indicating whether the elements of this `Query` end
+     * with the same sequence of elements in another `Queryable`.
      *
      * @param right A `Queryable` object.
      */
-    endsWith(right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
+    endsWith(right: Queryable<T>): boolean;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query end
-     * with the same sequence of elements in another Queryable.
+     * Computes a scalar value indicating whether the elements of this `Query` end
+     * with the same sequence of elements in another `Queryable`.
      *
      * @param right A `Queryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
@@ -1021,7 +1078,7 @@ export interface Query<T> {
      *
      * @param keySelector A callback used to select a key for each element.
      */
-    toMap<K>(keySelector: (element: T) => K, elementSelector?: (element: T) => T): Map<K, T>;
+    toMap<K>(keySelector: (element: T) => K): Map<K, T>;
 
     /**
      * Creates a `Map` for the elements of the `Query`.
@@ -1036,7 +1093,7 @@ export interface Query<T> {
      *
      * @param keySelector A callback used to select a key for each element.
      */
-    toLookup<K>(keySelector: (element: T) => K, elementSelector?: (element: T) => T): Lookup<K, T>;
+    toLookup<K>(keySelector: (element: T) => K): Lookup<K, T>;
 
     /**
      * Creates a `Lookup` for the elements of the `Query`.
@@ -1281,10 +1338,10 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode>{
      * @param skipCount The number of elements to skip from start.
      * @param range The range to patch into the result.
      */
-    patch(start: number, skipCount: number, range: Queryable<T>): HierarchyQuery<TNode, T>;
+    patch(start: number, skipCount?: number, range?: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery that contains the provided default value if this Query
+     * Creates a subquery that contains the provided default value if this `Query`
      * contains no elements.
      *
      * @param defaultValue The default value.
@@ -1383,21 +1440,21 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode>{
     descendantsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
 
     /**
-     * Creates a subquery for this query.
+     * Creates a subquery for this `query`.
      *
      * @param predicate A callback used to filter the results.
      */
     self<U extends T>(predicate: (element: T) => element is U): HierarchyQuery<TNode, U>;
 
     /**
-     * Creates a subquery for this query.
+     * Creates a subquery for this `query`.
      *
      * @param predicate A callback used to filter the results.
      */
     self<U extends TNode>(predicate: (element: TNode) => element is U): HierarchyQuery<TNode, U>;
 
     /**
-     * Creates a subquery for this query.
+     * Creates a subquery for this `query`.
      *
      * @param predicate A callback used to filter the results.
      */

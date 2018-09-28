@@ -15,7 +15,7 @@
  */
 
 import { assert, True, GetHierarchy, ToStringTag, Registry } from "../internal";
-import { HierarchyProvider, AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, Hierarchical } from "../types";
+import { HierarchyProvider, AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Axis } from "./axis";
 
 export function rootAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
@@ -67,7 +67,7 @@ export function parentsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode
 }
 
 export function selfAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): AsyncHierarchyIterable<TNode, U>;
-export function selfAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<T>, predicate?: (element: T) => boolean ): AsyncHierarchyIterable<TNode, T>;
+export function selfAsync<TNode, T extends TNode>(source: AsyncHierarchyIterable<T>, predicate?: (element: T) => boolean ): AsyncHierarchyIterable<TNode, T>;
 export function selfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
@@ -120,13 +120,13 @@ function CreateAsyncTraversalIterable(tag: string, axis: <TNode>(provider: Hiera
         private _source: PossiblyAsyncHierarchyIterable<TNode>;
         private _predicate: (element: TNode) => boolean;
         private _axis: (provider: HierarchyProvider<TNode>, element: TNode) => Iterable<TNode>;
-    
+
         constructor(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean) {
             this._source = source;
             this._predicate = predicate;
             this._axis = axis;
         }
-    
+
         async *[Symbol.asyncIterator](): AsyncIterator<TNode> {
             const source = this._source;
             const hierarchy = GetHierarchy(this._source);
@@ -140,12 +140,12 @@ function CreateAsyncTraversalIterable(tag: string, axis: <TNode>(provider: Hiera
                 }
             }
         }
-    
+
         [Hierarchical.hierarchy]() {
             return GetHierarchy(this._source);
         }
     }
-    
+
     return AsyncHierarchyTraversalIterable;
 }
 

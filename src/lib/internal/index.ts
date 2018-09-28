@@ -14,12 +14,23 @@
   limitations under the License.
  */
 
+/** @internal */
 export * from "./decorators";
+/** @internal */
 export * from "./conversion";
+/** @internal */
 export * from "./flow";
+/** @internal */
 export * from "./guards";
+/** @internal */
 export * from "./utils";
+/** @internal */
 export * from "./registry";
+/** @internal */
+export * from "./types";
+/** @internal */
 import * as assert from "./assert";
+/** @internal */
 import * as Debug from "./debug";
+/** @internal */
 export { assert, Debug };

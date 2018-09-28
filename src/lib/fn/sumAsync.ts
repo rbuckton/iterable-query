@@ -15,12 +15,23 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
-export function sumAsync(source: PossiblyAsyncQueryable<number>): Promise<number>;
-export function sumAsync<T>(source: PossiblyAsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
-export async function sumAsync(source: PossiblyAsyncQueryable<number>, elementSelector: (element: number) => number = Identity): Promise<number> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+/**
+ * Computes the sum for a series of numbers.
+ * 
+ * @param source An `AsyncQueryable` object.
+ */
+export async function sumAsync(source: AsyncQueryable<number>): Promise<number>;
+/**
+ * Computes the sum for a series of numbers.
+ * 
+ * @param source An `AsyncQueryable` object.
+ * @param elementSelector A callback used to convert a value in `source` to a number.
+ */
+export async function sumAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
+export async function sumAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number = Identity): Promise<number> {
+    assert.mustBeAsyncQueryable<number>(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     let sum = 0;
     for await (const value of ToPossiblyAsyncIterable(source)) {

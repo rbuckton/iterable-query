@@ -15,28 +15,26 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, PossiblyAsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Creates a subquery that iterates the results of recursively expanding the
  * elements of the source.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param projection A callback used to recusively expand each element.
  */
-export function expandAsync<TNode, T extends TNode = TNode, U extends TNode = T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, projection: (element: T) => PossiblyAsyncQueryable<U>): AsyncHierarchyIterable<TNode, U>;
-
+export function expandAsync<TNode, T extends TNode = TNode, U extends TNode = T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, projection: (element: T) => AsyncQueryable<U>): AsyncHierarchyIterable<TNode, U>;
 /**
  * Creates a subquery that iterates the results of recursively expanding the
  * elements of the source.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param projection A callback used to recusively expand each element.
  */
-export function expandAsync<T>(source: PossiblyAsyncQueryable<T>, projection: (element: T) => PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-
-export function expandAsync<T>(source: PossiblyAsyncQueryable<T>, projection: (element: T) => PossiblyAsyncQueryable<T>): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function expandAsync<T>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<T>): AsyncIterable<T>;
+export function expandAsync<T>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<T>): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(projection, "projection");
     return FlowHierarchy(new AsyncExpandIterable(ToPossiblyAsyncIterable(source), projection), source);
 }
@@ -44,9 +42,9 @@ export function expandAsync<T>(source: PossiblyAsyncQueryable<T>, projection: (e
 @ToStringTag("AsyncExpandIterable")
 class AsyncExpandIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _projection: (element: T) => PossiblyAsyncQueryable<T>;
+    private _projection: (element: T) => AsyncQueryable<T>;
 
-    constructor(source: PossiblyAsyncIterable<T>, projection: (element: T) => PossiblyAsyncQueryable<T>) {
+    constructor(source: PossiblyAsyncIterable<T>, projection: (element: T) => AsyncQueryable<T>) {
         this._source = source;
         this._projection = projection;
     }
@@ -57,7 +55,9 @@ class AsyncExpandIterable<T> implements AsyncIterable<T> {
         while (queue.length) {
             const source = queue.shift()!;
             for await (const element of source) {
-                queue.push(ToPossiblyAsyncIterable(projection(element)));
+                const projected = projection(element);
+                assert.mustBeAsyncQueryable<T>(projected);
+                queue.push(ToPossiblyAsyncIterable(projected));
                 yield element;
             }
         }

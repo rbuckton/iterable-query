@@ -14,39 +14,29 @@
   limitations under the License.
  */
 
-import { assert, MakeTuple, GetAsyncIterator, ToAsyncIterable, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncIterable, PossiblyAsyncIterator } from "../types";
+import { assert, MakeTuple, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery that combines two Queryables by combining elements
+ * Creates a subquery that combines two `AsyncQueryable` objects by combining elements
  * in tuples.
  *
- * @param left A Queryable.
- * @param right A Queryable.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  */
-export function zipAsync<T, U>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<U>): AsyncIterable<[T, U]>;
-
+export function zipAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>): AsyncIterable<[T, U]>;
 /**
- * Creates a subquery that combines two Queryables by combining elements
+ * Creates a subquery that combines two `AsyncQueryable` objects by combining elements
  * using the supplied callback.
  *
- * @param left A Queryable.
- * @param right A Queryable.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  * @param selector A callback used to combine two elements.
  */
-export function zipAsync<T, U, R>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncIterable<R>;
-
-/**
- * Creates a subquery that combines two Queryables by combining elements
- * using the supplied callback.
- *
- * @param left A Queryable.
- * @param right A Queryable.
- * @param selector An optional callback used to combine two elements.
- */
-export function zipAsync<T, U, R>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): AsyncIterable<[T, U] | R> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
+export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncIterable<R>;
+export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): AsyncIterable<[T, U] | R> {
+    assert.mustBeAsyncQueryable<T>(left, "left");
+    assert.mustBeAsyncQueryable<U>(right, "right");
     assert.mustBeFunction(selector, "selector");
     return new AsyncZipIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right), selector);
 }
@@ -65,11 +55,11 @@ class AsyncZipIterable<T, U, R> implements AsyncIterable<R> {
 
     async *[Symbol.asyncIterator](): AsyncIterator<R> {
         const selector = this._selector;
-        const leftIterator: PossiblyAsyncIterator<T> = GetAsyncIterator(this._left);
+        const leftIterator: AsyncIterator<T> = GetAsyncIterator(this._left);
         let leftDone = false;
         let leftValue: T;
         try {
-            const rightIterator: PossiblyAsyncIterator<U> = GetAsyncIterator(this._right);
+            const rightIterator: AsyncIterator<U> = GetAsyncIterator(this._right);
             let rightDone = false;
             let rightValue: U;
             try {

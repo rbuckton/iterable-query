@@ -23,6 +23,7 @@ import { elementAt } from "./elementAt";
  * Creates a subquery for the child of each element at the specified offset. A negative offset
  * starts from the last child.
  *
+ * @param source An `AsyncHierarchyIterable` object.
  * @param offset The offset for the child.
  */
 export function nthChildAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, offset: number): AsyncHierarchyIterable<TNode> {

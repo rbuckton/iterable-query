@@ -5,15 +5,17 @@
         "module": "commonjs",
         "outDir": "../../out/tests",
         "noImplicitAny": true,
+        "noEmitOnError": true,
         "sourceMap": true,
         "stripInternal": true,
         "declaration": true,
         "experimentalDecorators": true,
-        "rootDirs": ["../lib", "../es5", "../lib"]
+        "rootDirs": ["../es5", "../es2015", "../lib"]
     },
     "references": [
         { "path": "../lib/tsconfig.json" },
         { "path": "../lib/tsconfig.es5.json" },
+        { "path": "../lib/tsconfig.es2015.json" },
     ],
     "include": [
         "**/*.ts"

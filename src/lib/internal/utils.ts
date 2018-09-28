@@ -14,12 +14,13 @@
   limitations under the License.
  */
 
-import { Hierarchical, HierarchyProvider, PossiblyAsyncQueryable, Queryable, PossiblyAsyncIterator, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, QuerySource, AsyncQuerySource, OrderedHierarchyIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncOrderedHierarchyIterable } from "../types";
+import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
 import { IsAsyncIterable, IsIterable, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
 import { Query, HierarchyQuery, OrderedHierarchyQuery, OrderedQuery } from "../query";
 import { AsyncQuery, AsyncOrderedQuery, AsyncOrderedHierarchyQuery, AsyncHierarchyQuery } from "../asyncQuery";
+import { QuerySource, AsyncQuerySource } from "./types";
 
 /** @internal */
 export function GetIterator<T>(source: Iterable<T>): Iterator<T> {
@@ -111,11 +112,11 @@ export function GetHierarchy<TNode>(value: Hierarchical<TNode>): HierarchyProvid
     throw new TypeError();
 }
 
-/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncOrderedHierarchyQuery<TNode, T>): PossiblyAsyncOrderedHierarchyIterable<TNode, T>;
-/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncHierarchyQuery<TNode, T>): PossiblyAsyncHierarchyIterable<TNode, T>;
-/** @internal */ export function GetAsyncSource<T>(query: AsyncOrderedQuery<T>): PossiblyAsyncOrderedIterable<T>;
-/** @internal */ export function GetAsyncSource<T>(query: AsyncQuerySource<T>): PossiblyAsyncQueryable<T>;
-/** @internal */ export function GetAsyncSource<T>(query: AsyncQuerySource<T>): PossiblyAsyncQueryable<T> {
+/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncOrderedHierarchyQuery<TNode, T>): AsyncOrderedHierarchyIterable<TNode, T>;
+/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncHierarchyQuery<TNode, T>): AsyncHierarchyIterable<TNode, T>;
+/** @internal */ export function GetAsyncSource<T>(query: AsyncOrderedQuery<T>): AsyncOrderedIterable<T>;
+/** @internal */ export function GetAsyncSource<T>(query: AsyncQuerySource<T>): AsyncQueryable<T>;
+/** @internal */ export function GetAsyncSource<T>(query: AsyncQuerySource<T>): AsyncQueryable<T> {
     const sourceMethod = query[AsyncQuerySource.source];
     if (typeof sourceMethod === "function") {
         return sourceMethod.call(query);
@@ -126,9 +127,9 @@ export function GetHierarchy<TNode>(value: Hierarchical<TNode>): HierarchyProvid
 /** @internal */ export function CreateAsyncSubquery<TNode, T extends TNode>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyQuery<TNode, T>;
 /** @internal */ export function CreateAsyncSubquery<TNode, T extends TNode>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyQuery<TNode, T>;
 /** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncOrderedIterable<T>): AsyncOrderedQuery<T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncQueryable<T>): AsyncQuery<T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: PossiblyAsyncQueryable<T>): AsyncQuerySource<T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: PossiblyAsyncQueryable<T>): AsyncQuerySource<T> {
+/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuery<unknown>, subquery: AsyncQueryable<T>): AsyncQuery<T>;
+/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: AsyncQueryable<T>): AsyncQuerySource<T>;
+/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: AsyncQueryable<T>): AsyncQuerySource<T> {
     const subqueryMethod = query[AsyncQuerySource.create];
     if (typeof subqueryMethod === "function") {
         return subqueryMethod.call(query, subquery);
@@ -148,16 +149,6 @@ export function IteratorClose<T>(iterator: Iterator<T> | undefined | null): Iter
 
 /** @internal */
 export function AsyncIteratorClose<T>(iterator: AsyncIterator<T> | undefined | null): Promise<IteratorResult<T>> | undefined {
-    if (iterator !== undefined && iterator !== null) {
-        const close = iterator.return;
-        if (typeof close === "function") {
-            return close.call(iterator);
-        }
-    }
-}
-
-/** @internal */
-export function PossiblyAsyncIteratorClose<T>(iterator: PossiblyAsyncIterator<T> | undefined | null): Promise<IteratorResult<T>> | IteratorResult<T> | undefined {
     if (iterator !== undefined && iterator !== null) {
         const close = iterator.return;
         if (typeof close === "function") {
@@ -233,8 +224,9 @@ export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (ele
     return map;
 }
 
-/** @internal */
-export async function CreateGroupingsAsync<T, K, V>(source: PossiblyAsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>> {
+/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>>;
+/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>>;
+/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>> {
     const map = new Map<K, V[]>();
     for await (const item of ToPossiblyAsyncIterable(source)) {
         let key = keySelector(item);

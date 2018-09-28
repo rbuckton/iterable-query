@@ -25,7 +25,6 @@ import { toArray } from "./toArray";
  * @param accumulator the callback used to compute the result.
  */
 export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T): T;
-
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
@@ -34,7 +33,6 @@ export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, e
  * @param seed An optional seed value.
  */
 export function reduceRight<T, U>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): U;
-
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
@@ -44,15 +42,6 @@ export function reduceRight<T, U>(source: Queryable<T>, accumulator: (current: U
  * @param resultSelector An optional callback used to compute the final result.
  */
 export function reduceRight<T, U, R>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): R;
-
-/**
- * Computes a scalar value by applying an accumulator callback over each element in reverse.
- *
- * @param source A `Queryable` object.
- * @param accumulator the callback used to compute the result.
- * @param seed An optional seed value.
- * @param resultSelector An optional callback used to compute the final result.
- */
 export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): T {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");

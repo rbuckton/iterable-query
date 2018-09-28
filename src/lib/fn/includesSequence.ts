@@ -24,10 +24,8 @@ import { toArray } from "./toArray";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
- * @param equalityComparison A callback used to compare the equality of two elements.
  */
-export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
-
+export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>): boolean;
 /**
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
@@ -37,15 +35,6 @@ export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equ
  * @param equalityComparison A callback used to compare the equality of two elements.
  */
 export function includesSequence<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-
-/**
- * Computes a scalar value indicating whether the elements of `left` include
- * an exact sequence of elements from `right`.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
- */
 export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
     assert.mustBeQueryable(left, "source");
     assert.mustBeQueryable(right, "other");

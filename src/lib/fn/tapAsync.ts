@@ -14,25 +14,53 @@
   limitations under the License.
  */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry, IsPromiseLike } from "../internal";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
+ * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
  */
 export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, callback: (element: T, offset: number) => void): AsyncHierarchyIterable<TNode, T>;
-
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
+ * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
  */
-export function tapAsync<T>(source: PossiblyAsyncQueryable<T>, callback: (element: T, offset: number) => void): AsyncIterable<T>;
-
-export function tapAsync<T>(source: PossiblyAsyncQueryable<T>, callback: (element: T, offset: number) => void): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, callback: (element: T, offset: number) => PromiseLike<void>): AsyncHierarchyIterable<TNode, T>;
+/**
+ * Lazily invokes a callback as each element of the iterable is iterated.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param callback The callback to invoke.
+ */
+export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncHierarchyIterable<TNode, T>;
+/**
+ * Lazily invokes a callback as each element of the iterable is iterated.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param callback The callback to invoke.
+ */
+export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => void): AsyncIterable<T>;
+/**
+ * Lazily invokes a callback as each element of the iterable is iterated.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param callback The callback to invoke.
+ */
+export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => PromiseLike<void>): AsyncIterable<T>;
+/**
+ * Lazily invokes a callback as each element of the iterable is iterated.
+ *
+ * @param source An `AsyncQueryable` object.
+ * @param callback The callback to invoke.
+ */
+export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncIterable<T>;
+export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(callback, "callback");
     return FlowHierarchy(new AsyncTapterable(ToPossiblyAsyncIterable(source), callback), source);
 }
@@ -40,9 +68,9 @@ export function tapAsync<T>(source: PossiblyAsyncQueryable<T>, callback: (elemen
 @ToStringTag("AsyncTapIterable")
 class AsyncTapterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _callback: (element: T, offset: number) => void;
+    private _callback: (element: T, offset: number) => PromiseLike<void> | void;
 
-    constructor(source: PossiblyAsyncIterable<T>, callback: (element: T, offset: number) => void) {
+    constructor(source: PossiblyAsyncIterable<T>, callback: (element: T, offset: number) => PromiseLike<void> | void) {
         this._source = source;
         this._callback = callback;
     }
@@ -52,7 +80,8 @@ class AsyncTapterable<T> implements AsyncIterable<T> {
         const callback = this._callback;
         let offset = 0;
         for await (const element of source) {
-            callback(element, offset++);
+            const result = callback(element, offset++);
+            if (IsPromiseLike(result)) await result;
             yield element;
         }
     }

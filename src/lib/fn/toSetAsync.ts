@@ -15,26 +15,24 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 import { Set } from "../collections";
 
 /**
  * Creates a Set for the elements of the Query.
  * 
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  */
-export function toSetAsync<T>(source: PossiblyAsyncQueryable<T>, elementSelector?: (element: T) => T): Promise<Set<T>>;
-
+export function toSetAsync<T>(source: AsyncQueryable<T>): Promise<Set<T>>;
 /**
  * Creates a Set for the elements of the Query.
- *
- * @param source A `Queryable` object.
+ * 
+ * @param source An `AsyncQueryable` object.
  * @param elementSelector A callback that selects a value for each element.
  */
-export function toSetAsync<T, V>(source: PossiblyAsyncQueryable<T>, elementSelector: (element: T) => V): Promise<Set<V>>;
-
-export async function toSetAsync<T>(source: PossiblyAsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<Set<T>> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function toSetAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V): Promise<Set<V>>;
+export async function toSetAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<Set<T>> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const set = new Set<T>();
     for await (const item of ToPossiblyAsyncIterable(source)) {

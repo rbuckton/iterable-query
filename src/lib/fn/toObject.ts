@@ -24,8 +24,7 @@ import { Queryable } from "../types";
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  */
-export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => T): object;
-
+export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey): object;
 /**
  * Creates an Object for the elements of `source`.
  *
@@ -35,7 +34,6 @@ export function toObject<T>(source: Queryable<T>, prototype: object | null, keyS
  * @param elementSelector A callback that selects a value for each element.
  */
 export function toObject<T, V>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): object;
-
 export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T = Identity): object {
     assert.mustBeQueryable(source, "source");
     assert.mustBeObjectOrNull(prototype, "prototype");

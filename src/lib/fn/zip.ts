@@ -18,32 +18,22 @@ import { assert, MakeTuple, GetIterator, IteratorClose, ToIterable, ToStringTag,
 import { Queryable } from "../types";
 
 /**
- * Creates a subquery that combines two Queryables by combining elements
+ * Creates a subquery that combines two `Queryable` objects by combining elements
  * in tuples.
  *
- * @param left A Queryable.
- * @param right A Queryable.
+ * @param left A `Queryable`.
+ * @param right A `Queryable`.
  */
 export function zip<T, U>(left: Queryable<T>, right: Queryable<U>): Iterable<[T, U]>;
-
 /**
- * Creates a subquery that combines two Queryables by combining elements
+ * Creates a subquery that combines two `Queryable` objects by combining elements
  * using the supplied callback.
  *
- * @param left A Queryable.
- * @param right A Queryable.
+ * @param left A `Queryable`.
+ * @param right A `Queryable`.
  * @param selector A callback used to combine two elements.
  */
 export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => R): Iterable<R>;
-
-/**
- * Creates a subquery that combines two Queryables by combining elements
- * using the supplied callback.
- *
- * @param left A Queryable.
- * @param right A Queryable.
- * @param selector An optional callback used to combine two elements.
- */
 export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): Iterable<[T, U] | R> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

@@ -14,9 +14,9 @@
   limitations under the License.
  */
 
-import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { assert, True, Registry, ToPossiblyAsyncIterable } from "../internal";
 import { Map, Set } from "../collections";
+import { AsyncQueryable } from "../types";
 
 /**
  * Counts the number of elements, optionally filtering elements using the supplied callback.
@@ -24,8 +24,8 @@ import { Map, Set } from "../collections";
  * @param source A `Queryable` object.
  * @param predicate An optional callback used to match each element.
  */
-export async function countAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<number> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function countAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<number> {
+    assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
 
     if (predicate === True) {

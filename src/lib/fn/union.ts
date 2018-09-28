@@ -19,29 +19,26 @@ import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
 
 /**
- * Creates a subquery for the set union of two Queryables.
+ * Creates a subquery for the set union of two `Queryable` objects.
  *
- * @param left A Queryable value.
+ * @param left A `Queryable` value.
  * @param right A Queryable value.
  */
 export function union<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
-
 /**
- * Creates a subquery for the set union of two Queryables.
+ * Creates a subquery for the set union of two `Queryable` objects.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left A `Queryable` value.
+ * @param right A `Queryable` value.
  */
 export function union<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
-
 /**
- * Creates a subquery for the set union of two Queryables.
+ * Creates a subquery for the set union of two `Queryable` objects.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left A `Queryable` value.
+ * @param right A `Queryable` value.
  */
 export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-
 export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

@@ -394,7 +394,6 @@ describe("Query", () => {
             "Infinity": [RangeError, Infinity]
         });
         theory.throws("throws if 'skipCount' is", (skipCount: any) => Query.from([]).patch(0, skipCount, []), {
-            "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-number": [TypeError, ""],
             "negative": [RangeError, -1],
@@ -402,7 +401,6 @@ describe("Query", () => {
             "Infinity": [RangeError, Infinity]
         });
         theory.throws("throws if 'range' is", (range: any) => Query.from([]).patch(0, 0, range), {
-            "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-object": [TypeError, 0],
             "non-queryable": [TypeError, {}]

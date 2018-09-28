@@ -13,47 +13,47 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
-import { assert, ToPossiblyAsyncIterable, ToAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
-import { Map } from "../collections";
-import { toArrayAsync } from "./toArrayAsync";
+import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, SameValue } from "../internal";
+import { AsyncQueryable, PossiblyAsyncIterable, AsyncChoice } from "../types";
 
 /**
  * Creates an `Iterable` that iterates the elements from sources picked from a list based on the
  * result of a lazily evaluated choice.
  *
  * @param chooser A callback used to choose a source.
- * @param choices A `Queryable` of key/value pairs, where each value is a `Queryable` object.
+ * @param choices An `AsyncQueryable` of key/value pairs, where each value is an `AsyncQueryable` object.
  * @param otherwise A default source to use when another choice could not be made.
  */
-export function chooseAsync<K, T>(chooser: () => K, choices: PossiblyAsyncQueryable<[K, PossiblyAsyncQueryable<T>]>, otherwise?: PossiblyAsyncQueryable<T>): AsyncIterable<T> {
+export function chooseAsync<K, V>(chooser: () => PromiseLike<K> | K, choices: AsyncQueryable<AsyncChoice<K, V>>, otherwise?: AsyncQueryable<V>): AsyncIterable<V> {
     assert.mustBeFunction(chooser, "chooser");
-    assert.mustBePossiblyAsyncQueryable(choices, "choices");
-    assert.mustBePossiblyAsyncQueryableOrUndefined(otherwise, "otherwise");
-    return new AsyncChooseIterable(chooser, ToAsyncIterable(choices), otherwise && ToAsyncIterable(otherwise));
+    assert.mustBeAsyncQueryable<AsyncChoice<K, V>>(choices, "choices");
+    assert.mustBeAsyncQueryableOrUndefined<V>(otherwise, "otherwise");
+    return new AsyncChooseIterable(chooser, ToPossiblyAsyncIterable(choices), otherwise && ToPossiblyAsyncIterable(otherwise));
 }
 
 @ToStringTag("AsyncChooseIterable")
-class AsyncChooseIterable<K, T> implements AsyncIterable<T> {
-    private _chooser: () => K;
-    private _choices: AsyncIterable<[K, PossiblyAsyncQueryable<T>]>;
-    private _otherwise: AsyncIterable<T> | undefined;
+class AsyncChooseIterable<K, V> implements AsyncIterable<V> {
+    private _chooser: () => PromiseLike<K> | K;
+    private _choices: PossiblyAsyncIterable<AsyncChoice<K, V>>;
+    private _otherwise: PossiblyAsyncIterable<V> | undefined;
 
-    constructor(chooser: () => K, choices: AsyncIterable<[K, PossiblyAsyncQueryable<T>]>, otherwise?: AsyncIterable<T>) {
+    constructor(chooser: () => PromiseLike<K> | K, choices: PossiblyAsyncIterable<AsyncChoice<K, V>>, otherwise?: PossiblyAsyncIterable<V>) {
         this._chooser = chooser;
         this._choices = choices;
         this._otherwise = otherwise;
     }
 
-    async *[Symbol.asyncIterator](): AsyncIterator<T> {
+    async *[Symbol.asyncIterator](): AsyncIterator<V> {
         const chooser = this._chooser;
-        const choices = new Map(await toArrayAsync(this._choices));
-        const choice = choices.get(chooser());
-        if (choice !== undefined && choice !== null) {
-            yield* ToPossiblyAsyncIterable(choice);
+        const choice = await chooser();
+        for await (const [key, values] of this._choices) {
+            if (SameValue(choice, await key)) {
+                yield* ToPossiblyAsyncIterable(values);
+                return;
+            }
         }
-        else if (this._otherwise) {
-            yield* ToPossiblyAsyncIterable(this._otherwise);
+        if (this._otherwise) {
+            yield* this._otherwise;
         }
     }
 }

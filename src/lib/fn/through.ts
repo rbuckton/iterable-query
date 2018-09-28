@@ -17,10 +17,18 @@
 import { assert, Registry, GetSource, CreateSubquery } from "../internal";
 import { Queryable } from "../types";
 
+/**
+ * Pass the entire source to the provided callback, returning a `Queryable` from the result.
+ *
+ * @param source A `Queryable` object.
+ * @param callback A callback function.
+ */
 export function through<T, U, S extends Queryable<T> = Queryable<T>, R extends Queryable<U> = Queryable<U>>(source: S, callback: (source: S) => R): R {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(callback, "callback");
-    return callback(source);
+    const result = callback(source);
+    assert.mustBeQueryable(result);
+    return result;
 }
 
 Registry.Query.registerCustom("through", through, function (callback) {

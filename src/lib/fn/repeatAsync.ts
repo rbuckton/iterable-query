@@ -14,7 +14,7 @@
   limitations under the License.
  */
 
- import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag, Registry } from "../internal";
 
 /**
  * Creates an Iterable for a value repeated a provided number of times.

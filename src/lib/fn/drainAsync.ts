@@ -15,15 +15,15 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Iterates over all of the elements in the query, ignoring the results.
  * 
  * @param source A `Queryable` object.
  */
-export async function drainAsync<T>(source: PossiblyAsyncQueryable<T>): Promise<void> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function drainAsync<T>(source: AsyncQueryable<T>): Promise<void> {
+    assert.mustBeAsyncQueryable(source, "source");
     for await (const _ of ToPossiblyAsyncIterable(source)) ;
 }
 

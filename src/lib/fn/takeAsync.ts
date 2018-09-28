@@ -15,26 +15,24 @@
  */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery containing the first elements up to the supplied
- * count.
+ * Creates a subquery containing the first elements up to the supplied count.
  *
+ * @param source An `AsyncQueryable` object.
  * @param count The number of elements to take.
  */
 export function takeAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, count: number): AsyncHierarchyIterable<TNode, T>;
-
 /**
- * Creates a subquery containing the first elements up to the supplied
- * count.
+ * Creates a subquery containing the first elements up to the supplied count.
  *
+ * @param source An `AsyncQueryable` object.
  * @param count The number of elements to take.
  */
-export function takeAsync<T>(source: PossiblyAsyncQueryable<T>, count: number): AsyncIterable<T>;
-
-export function takeAsync<T>(source: PossiblyAsyncQueryable<T>, count: number): AsyncIterable<T> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function takeAsync<T>(source: AsyncQueryable<T>, count: number): AsyncIterable<T>;
+export function takeAsync<T>(source: AsyncQueryable<T>, count: number): AsyncIterable<T> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBePositiveFiniteNumber(count, "count");
     return FlowHierarchy(new AsyncTakeIterable(ToPossiblyAsyncIterable(source), count), source);
 }

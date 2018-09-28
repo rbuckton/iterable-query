@@ -22,6 +22,8 @@ import { Axis } from "./axis";
 /**
  * Creates a subquery for the top-most elements. Elements that are a descendant of any other
  * element are removed.
+ * 
+ * @param source A `Queryable` object.
  */
 export function topMost<T>(source: HierarchyIterable<T>): HierarchyIterable<T> {
     assert.mustBeHierarchyIterable(source, "source");

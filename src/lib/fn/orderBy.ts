@@ -25,7 +25,6 @@ import { toArray } from "./toArray";
  * @param comparison An optional callback used to compare two keys.
  */
 export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
  *
@@ -33,7 +32,6 @@ export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNo
  * @param comparison An optional callback used to compare two keys.
  */
 export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-
 export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
@@ -48,7 +46,6 @@ export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) =>
  * @param comparison An optional callback used to compare two keys.
  */
 export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
  *
@@ -56,7 +53,6 @@ export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIt
  * @param comparison An optional callback used to compare two keys.
  */
 export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-
 export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
@@ -71,7 +67,6 @@ export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (elem
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
  *
@@ -79,7 +74,6 @@ export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterab
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-
 export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
     assert.mustBeOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
@@ -94,7 +88,6 @@ export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: 
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
-
 /**
  * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
  *
@@ -102,7 +95,6 @@ export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHiera
  * @param comparison An optional callback used to compare two keys.
  */
 export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-
 export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
     assert.mustBeOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");

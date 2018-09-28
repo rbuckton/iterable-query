@@ -15,17 +15,17 @@
  */
 
 import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Computes a scalar value indicating whether `source` contains any elements,
  * optionally filtering the elements using the supplied callback.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate An optional callback used to match each element.
  */
-export async function someAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<boolean> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function someAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<boolean> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     for await (const element of ToPossiblyAsyncIterable(source)) {
         if (predicate(element)) {

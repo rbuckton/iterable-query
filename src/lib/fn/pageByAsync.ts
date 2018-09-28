@@ -15,27 +15,28 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, CreatePage } from "../internal";
-import { PossiblyAsyncQueryable, PossiblyAsyncIterable, Page, PossiblyAsyncHierarchyIterable, HierarchyPage } from "../types";
+import { AsyncQueryable, PossiblyAsyncIterable, Page, PossiblyAsyncHierarchyIterable, HierarchyPage } from "../types";
 
 /**
- * Creates a subquery that splits this Query into one or more pages.
+ * Creates a subquery that splits an `AsyncIterable` into one or more pages.
  * While advancing from page to page is evaluated lazily, the elements of the page are
  * evaluated eagerly.
  *
+ * @param source An `AsyncIterable` object.
  * @param pageSize The number of elements per page.
  */
 export function pageByAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, pageSize: number): AsyncIterable<HierarchyPage<TNode, T>>;
-
 /**
- * Creates a subquery that splits this Query into one or more pages.
+ * Creates a subquery that splits an `AsyncIterable` into one or more pages.
  * While advancing from page to page is evaluated lazily, the elements of the page are
  * evaluated eagerly.
  *
+ * @param source An `AsyncIterable` object.
  * @param pageSize The number of elements per page.
  */
-export function pageByAsync<T>(source: PossiblyAsyncQueryable<T>, pageSize: number): AsyncIterable<Page<T>>;
-export function pageByAsync<T>(source: PossiblyAsyncQueryable<T>, pageSize: number): AsyncIterable<Page<T>> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export function pageByAsync<T>(source: AsyncQueryable<T>, pageSize: number): AsyncIterable<Page<T>>;
+export function pageByAsync<T>(source: AsyncQueryable<T>, pageSize: number): AsyncIterable<Page<T>> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBePositiveNonZeroFiniteNumber(pageSize, "pageSize");
     return new AsyncPageByIterable(ToPossiblyAsyncIterable(source), pageSize);
 }

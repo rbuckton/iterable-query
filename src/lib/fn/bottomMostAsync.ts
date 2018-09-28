@@ -14,8 +14,8 @@
   limitations under the License.
  */
 
-import { assert, GetHierarchy, ToAsyncHierarchyIterable, ToStringTag, Registry } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, Hierarchical } from "../types";
+import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
+import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Map, Set } from "../collections";
 import { Axis } from "./axis";
 import { toArrayAsync } from "./toArrayAsync";
@@ -25,15 +25,15 @@ import { toArrayAsync } from "./toArrayAsync";
  * element are removed.
  */
 export function bottomMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode> {
-    assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
-    return new AsyncBottomMostIterable(ToAsyncHierarchyIterable(source));
+    assert.mustBePossiblyAsyncHierarchyIterable<TNode, T>(source, "source");
+    return new AsyncBottomMostIterable(source);
 }
 
 @ToStringTag("AsyncBottomMostIterable")
 class AsyncBottomMostIterable<T> implements AsyncHierarchyIterable<T> {
-    private _source: AsyncHierarchyIterable<T>;
+    private _source: PossiblyAsyncHierarchyIterable<T>;
 
-    constructor(source: AsyncHierarchyIterable<T>) {
+    constructor(source: PossiblyAsyncHierarchyIterable<T>) {
         this._source = source;
     }
 

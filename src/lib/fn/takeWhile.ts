@@ -20,31 +20,31 @@ import { Queryable, HierarchyIterable } from "../types";
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
  */
 export function takeWhile<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => element is U): HierarchyIterable<TNode, U>;
-
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
  */
 export function takeWhile<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
  */
 export function takeWhile<T, U extends T>(source: Queryable<T>, predicate: (element: T) => element is U): Iterable<U>;
-
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
+ * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
  */
 export function takeWhile<T>(source: Queryable<T>, predicate: (element: T) => boolean): Iterable<T>;
-
 export function takeWhile<T>(source: Queryable<T>, predicate: (element: T) => boolean): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");

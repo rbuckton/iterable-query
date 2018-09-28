@@ -24,8 +24,7 @@ import { Map } from "../collections";
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select a key for each element.
  */
-export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector?: (element: T) => T): Map<K, T>;
-
+export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Map<K, T>;
 /**
  * Creates a Map for the elements of the Query.
  *
@@ -34,7 +33,6 @@ export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K
  * @param elementSelector A callback that selects a value for each element.
  */
 export function toMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V>;
-
 export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Map<K, T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");

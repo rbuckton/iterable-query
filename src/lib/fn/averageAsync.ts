@@ -14,13 +14,24 @@
   limitations under the License.
  */
 
-import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { assert, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncQueryable } from "../types";
 
-export function averageAsync(source: PossiblyAsyncQueryable<number>): Promise<number>;
-export function averageAsync<T>(source: PossiblyAsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
-export async function averageAsync(source: PossiblyAsyncQueryable<number>, elementSelector: (element: number) => number = Identity): Promise<number> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+/**
+ * Computes the average for a series of numbers.
+ * 
+ * @param source An `AsyncQueryable` object.
+ */
+export async function averageAsync(source: AsyncQueryable<number>): Promise<number>;
+/**
+ * Computes the average for a series of numbers.
+ * 
+ * @param source An `AsyncQueryable` object.
+ * @param elementSelector A callback used to convert a value in `source` to a number.
+ */
+export async function averageAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
+export async function averageAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number = Number): Promise<number> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunctionOrUndefined(elementSelector, "elementSelector");
     let sum = 0;
     let count = 0;

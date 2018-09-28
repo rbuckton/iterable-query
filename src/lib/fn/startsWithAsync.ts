@@ -15,48 +15,37 @@
  */
 
 
-import { assert, SameValue, GetAsyncIterator, ToAsyncIterable, AsyncIteratorClose, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { assert, SameValue, GetAsyncIterator, AsyncIteratorClose, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { AsyncQueryable } from "../types";
 
 /**
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
+ */
+export async function startsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
+/**
+ * Computes a scalar value indicating whether the elements of this Query start
+ * with the same sequence of elements in another Queryable.
+ *
+ * @param left An `AsyncQueryable` object.
+ * @param right An `AsyncQueryable` object.
  * @param equalityComparison A callback used to compare the equality of two elements.
  */
-export function startsWithAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>, equalityComparison?: (left: T, right: T) => boolean): Promise<boolean>;
-
-/**
- * Computes a scalar value indicating whether the elements of this Query start
- * with the same sequence of elements in another Queryable.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison A callback used to compare the equality of two elements.
- */
-export function startsWithAsync<T, U>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
-
-/**
- * Computes a scalar value indicating whether the elements of this Query start
- * with the same sequence of elements in another Queryable.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
- */
-export async function startsWithAsync<T>(left: PossiblyAsyncQueryable<T>, right: PossiblyAsyncQueryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): Promise<boolean> {
-    assert.mustBePossiblyAsyncQueryable(left, "left");
-    assert.mustBePossiblyAsyncQueryable(right, "right");
+export async function startsWithAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+export async function startsWithAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean = SameValue): Promise<boolean> {
+    assert.mustBeAsyncQueryable<T>(left, "left");
+    assert.mustBeAsyncQueryable<U>(right, "right");
     assert.mustBeFunction(equalityComparison, "equalityComparison");
-    const leftIterator = GetAsyncIterator(ToAsyncIterable(left));
+    const leftIterator = GetAsyncIterator(ToPossiblyAsyncIterable(left));
     let leftDone = false;
     let leftValue: T;
     try {
-        const rightIterator = GetAsyncIterator(ToAsyncIterable(right));
+        const rightIterator = GetAsyncIterator(ToPossiblyAsyncIterable(right));
         let rightDone = false;
-        let rightValue: T;
+        let rightValue: U;
         try {
             for (;;) {
                 ({ done: leftDone, value: leftValue } = await leftIterator.next());

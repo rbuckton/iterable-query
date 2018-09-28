@@ -15,7 +15,7 @@
  */
 
 import { assert, GetIterator, ToIterable, FlowHierarchy, Registry, GetSource, CreateSubquery, MakeTuple } from "../internal";
-import { Queryable, HierarchyIterable, QuerySource } from "../types";
+import { Queryable, HierarchyIterable } from "../types";
 import { prepend } from "./prepend";
 import { consume, ConsumeOptions } from "./consume";
 import { empty } from "./empty";
@@ -35,7 +35,6 @@ const cacheAndClose: ConsumeOptions = { cacheElements: true, leaveOpen: false };
  * @param predicate The predicate used to match elements.
  */
 export function span<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => element is U): [HierarchyIterable<TNode, U>, HierarchyIterable<TNode, T>];
-
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that match the supplied predicate, and whose second element is an `Iterable`
@@ -48,7 +47,6 @@ export function span<TNode, T extends TNode, U extends T>(source: HierarchyItera
  * @param predicate The predicate used to match elements.
  */
 export function span<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
-
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that match the supplied predicate, and whose second element is an `Iterable`
@@ -61,7 +59,6 @@ export function span<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>
  * @param predicate The predicate used to match elements.
  */
 export function span<T, U extends T>(source: Queryable<T>, predicate: (element: T) => element is U): [Iterable<U>, Iterable<T>];
-
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that match the supplied predicate, and whose second element is an `Iterable`
@@ -74,7 +71,6 @@ export function span<T, U extends T>(source: Queryable<T>, predicate: (element: 
  * @param predicate The predicate used to match elements.
  */
 export function span<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>];
-
 export function span<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>] {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");

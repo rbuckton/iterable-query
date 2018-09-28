@@ -18,7 +18,7 @@ import * as assert from "./assert";
 import { ToStringTag } from "./decorators";
 import { GetHierarchy, GetIterator, GetAsyncIterator, ThenBy, ThenByAsync } from "./utils";
 import { IsIterable, IsArrayLike, IsOrderedIterable, IsAsyncIterable, IsOrderedHierarchyIterable, IsHierarchyIterable, IsAsyncHierarchyIterable, IsAsyncOrderedIterable, IsAsyncOrderedHierarchyIterable, IsGrouping, IsPossiblyAsyncHierarchyIterable } from "./guards";
-import { HierarchyIterable, AsyncHierarchyIterable, AsyncOrderedIterable, OrderedIterable, AsyncOrderedHierarchyIterable, OrderedHierarchyIterable, HierarchyProvider, Queryable, PossiblyAsyncQueryable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable, Hierarchical, Grouping, HierarchyGrouping, Page, HierarchyPage } from "../types";
+import { HierarchyIterable, AsyncHierarchyIterable, AsyncOrderedIterable, OrderedIterable, AsyncOrderedHierarchyIterable, OrderedHierarchyIterable, HierarchyProvider, Queryable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable, Hierarchical, Grouping, HierarchyGrouping, Page, HierarchyPage, AsyncQueryable } from "../types";
 import { FlowHierarchy } from "./flow";
 
 /** @internal */ export function ToIterable<TNode, T extends TNode>(value: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyIterable<TNode, T>;
@@ -34,8 +34,8 @@ import { FlowHierarchy } from "./flow";
 /** @internal */ export function ToAsyncIterable<TNode, T extends TNode>(value: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyIterable<TNode, T>;
 /** @internal */ export function ToAsyncIterable<TNode, T extends TNode>(value: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /** @internal */ export function ToAsyncIterable<T>(value: PossiblyAsyncOrderedIterable<T>): AsyncOrderedIterable<T>;
-/** @internal */ export function ToAsyncIterable<T>(value: PossiblyAsyncQueryable<T>): AsyncIterable<T>;
-/** @internal */ export function ToAsyncIterable<T>(value: PossiblyAsyncQueryable<T>) {
+/** @internal */ export function ToAsyncIterable<T>(value: AsyncQueryable<T>): AsyncIterable<T>;
+/** @internal */ export function ToAsyncIterable<T>(value: AsyncQueryable<T>) {
     if (IsAsyncIterable(value)) return value;
     if (IsOrderedHierarchyIterable(value)) return new AsyncFromSyncOrderedHierarchyIterable(value);
     if (IsOrderedIterable(value)) return new AsyncFromSyncOrderedIterable(value);
@@ -68,8 +68,8 @@ import { FlowHierarchy } from "./flow";
 /** @internal */ export function ToPossiblyAsyncIterable<TNode, T extends TNode>(value: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): PossiblyAsyncOrderedHierarchyIterable<TNode, T>;
 /** @internal */ export function ToPossiblyAsyncIterable<TNode, T extends TNode>(value: PossiblyAsyncHierarchyIterable<TNode, T>): PossiblyAsyncHierarchyIterable<TNode, T>;
 /** @internal */ export function ToPossiblyAsyncIterable<T>(value: PossiblyAsyncOrderedIterable<T>): PossiblyAsyncOrderedIterable<T>;
-/** @internal */ export function ToPossiblyAsyncIterable<T>(value: PossiblyAsyncQueryable<T>): PossiblyAsyncIterable<T>;
-/** @internal */ export function ToPossiblyAsyncIterable<T>(value: PossiblyAsyncQueryable<T>) {
+/** @internal */ export function ToPossiblyAsyncIterable<T>(value: AsyncQueryable<T>): PossiblyAsyncIterable<T>;
+/** @internal */ export function ToPossiblyAsyncIterable<T>(value: AsyncQueryable<T>) {
     if (IsAsyncIterable(value)) return value;
     if (IsIterable(value)) return value;
     if (IsArrayLike(value)) return new ArrayLikeIterable(value);
@@ -78,7 +78,7 @@ import { FlowHierarchy } from "./flow";
 
 /** @internal */ export function MakeHierarchyIterable<TNode, T extends TNode>(value: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyIterable<TNode, T>;
 /** @internal */ export function MakeHierarchyIterable<TNode, T extends TNode>(value: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T>;
-/** @internal */ export function MakeHierarchyIterable<TNode, T extends TNode>(value: Queryable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyIterable<TNode, T> | HierarchyIterable<TNode, T> {
+/** @internal */ export function MakeHierarchyIterable<TNode, T extends TNode>(value: Queryable<T> | OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyIterable<TNode, T> | HierarchyIterable<TNode, T> {
     if (IsOrderedIterable(value)) return new OrderedHierarchyIterableImpl(value, hierarchy);
     if (IsGrouping(value)) return new HierarchyGroupingImpl(value.key, new HierarchyIterableImpl(value, hierarchy));
     if (IsIterable(value)) return new HierarchyIterableImpl(value, hierarchy);
@@ -92,8 +92,8 @@ import { FlowHierarchy } from "./flow";
 }
 
 /** @internal */ export function MakeAsyncHierarchyIterable<TNode, T extends TNode>(value: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyIterable<TNode, T>;
-/** @internal */ export function MakeAsyncHierarchyIterable<TNode, T extends TNode>(value: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T>;
-/** @internal */ export function MakeAsyncHierarchyIterable<TNode, T extends TNode>(value: PossiblyAsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T> {
+/** @internal */ export function MakeAsyncHierarchyIterable<TNode, T extends TNode>(value: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T>;
+/** @internal */ export function MakeAsyncHierarchyIterable<TNode, T extends TNode>(value: AsyncQueryable<T> | PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T> {
     if (IsAsyncOrderedIterable(value)) return new AsyncOrderedHierarchyIterableImpl(value, hierarchy);
     if (IsAsyncIterable(value)) return new AsyncHierarchyIterableImpl(value, hierarchy);
     if (IsOrderedIterable(value)) return new AsyncOrderedHierarchyIterableImpl(new AsyncFromSyncOrderedIterable(value), hierarchy);
@@ -120,7 +120,7 @@ class ArrayLikeIterable<T> implements Iterable<T> {
 }
 
 @ToStringTag("Async-from-sync Iterable")
-class AsyncFromSyncIterable<T, TSource extends Iterable<T>> implements AsyncIterable<T> {
+class AsyncFromSyncIterable<T, TSource extends Iterable<PromiseLike<T> | T>> implements AsyncIterable<T> {
     protected _source: TSource;
 
     constructor(source: TSource) {
@@ -235,7 +235,7 @@ class AsyncOrderedHierarchyIterableImpl<TNode, T extends TNode> extends AsyncHie
     }
 }
 
-/** @internal */ export function ToGroupingWithFlow<K, V>(key: K, elements: Iterable<V>, source?: PossiblyAsyncQueryable<V>): Grouping<K, V> {
+/** @internal */ export function ToGroupingWithFlow<K, V>(key: K, elements: Iterable<V>, source?: AsyncQueryable<V>): Grouping<K, V> {
     return IsPossiblyAsyncHierarchyIterable(source) 
         ? CreateHierarchyGrouping(key, FlowHierarchy(elements, source)) 
         : CreateGrouping(key, elements);

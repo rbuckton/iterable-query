@@ -15,16 +15,16 @@
  */
 
 import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Gets the only element, or returns `undefined`.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate An optional callback used to match each element.
  */
-export async function singleAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean = True) {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function singleAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True) {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     let hasResult = false;
     let result: T | undefined;

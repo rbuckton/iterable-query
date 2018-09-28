@@ -21,18 +21,18 @@ import { Queryable, HierarchyIterable } from "../types";
  * Creates a subquery containing all elements except the first elements up to the supplied
  * count.
  *
+ * @param source A `Queryable` object.
  * @param count The number of elements to skip.
  */
 export function skipRight<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, count: number): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery containing all elements except the first elements up to the supplied
  * count.
  *
+ * @param source A `Queryable` object.
  * @param count The number of elements to skip.
  */
 export function skipRight<T>(source: Queryable<T>, count: number): Iterable<T>;
-
 export function skipRight<T>(source: Queryable<T>, count: number): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBePositiveFiniteNumber(count, "count");

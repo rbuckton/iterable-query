@@ -17,7 +17,19 @@
 import { assert, MakeHierarchyIterable, Registry } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyProvider, OrderedIterable, OrderedHierarchyIterable } from "../types";
 
+/**
+ * Creates a `HierarchyIterable` using the provided `HierarchyProvider`.
+ *
+ * @param source A `Queryable` object.
+ * @param hierarchy A `HierarchyProvider`.
+ */
 export function toHierarchy<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyIterable<TNode, T>;
+/**
+ * Creates a `HierarchyIterable` using the provided `HierarchyProvider`.
+ *
+ * @param source A `Queryable` object.
+ * @param hierarchy A `HierarchyProvider`.
+ */
 export function toHierarchy<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T>;
 export function toHierarchy<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T> {
     assert.mustBeQueryable(source, "source");

@@ -15,7 +15,7 @@
  */
 
 import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
-import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, Hierarchical } from "../types";
+import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Axis } from "./axis";
 import { Map, Set } from "../collections";
 import { toArrayAsync } from "./toArrayAsync";
@@ -23,6 +23,8 @@ import { toArrayAsync } from "./toArrayAsync";
 /**
  * Creates a subquery for the top-most elements. Elements that are a descendant of any other
  * element are removed.
+ * 
+ * @param source An `AsyncQueryable` object.
  */
 export function topMostAsync<T>(source: PossiblyAsyncHierarchyIterable<T>): AsyncHierarchyIterable<T> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");

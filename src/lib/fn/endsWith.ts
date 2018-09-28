@@ -25,10 +25,8 @@ import { toArray } from "./toArray";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
  */
-export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison?: (left: T, right: T) => boolean): boolean;
-
+export function endsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
 /**
  * Computes a scalar value indicating whether the elements of this Query end
  * with the same sequence of elements in another Queryable.
@@ -38,15 +36,6 @@ export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityCom
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  */
 export function endsWith<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-
-/**
- * Computes a scalar value indicating whether the elements of this Query end
- * with the same sequence of elements in another Queryable.
- *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
- */
 export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

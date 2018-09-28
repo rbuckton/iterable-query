@@ -15,29 +15,27 @@
  */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Creates an Object for the elements of `source`.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  */
-export function toObjectAsync<T>(source: PossiblyAsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => T): Promise<object>;
-
+export async function toObjectAsync<T>(source: AsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey): Promise<object>;
 /**
  * Creates an Object for the elements of `source`.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
  */
-export function toObjectAsync<T, V>(source: PossiblyAsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): Promise<object>;
-
-export async function toObjectAsync<T>(source: PossiblyAsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T = Identity): Promise<object> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function toObjectAsync<T, V>(source: AsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): Promise<object>;
+export async function toObjectAsync<T>(source: AsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T = Identity): Promise<object> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeObjectOrNull(prototype, "prototype");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");

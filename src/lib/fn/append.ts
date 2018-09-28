@@ -25,7 +25,6 @@ import { Queryable, HierarchyIterable } from "../types";
  * @param value The value to append.
  */
 export function append<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, value: T): HierarchyIterable<TNode, T>;
-
 /**
  * Creates an `Iterable` for the elements of `source` with the provided `value` appended to the
  * end.

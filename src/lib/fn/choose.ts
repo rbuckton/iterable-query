@@ -15,7 +15,7 @@
  */
 
 import { assert, ToIterable, ToStringTag, Registry } from "../internal";
-import { Queryable } from "../types";
+import { Queryable, Choice } from "../types";
 import { Map } from "../collections";
 
 /**
@@ -26,7 +26,7 @@ import { Map } from "../collections";
  * @param choices A `Queryable` of key/value pairs, where each value is a `Queryable` object.
  * @param otherwise A default source to use when another choice could not be made.
  */
-export function choose<K, T>(chooser: () => K, choices: Queryable<[K, Queryable<T>]>, otherwise?: Queryable<T>): Iterable<T> {
+export function choose<K, V>(chooser: () => K, choices: Queryable<Choice<K, V>>, otherwise?: Queryable<V>): Iterable<V> {
     assert.mustBeFunction(chooser, "chooser");
     assert.mustBeQueryable(choices, "choices");
     assert.mustBeQueryableOrUndefined(otherwise, "otherwise");

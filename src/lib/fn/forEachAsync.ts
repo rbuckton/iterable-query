@@ -15,16 +15,16 @@
  */
 
 import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Invokes a callback for each element.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
  */
-export async function forEachAsync<T>(source: PossiblyAsyncQueryable<T>, callback: (element: T, offset: number) => void): Promise<void> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function forEachAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => void): Promise<void> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(callback, "callback");
     let offset = 0;
     for await (const element of ToPossiblyAsyncIterable(source)) {

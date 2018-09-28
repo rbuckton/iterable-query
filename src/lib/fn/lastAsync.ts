@@ -15,17 +15,17 @@
  */
 
 import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
-import { PossiblyAsyncQueryable } from "../types";
+import { AsyncQueryable } from "../types";
 
 /**
  * Gets the last element, optionally filtering elements using the supplied
  * callback.
  *
- * @param source A `Queryable` object.
+ * @param source An `AsyncQueryable` object.
  * @param predicate An optional callback used to match each element.
  */
-export async function lastAsync<T>(source: PossiblyAsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<T | undefined> {
-    assert.mustBePossiblyAsyncQueryable(source, "source");
+export async function lastAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<T | undefined> {
+    assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     let result: T | undefined;
     for await (const element of ToPossiblyAsyncIterable(source)) {

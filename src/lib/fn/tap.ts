@@ -20,17 +20,17 @@ import { Queryable, HierarchyIterable } from "../types";
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
+ * @param source A `Queryable` object.
  * @param callback The callback to invoke.
  */
 export function tap<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, callback: (element: T, offset: number) => void): HierarchyIterable<TNode, T>;
-
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
+ * @param source A `Queryable` object.
  * @param callback The callback to invoke.
  */
 export function tap<T>(source: Queryable<T>, callback: (element: T, offset: number) => void): Iterable<T>;
-
 export function tap<T>(source: Queryable<T>, callback: (element: T, offset: number) => void): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(callback, "callback");

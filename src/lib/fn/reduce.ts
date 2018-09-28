@@ -24,7 +24,6 @@ import { Queryable } from "../types";
  * @param accumulator the callback used to compute the result.
  */
 export function reduce<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T): T;
-
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
@@ -33,7 +32,6 @@ export function reduce<T>(source: Queryable<T>, accumulator: (current: T, elemen
  * @param seed An optional seed value.
  */
 export function reduce<T, U>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): U;
-
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
@@ -43,15 +41,6 @@ export function reduce<T, U>(source: Queryable<T>, accumulator: (current: U, ele
  * @param resultSelector An optional callback used to compute the final result.
  */
 export function reduce<T, U, R>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): R;
-
-/**
- * Computes a scalar value by applying an accumulator callback over each element.
- *
- * @param source A `Queryable` object.
- * @param accumulator the callback used to compute the result.
- * @param seed An optional seed value.
- * @param resultSelector An optional callback used to compute the final result.
- */
 export function reduce<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): T {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");
