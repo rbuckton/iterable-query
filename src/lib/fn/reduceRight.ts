@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -23,6 +24,7 @@ import { toArray } from "./toArray";
  *
  * @param source A `Queryable` object.
  * @param accumulator the callback used to compute the result.
+ * @category Scalar
  */
 export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T): T;
 /**
@@ -31,6 +33,7 @@ export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, e
  * @param source A `Queryable` object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
+ * @category Scalar
  */
 export function reduceRight<T, U>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): U;
 /**
@@ -40,6 +43,7 @@ export function reduceRight<T, U>(source: Queryable<T>, accumulator: (current: U
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.
+ * @category Scalar
  */
 export function reduceRight<T, U, R>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): R;
 export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): T {

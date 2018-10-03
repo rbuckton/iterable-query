@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
 import { HierarchyProvider, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, Hierarchical } from "../types";
@@ -25,6 +26,7 @@ import { elementAt } from "./elementAt";
  *
  * @param source An `AsyncHierarchyIterable` object.
  * @param offset The offset for the child.
+ * @category Hierarchy
  */
 export function nthChildAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, offset: number): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetAsyncIterator, FlowHierarchy, Registry, GetAsyncSource, CreateAsyncSubquery, CreateSubquery, MakeTuple, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncHierarchyIterable, HierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable } from "../types";
@@ -33,6 +34,7 @@ const cacheAndClose: ConsumeAsyncOptions = { cacheElements: true, leaveOpen: fal
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
@@ -45,6 +47,7 @@ export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHi
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
 export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {

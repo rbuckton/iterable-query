@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, CompareValues, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable } from "../types";
  *
  * @param source An `AsyncQueryable` object.
  * @param comparison An optional callback used to compare two elements.
+ * @category Scalar
  */
 export async function maxAsync<T>(source: AsyncQueryable<T>, comparison: (x: T, y: T) => number = CompareValues): Promise<T | undefined> {
     assert.mustBeAsyncQueryable<T>(source, "source");

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -21,12 +22,14 @@ import { Queryable, HierarchyIterable } from "../types";
  * Creates a subquery for the elements of the source with the provided value prepended to the beginning.
  *
  * @param value The value to prepend.
+ * @category Subquery
  */
 export function prepend<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, value: T): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the elements of the source with the provided value prepended to the beginning.
  *
  * @param value The value to prepend.
+ * @category Subquery
  */
 export function prepend<T>(source: Queryable<T>, value: T): Iterable<T>;
 export function prepend<T>(source: Queryable<T>, value: T): Iterable<T> {

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Registry, GetSource, CreateSubquery } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param callback A callback function.
+ * @category Subquery
  */
 export function through<T, U, S extends Queryable<T> = Queryable<T>, R extends Queryable<U> = Queryable<U>>(source: S, callback: (source: S) => R): R {
     assert.mustBeQueryable(source, "source");

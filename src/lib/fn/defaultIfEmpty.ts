@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -22,17 +23,17 @@ import { Queryable, HierarchyIterable } from "../types";
  * contains no elements.
  *
  * @param defaultValue The default value.
+ * @category Subquery
  */
 export function defaultIfEmpty<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, defaultValue: T): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery that contains the provided default value if the source
  * contains no elements.
  *
  * @param defaultValue The default value.
+ * @category Subquery
  */
 export function defaultIfEmpty<T>(source: Queryable<T>, defaultValue: T): Iterable<T>;
-
 export function defaultIfEmpty<T>(source: Queryable<T>, defaultValue: T): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     return FlowHierarchy(new DefaultIfEmptyIterable(ToIterable(source), defaultValue), source);

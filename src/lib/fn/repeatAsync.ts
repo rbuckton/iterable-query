@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToStringTag, Registry } from "../internal";
 
@@ -21,6 +22,7 @@ import { assert, ToStringTag, Registry } from "../internal";
  *
  * @param value The value for each element of the Iterable.
  * @param count The number of times to repeat the value.
+ * @category Query
  */
 export function repeatAsync<T>(value: PromiseLike<T> | T, count: number): AsyncIterable<T> {
     assert.mustBePositiveFiniteNumber(count, "count");

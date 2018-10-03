@@ -4,4 +4,5 @@ coverage
 src
 scripts
 out/tests
+out/sandbox
 gulpfile.js

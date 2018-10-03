@@ -13,6 +13,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
+
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry} from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
@@ -22,6 +24,7 @@ import { toArrayAsync } from "./toArrayAsync";
  *
  * @param source An `AsyncQueryable` object.
  * @param accumulator The callback used to compute each result.
+ * @category Subquery
  */
 export function scanRightAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): AsyncIterable<T>;
 /**
@@ -30,6 +33,7 @@ export function scanRightAsync<T>(source: AsyncQueryable<T>, accumulator: (curre
  * @param source An `AsyncQueryable` object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
+ * @category Subquery
  */
 export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U): AsyncIterable<U>;
 export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, seed?: T | U): AsyncIterable<T | U> {

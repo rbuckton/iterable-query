@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -21,6 +22,7 @@ import { AsyncQueryable } from "../types";
  * Computes the sum for a series of numbers.
  * 
  * @param source An `AsyncQueryable` object.
+ * @category Scalar
  */
 export async function sumAsync(source: AsyncQueryable<number>): Promise<number>;
 /**
@@ -28,6 +30,7 @@ export async function sumAsync(source: AsyncQueryable<number>): Promise<number>;
  * 
  * @param source An `AsyncQueryable` object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
+ * @category Scalar
  */
 export async function sumAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
 export async function sumAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number = Identity): Promise<number> {

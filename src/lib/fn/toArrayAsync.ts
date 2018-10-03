@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -21,12 +22,15 @@ import { AsyncQueryable } from "../types";
  * Creates an Array for the elements of the `AsyncIterable`.
  * 
  * @param source An `AsyncQueryable` object.
+ * @category Scalar
  */
 export async function toArrayAsync<T>(source: AsyncQueryable<T>): Promise<T[]>;
 /**
  * Creates an Array for the elements of the `AsyncIterable`.
  * 
  * @param source An `AsyncQueryable` object.
+ * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export async function toArrayAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V): Promise<V[]>;
 export async function toArrayAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<T[]> {

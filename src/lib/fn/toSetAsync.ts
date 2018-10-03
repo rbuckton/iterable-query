@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { Set } from "../collections";
  * Creates a Set for the elements of the Query.
  * 
  * @param source An `AsyncQueryable` object.
+ * @category Scalar
  */
 export function toSetAsync<T>(source: AsyncQueryable<T>): Promise<Set<T>>;
 /**
@@ -29,6 +31,7 @@ export function toSetAsync<T>(source: AsyncQueryable<T>): Promise<Set<T>>;
  * 
  * @param source An `AsyncQueryable` object.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export function toSetAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V): Promise<Set<V>>;
 export async function toSetAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<Set<T>> {

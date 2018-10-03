@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -23,6 +24,7 @@ import { Queryable, HierarchyIterable } from "../types";
  *
  * @param source A `HierarchyIterable` value.
  * @param value The value to append.
+ * @category Subquery
  */
 export function append<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, value: T): HierarchyIterable<TNode, T>;
 /**
@@ -31,9 +33,9 @@ export function append<TNode, T extends TNode>(source: HierarchyIterable<TNode, 
  *
  * @param source A `Queryable` value.
  * @param value The value to append.
+ * @category Subquery
  */
 export function append<T>(source: Queryable<T>, value: T): Iterable<T>;
-
 export function append<T>(source: Queryable<T>, value: T): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     return FlowHierarchy(new AppendIterable(ToIterable(source), value), source);

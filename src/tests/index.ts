@@ -1,5 +1,5 @@
 import "source-map-support/register";
-import { Sandbox } from "./sandbox";
+import { Sandbox } from "../sandbox";
 
 const requires = {
     "mocha": require("mocha"),
@@ -41,7 +41,8 @@ const nodeGlobals = {
     Buffer
 };
 
-const es5 = new Sandbox(__dirname, {
+const es5 = new Sandbox({
+    base: __dirname,
     context: {
         ...globals,
         ...es5Globals,
@@ -54,7 +55,8 @@ const es5 = new Sandbox(__dirname, {
     requires
 });
 
-const es2015 = new Sandbox(__dirname, {
+const es2015 = new Sandbox({
+    base: __dirname,
     context: {
         ...globals,
         ...es6Globals,
@@ -67,7 +69,8 @@ const es2015 = new Sandbox(__dirname, {
     requires
 });
 
-const es2017 = new Sandbox(__dirname, {
+const es2017 = new Sandbox({
+    base: __dirname,
     context: {
         ...globals,
         ...es6Globals,

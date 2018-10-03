@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, ToStringTag, Registry, CreatePage } from "../internal";
 import { Queryable, Page, HierarchyIterable, HierarchyPage } from "../types";
@@ -23,6 +24,7 @@ import { Queryable, Page, HierarchyIterable, HierarchyPage } from "../types";
  * evaluated eagerly.
  *
  * @param pageSize The number of elements per page.
+ * @category Subquery
  */
 export function pageBy<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, pageSize: number): Iterable<HierarchyPage<TNode, T>>;
 /**
@@ -31,6 +33,7 @@ export function pageBy<TNode, T extends TNode>(source: HierarchyIterable<TNode, 
  * evaluated eagerly.
  *
  * @param pageSize The number of elements per page.
+ * @category Subquery
  */
 export function pageBy<T>(source: Queryable<T>, pageSize: number): Iterable<Page<T>>;
 export function pageBy<T>(source: Queryable<T>, pageSize: number): Iterable<Page<T>> {

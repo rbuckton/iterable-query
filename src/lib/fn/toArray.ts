@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -21,6 +22,7 @@ import { Queryable } from "../types";
  * Creates an Array for the elements of the `Queryable`.
  * 
  * @param source A `Queryable` object.
+ * @category Scalar
  */
 export function toArray<T>(source: Queryable<T>): T[];
 /**
@@ -28,6 +30,7 @@ export function toArray<T>(source: Queryable<T>): T[];
  *
  * @param source A `Queryable` object.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export function toArray<T, V>(source: Queryable<T>, elementSelector: (element: T) => V): V[];
 export function toArray<T>(source: Queryable<T>, elementSelector: (element: T) => T = Identity): T[] {

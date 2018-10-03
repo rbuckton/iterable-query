@@ -191,7 +191,12 @@ function resolveDestPath(parsedProject, paths) {
 
 /**
  * @param {string} projectSpec
- * @param {{force?: boolean, verbose?: boolean | "minimal", cwd?: string, base?: string}} [options] 
+ * @param {object} [options]
+ * @param {boolean} [options.force]
+ * @param {boolean|"minimal"} [options.verbose]
+ * @param {string} [options.cwd]
+ * @param {string} [options.base]
+ * @param {(stream: NodeJS.ReadWriteStream)=>NodeJS.ReadWriteStream} [options.after]
  */
 function build(projectSpec, options = {}) {
     const paths = resolvePathOptions(options);
@@ -212,7 +217,9 @@ function build(projectSpec, options = {}) {
             .pipe(gulpif(sourceMap || inlineSourceMap, sourcemaps.write(sourceMapPath, sourceMapOptions)));
         const dts = stream.dts
             .pipe(gulpif(declarationMap, sourcemaps.write(sourceMapPath, sourceMapOptions)));
-        return merge2([js, dts])
+        let results = /** @type {NodeJS.ReadWriteStream}*/(merge2([js, dts]));
+        if (options.after) results = options.after(results);
+        return results
             .pipe(gulp.dest(destPath));
     };
 }

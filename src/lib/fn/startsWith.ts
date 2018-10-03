@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, SameValue, GetIterator, IteratorClose, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -23,6 +24,7 @@ import { Queryable } from "../types";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Scalar
  */
 export function startsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
 /**
@@ -32,6 +34,7 @@ export function startsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
  * @param equalityComparison A callback used to compare the equality of two elements.
+ * @category Scalar
  */
 export function startsWith<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
 export function startsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {

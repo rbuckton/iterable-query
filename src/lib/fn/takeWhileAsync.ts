@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable,
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeWhileAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): AsyncHierarchyIterable<TNode, U>;
 /**
@@ -29,6 +31,7 @@ export function takeWhileAsync<TNode, T extends TNode, U extends T>(source: Poss
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -36,6 +39,7 @@ export function takeWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHier
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeWhileAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T) => element is U): AsyncIterable<U>;
 /**
@@ -43,6 +47,7 @@ export function takeWhileAsync<T, U extends T>(source: AsyncQueryable<T>, predic
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
 export function takeWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {

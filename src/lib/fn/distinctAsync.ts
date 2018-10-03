@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
@@ -20,10 +21,12 @@ import { Set } from "../collections";
 
 /**
  * Creates a subquery for the distinct elements of the source.
+ * @category Subquery
  */
 export function distinctAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the distinct elements of the source.
+ * @category Subquery
  */
 export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
 export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T> {

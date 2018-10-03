@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, SameValue, Identity, CreateGrouping, ToStringTag, Registry, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
@@ -22,6 +23,7 @@ import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../ty
  *
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
+ * @category Subquery
  */
 export function spanMap<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): Iterable<HierarchyGrouping<K, TNode, T>>;
 /**
@@ -29,6 +31,7 @@ export function spanMap<TNode, T extends TNode, K>(source: HierarchyIterable<TNo
  *
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
+ * @category Subquery
  */
 export function spanMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Iterable<Grouping<K, T>>;
 /**
@@ -37,6 +40,7 @@ export function spanMap<T, K>(source: Queryable<T>, keySelector: (element: T) =>
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
+ * @category Subquery
  */
 export function spanMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Iterable<Grouping<K, V>>;
 /**
@@ -46,6 +50,7 @@ export function spanMap<T, K, V>(source: Queryable<T>, keySelector: (element: T)
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param spanSelector A callback used to select a result from a contiguous range.
+ * @category Subquery
  */
 export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Iterable<V>) => R): Iterable<R>;
 export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = Identity, spanSelector: (key: K, span: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {

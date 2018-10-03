@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -24,6 +25,7 @@ import { toArrayAsync } from "./toArrayAsync";
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Scalar
  */
 export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
 /**
@@ -33,6 +35,7 @@ export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: A
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
  * @param equalityComparison A callback used to compare the equality of two elements.
+ * @category Scalar
  */
 export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean = SameValue): Promise<boolean> {

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, CreateGroupingsAsync, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -23,6 +24,7 @@ import { Lookup } from "../lookup";
  *
  * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select a key for each element.
+ * @category Scalar
  */
 export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K): Promise<Lookup<K, T>>;
 /**
@@ -31,6 +33,7 @@ export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector
  * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Lookup<K, V>>;
 export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Lookup<K, T>> {

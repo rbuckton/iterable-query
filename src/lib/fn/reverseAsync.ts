@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToStringTag, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -20,10 +21,12 @@ import { toArrayAsync } from "./toArrayAsync";
 
 /**
  * Creates a subquery whose elements are in the reverse order.
+ * @category Subquery
  */
 export function reverseAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery whose elements are in the reverse order.
+ * @category Subquery
  */
 export function reverseAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
 export function reverseAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T> {

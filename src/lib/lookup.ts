@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query" */
 
 import { assert, ToIterable, GetIterator, CreateGrouping } from "./internal";
 import { Queryable, Grouping } from "./types";

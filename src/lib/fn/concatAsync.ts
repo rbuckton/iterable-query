@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable,
  *
  * @param left An `AsyncQueryable` value.
  * @param right An `AsyncQueryable` value.
+ * @category Subquery
  */
 export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -29,6 +31,7 @@ export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchy
  *
  * @param left An `AsyncQueryable` value.
  * @param right An `AsyncQueryable` value.
+ * @category Subquery
  */
 export function concatAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -36,6 +39,7 @@ export function concatAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, rig
  *
  * @param left An `AsyncQueryable` value.
  * @param right An `AsyncQueryable` value.
+ * @category Subquery
  */
 export function concatAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
 export function concatAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {

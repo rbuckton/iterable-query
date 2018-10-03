@@ -13,16 +13,19 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
+import { Registry, ToStringTag } from "../internal";
 
 /**
  * Creates an `AsyncIterable` with no elements.
+ * @category Query
  */
 export function emptyAsync<T>(): AsyncIterable<T> {
     return new AsyncEmptyIterable<T>();
 }
 
+@ToStringTag("AsyncEmptyIterable")
 class AsyncEmptyIterable<T> implements AsyncIterable<T> {
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
     }

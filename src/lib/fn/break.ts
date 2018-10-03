@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetIterator, FlowHierarchy, ToIterable, CreateSubquery, Registry, GetSource, MakeTuple } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -33,9 +34,9 @@ const cacheAndClose: ConsumeOptions = { cacheElements: true, leaveOpen: false };
  *
  * @param source A `Queryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 function _break<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
-
 /**
  * Creates a tuple whose first element is an `Iterable` containing the first span of
  * elements that do not match the supplied predicate, and whose second element is an `Iterable`
@@ -46,9 +47,9 @@ function _break<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, pre
  *
  * @param source A `Queryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 function _break<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>];
-
 function _break<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>] {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");

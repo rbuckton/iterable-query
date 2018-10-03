@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, MakeHierarchyIterable, Registry } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyProvider, OrderedIterable, OrderedHierarchyIterable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable, HierarchyIterable, HierarchyProvider, OrderedIterable, Order
  *
  * @param source A `Queryable` object.
  * @param hierarchy A `HierarchyProvider`.
+ * @category Hierarchy
  */
 export function toHierarchy<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyIterable<TNode, T>;
 /**
@@ -29,6 +31,7 @@ export function toHierarchy<TNode, T extends TNode>(source: OrderedIterable<T>, 
  *
  * @param source A `Queryable` object.
  * @param hierarchy A `HierarchyProvider`.
+ * @category Hierarchy
  */
 export function toHierarchy<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T>;
 export function toHierarchy<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T> {

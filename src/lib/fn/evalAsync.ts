@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, Registry, CreateSubquery, GetAsyncSource } from "../internal";
 import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyIterable } from "../types";
@@ -20,10 +21,12 @@ import { toArrayAsync } from "./toArrayAsync";
 
 /**
  * Eagerly evaluate an `AsyncQueryable`, returning a new `AsyncIterable`.
+ * @category Scalar
  */
 export async function evalAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): Promise<HierarchyIterable<TNode, T>>;
 /**
  * Eagerly evaluate an `AsyncQueryable`, returning a new `AsyncIterable`.
+ * @category Scalar
  */
 export async function evalAsync<T>(source: AsyncQueryable<T>): Promise<Iterable<T>>;
 export async function evalAsync<T>(source: AsyncQueryable<T>): Promise<Iterable<T>> {

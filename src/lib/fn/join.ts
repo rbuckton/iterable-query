@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, CreateGroupings, Identity, ToStringTag, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -24,6 +25,7 @@ import { Queryable } from "../types";
  * @param outerKeySelector A callback used to select the key for an element in this Query.
  * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
  * @param resultSelector A callback used to select the result for the correlated elements.
+ * @category Join
  */
 export function join<O, I, K, R>(outer: Queryable<O>, inner: Queryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: I) => R): Iterable<R> {
     assert.mustBeQueryable(outer, "outer");

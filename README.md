@@ -36,7 +36,7 @@ npm install iterable-query
 
 ## Documentation
 
-* [API Reference](docs/index.md)
+* [API Reference](https://rbuckton.github.io/iterable-query/modules/_iterable_query_.html)
 
 ## Examples
 ### Filtering
@@ -122,7 +122,29 @@ let thumbnails = doc
   .toArray();
 ```
 
-## Supported ECMAScript editions
+## Supported ECMAScript Editions
+
+- [ES2017](#es2017-support-default) (default)
+- [ES2015](#es2015-support)
+- [ES5](#es5-support)
+
+### ES2017 Support (default)
+
+The **iterable-query** library can be used in an ES2017-compatible runtime by importing `"iterable-query"`:
+
+```ts
+// TypeScript
+import { Query } from "iterable-query";
+
+// JavaScript
+const { Query } = require("iterable-query");
+
+// TypeScript (functional style)
+import { filter, groupBy } from "iterable-query/fn";
+
+// JavaScript (functional style)
+const { filter, groupBy } = require("iterable-query/fn");
+```
 
 The default implementation requires a host that supports ES2017 at a minimum. This means support for:
 - `Symbol` and `Symbol.iterator`

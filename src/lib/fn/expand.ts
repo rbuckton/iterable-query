@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -23,6 +24,7 @@ import { Queryable, HierarchyIterable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param projection A callback used to recusively expand each element.
+ * @category Subquery
  */
 export function expand<TNode, T extends TNode = TNode, U extends TNode = T>(source: HierarchyIterable<TNode, T>, projection: (element: T) => Queryable<U>): HierarchyIterable<TNode, U>;
 /**
@@ -31,6 +33,7 @@ export function expand<TNode, T extends TNode = TNode, U extends TNode = T>(sour
  *
  * @param source A `Queryable` object.
  * @param projection A callback used to recusively expand each element.
+ * @category Subquery
  */
 export function expand<T>(source: Queryable<T>, projection: (element: T) => Queryable<T>): Iterable<T>;
 export function expand<T>(source: Queryable<T>, projection: (element: T) => Queryable<T>): Iterable<T> {

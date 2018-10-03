@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry, IsPromiseLike } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -22,6 +23,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
  *
  * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, callback: (element: T, offset: number) => void): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -29,6 +31,7 @@ export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyI
  *
  * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, callback: (element: T, offset: number) => PromiseLike<void>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -36,6 +39,7 @@ export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyI
  *
  * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -43,6 +47,7 @@ export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyI
  *
  * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => void): AsyncIterable<T>;
 /**
@@ -50,6 +55,7 @@ export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, of
  *
  * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => PromiseLike<void>): AsyncIterable<T>;
 /**
@@ -57,6 +63,7 @@ export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, of
  *
  * @param source An `AsyncQueryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncIterable<T>;
 export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncIterable<T> {

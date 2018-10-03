@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetIterator, ToIterable, FlowHierarchy, Registry, GetSource, CreateSubquery, MakeTuple } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -33,6 +34,7 @@ const cacheAndClose: ConsumeOptions = { cacheElements: true, leaveOpen: false };
  *
  * @param source A `Queryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 export function span<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => element is U): [HierarchyIterable<TNode, U>, HierarchyIterable<TNode, T>];
 /**
@@ -45,6 +47,7 @@ export function span<TNode, T extends TNode, U extends T>(source: HierarchyItera
  *
  * @param source A `Queryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 export function span<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
 /**
@@ -57,6 +60,7 @@ export function span<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>
  *
  * @param source A `Queryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 export function span<T, U extends T>(source: Queryable<T>, predicate: (element: T) => element is U): [Iterable<U>, Iterable<T>];
 /**
@@ -69,6 +73,7 @@ export function span<T, U extends T>(source: Queryable<T>, predicate: (element: 
  *
  * @param source A `Queryable` object.
  * @param predicate The predicate used to match elements.
+ * @category Scalar
  */
 export function span<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>];
 export function span<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>] {

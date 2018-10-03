@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable } from "../types";
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Scalar
  */
 export async function everyAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<boolean> {
     assert.mustBeAsyncQueryable<T>(source, "source");

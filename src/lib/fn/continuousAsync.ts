@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { ToStringTag, Registry } from "../internal";
 
@@ -20,6 +21,7 @@ import { ToStringTag, Registry } from "../internal";
  * Creates an `AsyncIterable` that repeats the provided value forever.
  *
  * @param value The value for each element of the `AsyncIterable`.
+ * @category Query
  */
 export function continuousAsync<T>(value: PromiseLike<T> | T): AsyncIterable<T> {
     return new AsyncContinuousIterable(value);

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Registry, GetAsyncSource, CreateAsyncSubquery } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable } from "../types";
  *
  * @param source An `AsyncQueryable` object.
  * @param callback A callback function.
+ * @category Subquery
  */
 export function throughAsync<T, U, S extends AsyncQueryable<T> = AsyncQueryable<T>, R extends AsyncQueryable<U> = AsyncQueryable<U>>(source: S, callback: (source: S) => R): R {
     assert.mustBeAsyncQueryable<T>(source, "source");

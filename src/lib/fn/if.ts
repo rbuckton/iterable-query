@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, ToStringTag, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -25,6 +26,7 @@ import { empty } from "./empty";
  * @param condition A callback used to choose a source.
  * @param thenQueryable The source to use when the callback evaluates to `true`.
  * @param elseQueryable The source to use when the callback evaluates to `false`.
+ * @category Query
  */
 function _if<T>(condition: () => boolean, thenQueryable: Queryable<T>, elseQueryable?: Queryable<T>): Iterable<T> {
     assert.mustBeFunction(condition, "condition");

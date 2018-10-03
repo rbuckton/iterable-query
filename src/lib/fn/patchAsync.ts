@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
@@ -25,6 +26,7 @@ import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable,
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
+ * @category Subquery
  */
 export function patchAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -35,6 +37,7 @@ export function patchAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarch
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
+ * @category Subquery
  */
 export function patchAsync<T>(source: AsyncQueryable<T>, start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncIterable<T>;
 export function patchAsync<T>(source: AsyncQueryable<T>, start: number, skipCount: number = 0, range?: AsyncQueryable<T>): AsyncIterable<T> {

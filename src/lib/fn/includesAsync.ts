@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable } from "../types";
  *
  * @param source An `AsyncQueryable` object.
  * @param value A value.
+ * @category Scalar
  */
 export async function includesAsync<T>(source: AsyncQueryable<T>, value: T): Promise<boolean> {
     assert.mustBeAsyncQueryable<T>(source, "source");

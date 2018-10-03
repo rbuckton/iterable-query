@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, ToStringTag, Registry } from "../internal";
 import { Queryable, Choice } from "../types";
@@ -25,6 +26,7 @@ import { Map } from "../collections";
  * @param chooser A callback used to choose a source.
  * @param choices A `Queryable` of key/value pairs, where each value is a `Queryable` object.
  * @param otherwise A default source to use when another choice could not be made.
+ * @category Query
  */
 export function choose<K, V>(chooser: () => K, choices: Queryable<Choice<K, V>>, otherwise?: Queryable<V>): Iterable<V> {
     assert.mustBeFunction(chooser, "chooser");

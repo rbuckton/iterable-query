@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
 import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
@@ -23,6 +24,8 @@ import { toArrayAsync } from "./toArrayAsync";
 /**
  * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
  * element are removed.
+ * 
+ * @category Hierarchy
  */
 export function bottomMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable<TNode, T>(source, "source");

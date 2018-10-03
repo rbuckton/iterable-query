@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
  *
  * @param source An `AsyncQueryable` object.
  * @param selector A callback used to map each element.
+ * @category Subquery
  */
 export function mapAsync<T, U>(source: AsyncQueryable<T>, selector: (element: T, offset: number) => U): AsyncIterable<U> {
     assert.mustBeAsyncQueryable<T>(source, "source");

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, ToStringTag, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -24,6 +25,7 @@ import { toArray } from "./toArray";
  *
  * @param source A `Queryable` object.
  * @param accumulator The callback used to compute each result.
+ * @category Subquery
  */
 export function scanRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T): Iterable<T>;
 /**
@@ -32,6 +34,7 @@ export function scanRight<T>(source: Queryable<T>, accumulator: (current: T, ele
  * @param source A `Queryable` object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
+ * @category Subquery
  */
 export function scanRight<T, U>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U): Iterable<U>;
 export function scanRight<T, U>(source: Queryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, seed?: T | U): Iterable<T | U> {

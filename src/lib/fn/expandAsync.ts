@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
@@ -23,6 +24,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable,
  *
  * @param source An `AsyncQueryable` object.
  * @param projection A callback used to recusively expand each element.
+ * @category Subquery
  */
 export function expandAsync<TNode, T extends TNode = TNode, U extends TNode = T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, projection: (element: T) => AsyncQueryable<U>): AsyncHierarchyIterable<TNode, U>;
 /**
@@ -31,6 +33,7 @@ export function expandAsync<TNode, T extends TNode = TNode, U extends TNode = T>
  *
  * @param source An `AsyncQueryable` object.
  * @param projection A callback used to recusively expand each element.
+ * @category Subquery
  */
 export function expandAsync<T>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<T>): AsyncIterable<T>;
 export function expandAsync<T>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<T>): AsyncIterable<T> {

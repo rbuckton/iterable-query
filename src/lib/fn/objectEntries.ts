@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, SelectEntry, Registry } from "../internal";
 import { KeyValuePair } from "../types";
@@ -23,6 +24,7 @@ import { objectKeys } from "./objectKeys";
  * Creates an `Iterable` for the own property keys of an object.
  *
  * @param source An object.
+ * @category Query
  */
 export function objectEntries<T extends object>(source: T): Iterable<KeyValuePair<T, Extract<keyof T, string>>> {
     assert.mustBeObject(source, "source");

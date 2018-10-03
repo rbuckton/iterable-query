@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -23,17 +24,17 @@ import { toSet } from "./toSet";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function except<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery for the set difference between two `Queryable` objects.
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-
 export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, Identity, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -23,6 +24,7 @@ import { Queryable } from "../types";
  * @param source A `Queryable` object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
+ * @category Scalar
  */
 export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey): object;
 /**
@@ -32,6 +34,7 @@ export function toObject<T>(source: Queryable<T>, prototype: object | null, keyS
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export function toObject<T, V>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): object;
 export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T = Identity): object {

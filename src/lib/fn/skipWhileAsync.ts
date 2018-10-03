@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -23,6 +24,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function skipWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -31,6 +33,7 @@ export function skipWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHier
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function skipWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
 export function skipWhileAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {

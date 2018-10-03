@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
 import { HierarchyProvider, HierarchyIterable, Hierarchical } from "../types";
@@ -24,6 +25,7 @@ import { Axis } from "./axis";
  * starts from the last child.
  *
  * @param offset The offset for the child.
+ * @category Hierarchy
  */
 export function nthChild<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, offset: number): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");

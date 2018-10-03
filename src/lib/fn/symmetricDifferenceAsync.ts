@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
@@ -26,6 +27,7 @@ import { toSetAsync } from "./toSetAsync";
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Subquery
  */
 export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -35,6 +37,7 @@ export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyA
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Subquery
  */
 export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -44,6 +47,7 @@ export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQuer
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Subquery
  */
 export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
 export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {

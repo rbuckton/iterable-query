@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, SameValue, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param value A value.
+ * @category Scalar
  */
 export function includes<T>(source: Queryable<T>, value: T): boolean {
     assert.mustBeQueryable(source, "source");

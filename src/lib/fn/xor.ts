@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { Registry } from "../internal";
 import { symmetricDifference } from "./symmetricDifference";

@@ -13,12 +13,15 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, True, GetHierarchy, ToStringTag, Registry } from "../internal";
 import { HierarchyProvider, HierarchyIterable, Hierarchical } from "../types";
 import { Axis } from "./axis";
 
+/** @category Hierarchy */
 export function root<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function root<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function root<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -26,7 +29,9 @@ export function root<TNode>(source: HierarchyIterable<TNode>, predicate: (elemen
     return new RootTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function ancestors<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function ancestors<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function ancestors<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -34,7 +39,9 @@ export function ancestors<TNode>(source: HierarchyIterable<TNode>, predicate: (e
     return new AncestorsTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function ancestorsAndSelf<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function ancestorsAndSelf<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function ancestorsAndSelf<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -42,7 +49,9 @@ export function ancestorsAndSelf<TNode>(source: HierarchyIterable<TNode>, predic
     return new AncestorsAndSelfTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function descendants<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function descendants<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function descendants<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -50,7 +59,9 @@ export function descendants<TNode>(source: HierarchyIterable<TNode>, predicate: 
     return new DescendantsTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function descendantsAndSelf<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function descendantsAndSelf<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function descendantsAndSelf<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -58,7 +69,9 @@ export function descendantsAndSelf<TNode>(source: HierarchyIterable<TNode>, pred
     return new DescendantsAndSelfTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function parents<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function parents<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function parents<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -66,7 +79,9 @@ export function parents<TNode>(source: HierarchyIterable<TNode>, predicate: (ele
     return new ParentsTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function self<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function self<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate?: (element: T) => boolean): HierarchyIterable<TNode, T>;
 export function self<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -74,7 +89,9 @@ export function self<TNode>(source: HierarchyIterable<TNode>, predicate: (elemen
     return new SelfTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function siblings<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function siblings<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function siblings<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -82,7 +99,9 @@ export function siblings<TNode>(source: HierarchyIterable<TNode>, predicate: (el
     return new SiblingsTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function siblingsAndSelf<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function siblingsAndSelf<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function siblingsAndSelf<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -90,7 +109,9 @@ export function siblingsAndSelf<TNode>(source: HierarchyIterable<TNode>, predica
     return new SiblingsAndSelfTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function siblingsBeforeSelf<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function siblingsBeforeSelf<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function siblingsBeforeSelf<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -98,7 +119,9 @@ export function siblingsBeforeSelf<TNode>(source: HierarchyIterable<TNode>, pred
     return new SiblingsBeforeSelfTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function siblingsAfterSelf<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function siblingsAfterSelf<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function siblingsAfterSelf<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");
@@ -106,7 +129,9 @@ export function siblingsAfterSelf<TNode>(source: HierarchyIterable<TNode>, predi
     return new SiblingsAfterSelfTraversalIterable(source, predicate);
 }
 
+/** @category Hierarchy */
 export function children<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => element is U): HierarchyIterable<TNode, U>;
+/** @category Hierarchy */
 export function children<TNode>(source: HierarchyIterable<TNode>, predicate?: (element: TNode) => boolean): HierarchyIterable<TNode>;
 export function children<TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode) => boolean = True): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param callback The callback to invoke.
+ * @category Scalar
  */
 export function forEach<T>(source: Queryable<T>, callback: (element: T, offset: number) => void): void {
     assert.mustBeQueryable(source, "source");

@@ -13,6 +13,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
+
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, SameValue } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable, AsyncChoice } from "../types";
 
@@ -23,6 +25,7 @@ import { AsyncQueryable, PossiblyAsyncIterable, AsyncChoice } from "../types";
  * @param chooser A callback used to choose a source.
  * @param choices An `AsyncQueryable` of key/value pairs, where each value is an `AsyncQueryable` object.
  * @param otherwise A default source to use when another choice could not be made.
+ * @category Query
  */
 export function chooseAsync<K, V>(chooser: () => PromiseLike<K> | K, choices: AsyncQueryable<AsyncChoice<K, V>>, otherwise?: AsyncQueryable<V>): AsyncIterable<V> {
     assert.mustBeFunction(chooser, "chooser");

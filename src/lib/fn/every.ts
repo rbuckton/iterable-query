@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,17 +23,17 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
+ * @category Scalar
  */
 export function every<T, U extends T>(source: Queryable<T>, predicate: (element: T) => element is U): source is Queryable<U>;
-
 /**
  * Computes a scalar value indicating whether all elements match the supplied callback.
  *
  * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
+ * @category Scalar
  */
 export function every<T>(source: Queryable<T>, predicate: (element: T) => boolean): boolean;
-
 export function every<T>(source: Queryable<T>, predicate: (element: T) => boolean): boolean {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");

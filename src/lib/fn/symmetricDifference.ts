@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -26,6 +27,7 @@ import { toSet } from "./toSet";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function symmetricDifference<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
@@ -35,6 +37,7 @@ export function symmetricDifference<TNode, T extends TNode>(left: HierarchyItera
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
@@ -44,6 +47,7 @@ export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, 
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
 export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {

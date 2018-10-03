@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, Identity, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Set } from "../collections";
  * Creates a Set for the elements of the Query.
  * 
  * @param source A `Queryable` object.
+ * @category Scalar
  */
 export function toSet<T>(source: Queryable<T>): Set<T>;
 /**
@@ -29,6 +31,7 @@ export function toSet<T>(source: Queryable<T>): Set<T>;
  *
  * @param source A `Queryable` object.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export function toSet<T, V>(source: Queryable<T>, elementSelector: (element: T) => V): Set<V>;
 export function toSet<T>(source: Queryable<T>, elementSelector: (element: T) => T = Identity): Set<T> {

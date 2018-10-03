@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Registry, ToStringTag } from "../internal";
 import { KeyValuePair } from "../types";
@@ -21,6 +22,7 @@ import { KeyValuePair } from "../types";
  * Creates an `AsyncIterable` for the own property keys of an object.
  *
  * @param source An object.
+ * @category Query
  */
 export function objectEntriesAsync<T extends object>(source: PromiseLike<T> | T): AsyncIterable<KeyValuePair<T, Extract<keyof T, string>>> {
     return new AsyncObjectEntriesIterable(source);

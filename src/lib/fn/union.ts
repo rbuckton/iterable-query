@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -23,6 +24,7 @@ import { Set } from "../collections";
  *
  * @param left A `Queryable` value.
  * @param right A Queryable value.
+ * @category Subquery
  */
 export function union<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
@@ -30,6 +32,7 @@ export function union<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>,
  *
  * @param left A `Queryable` value.
  * @param right A `Queryable` value.
+ * @category Subquery
  */
 export function union<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
@@ -37,6 +40,7 @@ export function union<TNode, T extends TNode>(left: Queryable<T>, right: Hierarc
  *
  * @param left A `Queryable` value.
  * @param right A `Queryable` value.
+ * @category Subquery
  */
 export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
 export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, CreateGroupings, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -23,6 +24,7 @@ import { Lookup } from "../lookup";
  *
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select a key for each element.
+ * @category Scalar
  */
 export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Lookup<K, T>;
 /**
@@ -31,6 +33,7 @@ export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) =
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export function toLookup<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Lookup<K, V>;
 export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Lookup<K, T> {

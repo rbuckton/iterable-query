@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query" */
 
 import * as fn from "./fn";
 import { assert, IsPossiblyAsyncHierarchyIterable, GetHierarchy, ToPossiblyAsyncIterable, ThenByAsync, ToAsyncOrderedIterable, MakeAsyncHierarchyIterable, ToAsyncOrderedHierarchyIterable, IsPossiblyAsyncOrderedIterable, Registry, IsPossiblyAsyncOrderedHierarchyIterable, GetAsyncSource, GetAsyncIterator, AsyncQuerySource } from "./internal";
@@ -135,6 +136,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
      * @param source An `AsyncQueryable` object.
+     * @category Query
      */
     export function from<TNode, T extends TNode>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyQuery<TNode, T>;
 
@@ -142,6 +144,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
      * @param source An `AsyncQueryable` object.
+     * @category Query
      */
     export function from<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -149,6 +152,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
      * @param source An `AsyncQueryable` object.
+     * @category Query
      */
     export function from<T>(source: PossiblyAsyncOrderedIterable<T>): AsyncOrderedQuery<T>;
 
@@ -156,6 +160,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` from an `AsyncQueryable` source.
      *
      * @param source An `AsyncQueryable` object.
+     * @category Query
      */
     export function from<T>(source: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -164,6 +169,7 @@ export declare namespace AsyncQuery {
      *
      * @param source An `AsyncQueryable` object.
      * @param hierarchy A `HierarchyProvider` object.
+     * @category Query
      */
     export function from<TNode, T extends TNode>(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyQuery<TNode, T>;
 
@@ -172,6 +178,7 @@ export declare namespace AsyncQuery {
      *
      * @param source An `AsyncQueryable` object.
      * @param hierarchy A `HierarchyProvider` object.
+     * @category Query
      */
     export function from<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
 
@@ -179,11 +186,13 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` for the provided elements.
      *
      * @param elements The elements of the `Query`.
+     * @category Query
      */
     export function of<T>(...elements: (PromiseLike<T> | T)[]): AsyncQuery<T>;
 
     /**
      * Creates an `AsyncQuery` with no elements.
+     * @category Query
      */
     export function empty<T>(): AsyncQuery<T>;
 
@@ -191,6 +200,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` over a single element.
      *
      * @param value The only element for the `Query`.
+     * @category Query
      */
     export function once<T>(value: PromiseLike<T> | T): AsyncQuery<T>;
 
@@ -199,6 +209,7 @@ export declare namespace AsyncQuery {
      *
      * @param value The value for each element of the `Query`.
      * @param count The number of times to repeat the value.
+     * @category Query
      */
     export function repeat<T>(value: PromiseLike<T> | T, count: number): AsyncQuery<T>;
 
@@ -206,6 +217,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` that repeats the provided value forever.
      *
      * @param value The value for each element of the `Query`.
+     * @category Query
      */
     export function continuous<T>(value: PromiseLike<T> | T): AsyncQuery<T>;
 
@@ -215,6 +227,7 @@ export declare namespace AsyncQuery {
      *
      * @param count The number of times to execute the callback.
      * @param generator The callback to execute.
+     * @category Query
      */
     export function generate<T>(count: number, generator: (offset: number) => PromiseLike<T> | T): AsyncQuery<T>;
 
@@ -223,6 +236,7 @@ export declare namespace AsyncQuery {
      *
      * @param root The root node of the hierarchy.
      * @param hierarchy A `HierarchyProvider` object.
+     * @category Query
      */
     export function hierarchy<TNode, T extends TNode>(root: PromiseLike<T> | T, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyQuery<TNode, T>;
 
@@ -230,6 +244,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` that, when iterated, consumes the provided `AsyncIterator`.
      *
      * @param iterator An `AsyncIterator` object.
+     * @category Query
      */
     export function consume<T>(iterator: AsyncIterator<T>, options?: ConsumeAsyncOptions): AsyncQuery<T>;
 
@@ -240,6 +255,8 @@ export declare namespace AsyncQuery {
      * @param condition A callback used to choose a source.
      * @param thenQueryable The source to use when the callback evaluates to `true`.
      * @param elseQueryable The source to use when the callback evaluates to `false`.
+     * @alias if
+     * @category Query
      */
     function _if<T>(condition: () => PromiseLike<boolean> | boolean, thenQueryable: AsyncQueryable<T>, elseQueryable?: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -252,6 +269,7 @@ export declare namespace AsyncQuery {
      * @param chooser A callback used to choose a source.
      * @param choices A list of sources
      * @param otherwise A default source to use when another choice could not be made.
+     * @category Query
      */
     export function choose<K, V>(chooser: () => PromiseLike<K> | K, choices: AsyncQueryable<AsyncChoice<K, V>>, otherwise?: AsyncQueryable<V>): AsyncQuery<V>;
 
@@ -259,6 +277,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` for the own property keys of an object.
      *
      * @param source An object.
+     * @category Query
      */
     export function objectKeys<T extends object>(source: PromiseLike<T> | T): AsyncQuery<Extract<keyof T, string>>;
 
@@ -266,6 +285,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` for the own property values of an object.
      *
      * @param source An object.
+     * @category Query
      */
     export function objectValues<T extends object>(source: PromiseLike<T> | T): AsyncQuery<T[Extract<keyof T, string>]>;
 
@@ -273,6 +293,7 @@ export declare namespace AsyncQuery {
      * Creates an `AsyncQuery` for the own property key-value pairs of an object.
      *
      * @param source An object.
+     * @category Query
      */
     export function objectEntries<T extends object>(source: PromiseLike<T> | T): AsyncQuery<KeyValuePair<T, Extract<keyof T, string>>>;
 }
@@ -284,6 +305,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery whose elements match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     filter<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncQuery<U>;
 
@@ -291,6 +313,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery whose elements match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     filter(predicate: (element: T, offset: number) => boolean): AsyncQuery<T>;
 
@@ -299,6 +322,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `filter`.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     where<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncQuery<U>;
 
@@ -307,6 +331,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `filter`.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     where(predicate: (element: T, offset: number) => boolean): AsyncQuery<T>;
 
@@ -314,6 +339,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery by applying a callback to each element.
      *
      * @param selector A callback used to map each element.
+     * @category Subquery
      */
     map<U>(selector: (element: T, offset: number) => U): AsyncQuery<U>;
 
@@ -322,6 +348,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `map`.
      *
      * @param selector A callback used to map each element.
+     * @category Subquery
      */
     select<U>(selector: (element: T, offset: number) => U): AsyncQuery<U>;
 
@@ -329,6 +356,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery that iterates the results of applying a callback to each element.
      *
      * @param projection A callback used to map each element into an iterable.
+     * @category Subquery
      */
     flatMap<U>(projection: (element: T) => AsyncQueryable<U>): AsyncQuery<U>;
 
@@ -337,6 +365,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `flatMap`.
      *
      * @param projection A callback used to map each element into an iterable.
+     * @category Subquery
      */
     selectMany<U>(projection: (element: T) => AsyncQueryable<U>): AsyncQuery<U>;
 
@@ -345,6 +374,7 @@ export interface AsyncQuery<T> {
      * elements of the source.
      *
      * @param projection A callback used to recusively expand each element.
+     * @category Subquery
      */
     expand(projection: (element: T) => AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -352,6 +382,7 @@ export interface AsyncQuery<T> {
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     do(callback: (element: T, offset: number) => void): AsyncQuery<T>;
 
@@ -359,6 +390,7 @@ export interface AsyncQuery<T> {
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     do(callback: (element: T, offset: number) => PromiseLike<void>): AsyncQuery<T>;
 
@@ -366,6 +398,7 @@ export interface AsyncQuery<T> {
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncQuery<T>;
 
@@ -374,6 +407,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     tap(callback: (element: T, offset: number) => void): AsyncQuery<T>;
 
@@ -382,6 +416,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     tap(callback: (element: T, offset: number) => PromiseLike<void>): AsyncQuery<T>;
 
@@ -390,6 +425,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncQuery<T>;
 
@@ -397,6 +433,7 @@ export interface AsyncQuery<T> {
      * Pass the entire query to the provided callback, creating a new query from the result.
      *
      * @param callback A callback function.
+     * @category Subquery
      */
     through<UNode, U extends UNode>(callback: (source: this) => PossiblyAsyncOrderedHierarchyIterable<UNode, U>): AsyncOrderedHierarchyQuery<UNode, U>;
 
@@ -404,6 +441,7 @@ export interface AsyncQuery<T> {
      * Pass the entire query to the provided callback, creating a new query from the result.
      *
      * @param callback A callback function.
+     * @category Subquery
      */
     through<UNode, U extends UNode>(callback: (source: this) => PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
 
@@ -411,6 +449,7 @@ export interface AsyncQuery<T> {
      * Pass the entire query to the provided callback, creating a new query from the result.
      *
      * @param callback A callback function.
+     * @category Subquery
      */
     through<U>(callback: (source: this) => PossiblyAsyncOrderedIterable<U>): AsyncOrderedQuery<U>;
 
@@ -418,11 +457,13 @@ export interface AsyncQuery<T> {
      * Pass the entire query to the provided callback, creating a new query from the result.
      *
      * @param callback A callback function.
+     * @category Subquery
      */
     through<U>(callback: (source: this) => AsyncQueryable<U>): AsyncQuery<U>;
 
     /**
      * Creates a subquery whose elements are in the reverse order.
+     * @category Subquery
      */
     reverse(): AsyncQuery<T>;
 
@@ -431,6 +472,7 @@ export interface AsyncQuery<T> {
      * count.
      *
      * @param count The number of elements to skip.
+     * @category Subquery
      */
     skip(count: number): AsyncQuery<T>;
 
@@ -439,6 +481,7 @@ export interface AsyncQuery<T> {
      * count.
      *
      * @param count The number of elements to skip.
+     * @category Subquery
      */
     skipRight(count: number): AsyncQuery<T>;
 
@@ -447,6 +490,7 @@ export interface AsyncQuery<T> {
      * the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     skipWhile(predicate: (element: T) => boolean): AsyncQuery<T>;
 
@@ -455,6 +499,7 @@ export interface AsyncQuery<T> {
      * the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     skipUntil(predicate: (element: T) => boolean): AsyncQuery<T>;
 
@@ -463,6 +508,7 @@ export interface AsyncQuery<T> {
      * count.
      *
      * @param count The number of elements to take.
+     * @category Subquery
      */
     take(count: number): AsyncQuery<T>;
 
@@ -471,6 +517,7 @@ export interface AsyncQuery<T> {
      * count.
      *
      * @param count The number of elements to take.
+     * @category Subquery
      */
     takeRight(count: number): AsyncQuery<T>;
 
@@ -478,6 +525,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery containing the first elements that match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     takeWhile<U extends T>(predicate: (element: T) => element is U): AsyncQuery<U>;
 
@@ -485,6 +533,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery containing the first elements that match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     takeWhile(predicate: (element: T) => boolean): AsyncQuery<T>;
 
@@ -492,6 +541,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery containing the first elements that do not match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     takeUntil(predicate: (element: T) => boolean): AsyncQuery<T>;
 
@@ -499,6 +549,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     intersect<R extends PossiblyAsyncHierarchyIterable<unknown, T>>(right: R): R extends PossiblyAsyncHierarchyIterable<infer UNode, infer U>
         ? AsyncHierarchyQuery<UNode, U>
@@ -508,6 +559,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     intersect<U extends T>(right: AsyncQueryable<U>): AsyncQuery<U>;
 
@@ -515,6 +567,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     intersect(right: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -522,6 +575,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the set union of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     union(right: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -529,6 +583,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the set difference (a.k.a. 'relative complement') between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     except(right: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -538,6 +593,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `except`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     relativeComplement(right: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -545,6 +601,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     symmetricDifference(right: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -554,6 +611,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `symmetricDifference`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     xor(right: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -561,11 +619,13 @@ export interface AsyncQuery<T> {
      * Creates a subquery that concatenates this Query with another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     concat(right: AsyncQueryable<T>): AsyncQuery<T>;
 
     /**
      * Creates a subquery for the distinct elements of this Query.
+     * @category Subquery
      */
     distinct(): AsyncQuery<T>;
 
@@ -573,6 +633,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the elements of this Query with the provided value appended to the end.
      *
      * @param value The value to append.
+     * @category Subquery
      */
     append(value: PromiseLike<T> | T): AsyncQuery<T>;
 
@@ -580,6 +641,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery for the elements of this Query with the provided value prepended to the beginning.
      *
      * @param value The value to prepend.
+     * @category Subquery
      */
     prepend(value: PromiseLike<T> | T): AsyncQuery<T>;
 
@@ -590,6 +652,7 @@ export interface AsyncQuery<T> {
      * @param start The offset at which to patch the range.
      * @param skipCount The number of elements to skip from start.
      * @param range The range to patch into the result.
+     * @category Subquery
      */
     patch(start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncQuery<T>;
 
@@ -598,6 +661,7 @@ export interface AsyncQuery<T> {
      * contains no elements.
      *
      * @param defaultValue The default value.
+     * @category Subquery
      */
     defaultIfEmpty(defaultValue: PromiseLike<T> | T): AsyncQuery<T>;
 
@@ -607,6 +671,7 @@ export interface AsyncQuery<T> {
      * evaluated eagerly.
      *
      * @param pageSize The number of elements per page.
+     * @category Subquery
      */
     pageBy(pageSize: number): AsyncQuery<Page<T>>;
 
@@ -615,6 +680,7 @@ export interface AsyncQuery<T> {
      * in tuples.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Join
      */
     zip<U>(right: AsyncQueryable<U>): AsyncQuery<[T, U]>;
 
@@ -624,6 +690,7 @@ export interface AsyncQuery<T> {
      *
      * @param right An `AsyncQueryable` object.
      * @param selector A callback used to combine two elements.
+     * @category Join
      */
     zip<U, R>(right: AsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncQuery<R>;
 
@@ -632,6 +699,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedQuery<T>;
 
@@ -640,6 +708,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedQuery<T>;
 
@@ -647,6 +716,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
      *
      * @param keySelector A callback used to select the key for an element.
+     * @category Subquery
      */
     spanMap<K>(keySelector: (element: T) => K): AsyncQuery<Grouping<K, T>>;
 
@@ -655,6 +725,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param elementSelector A callback used to select a value for an element.
+     * @category Subquery
      */
     spanMap<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): AsyncQuery<Grouping<K, V>>;
 
@@ -664,6 +735,7 @@ export interface AsyncQuery<T> {
      * @param keySelector A callback used to select the key for an element.
      * @param elementSelector A callback used to select a value for an element.
      * @param spanSelector A callback used to select a result from a contiguous range.
+     * @category Subquery
      */
     spanMap<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Query<V>) => R): AsyncQuery<R>;
 
@@ -671,6 +743,7 @@ export interface AsyncQuery<T> {
      * Groups each element of this Query by its key.
      *
      * @param keySelector A callback used to select the key for an element.
+     * @category Subquery
      */
     groupBy<K>(keySelector: (element: T) => K): AsyncQuery<Grouping<K, T>>;
 
@@ -679,6 +752,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param elementSelector A callback used to select a value for an element.
+     * @category Subquery
      */
     groupBy<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): AsyncQuery<Grouping<K, V>>;
 
@@ -688,6 +762,7 @@ export interface AsyncQuery<T> {
      * @param keySelector A callback used to select the key for an element.
      * @param elementSelector A callback used to select a value for an element.
      * @param resultSelector A callback used to select a result from a group.
+     * @category Subquery
      */
     groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R): AsyncQuery<R>;
 
@@ -698,6 +773,7 @@ export interface AsyncQuery<T> {
      * @param outerKeySelector A callback used to select the key for an element in this `AsyncQuery`.
      * @param innerKeySelector A callback used to select the key for an element in the other `Queryable` object.
      * @param resultSelector A callback used to select the result for the correlated elements.
+     * @category Join
      */
     groupJoin<I, K, R>(inner: AsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): AsyncQuery<R>;
 
@@ -708,6 +784,7 @@ export interface AsyncQuery<T> {
      * @param outerKeySelector A callback used to select the key for an element in this Query.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
+     * @category Join
      */
     join<I, K, R>(inner: AsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): AsyncQuery<R>;
 
@@ -718,6 +795,7 @@ export interface AsyncQuery<T> {
      * @param outerKeySelector A callback used to select the key for an element in this Query.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
+     * @category Join
      */
     fullJoin<I, K, R>(inner: AsyncQueryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): AsyncQuery<R>;
 
@@ -725,6 +803,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery containing the cumulative results of applying the provided callback to each element.
      *
      * @param accumulator The callback used to compute each result.
+     * @category Subquery
      */
     scan(accumulator: (current: T, element: T, offset: number) => T): AsyncQuery<T>;
 
@@ -733,6 +812,7 @@ export interface AsyncQuery<T> {
      *
      * @param accumulator The callback used to compute each result.
      * @param seed An optional seed value.
+     * @category Subquery
      */
     scan<U>(accumulator: (current: U, element: T, offset: number) => U, seed: U): AsyncQuery<U>;
 
@@ -740,6 +820,7 @@ export interface AsyncQuery<T> {
      * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
      *
      * @param accumulator The callback used to compute each result.
+     * @category Subquery
      */
     scanRight(accumulator: (current: T, element: T, offset: number) => T): AsyncQuery<T>;
 
@@ -748,6 +829,7 @@ export interface AsyncQuery<T> {
      *
      * @param accumulator The callback used to compute each result.
      * @param seed An optional seed value.
+     * @category Subquery
      */
     scanRight<U>(accumulator: (current: U, element: T, offset: number) => U, seed?: U): AsyncQuery<U>;
 
@@ -755,6 +837,7 @@ export interface AsyncQuery<T> {
      * Creates a HierarchyQuery using the provided HierarchyProvider.
      *
      * @param hierarchy A HierarchyProvider.
+     * @category Hierarchy
      */
     toHierarchy(hierarchy: HierarchyProvider<T>): AsyncHierarchyQuery<T>;
 
@@ -766,6 +849,7 @@ export interface AsyncQuery<T> {
      * Computes a scalar value by applying an accumulator callback over each element.
      *
      * @param accumulator the callback used to compute the result.
+     * @category Scalar
      */
     reduce(accumulator: (current: T, element: T, offset: number) => T): Promise<T>;
 
@@ -774,6 +858,7 @@ export interface AsyncQuery<T> {
      *
      * @param accumulator the callback used to compute the result.
      * @param seed An optional seed value.
+     * @category Scalar
      */
     reduce<U>(accumulator: (current: U, element: T, offset: number) => U, seed?: U): Promise<U>;
 
@@ -783,6 +868,7 @@ export interface AsyncQuery<T> {
      * @param accumulator the callback used to compute the result.
      * @param seed An optional seed value.
      * @param resultSelector An optional callback used to compute the final result.
+     * @category Scalar
      */
     reduce<U, R>(accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): Promise<R>;
 
@@ -790,6 +876,7 @@ export interface AsyncQuery<T> {
      * Computes a scalar value by applying an accumulator callback over each element in reverse.
      *
      * @param accumulator the callback used to compute the result.
+     * @category Scalar
      */
     reduceRight(accumulator: (current: T, element: T, offset: number) => T): Promise<T>;
 
@@ -798,6 +885,7 @@ export interface AsyncQuery<T> {
      *
      * @param accumulator the callback used to compute the result.
      * @param seed An optional seed value.
+     * @category Scalar
      */
     reduceRight<U>(accumulator: (current: U, element: T, offset: number) => U, seed?: U): Promise<U>;
 
@@ -807,6 +895,7 @@ export interface AsyncQuery<T> {
      * @param accumulator the callback used to compute the result.
      * @param seed An optional seed value.
      * @param resultSelector An optional callback used to compute the final result.
+     * @category Scalar
      */
     reduceRight<U, R>(accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): Promise<R>;
 
@@ -815,6 +904,7 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     count(predicate?: (element: T) => boolean): Promise<number>;
 
@@ -823,6 +913,7 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     first<U extends T>(predicate: (element: T) => element is U): Promise<U | undefined>;
 
@@ -831,6 +922,7 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     first(predicate?: (element: T) => boolean): Promise<T | undefined>;
 
@@ -839,6 +931,7 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     last<U extends T>(predicate: (element: T) => element is U): Promise<U | undefined>;
 
@@ -847,6 +940,7 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     last(predicate?: (element: T) => boolean): Promise<T | undefined>;
 
@@ -854,6 +948,7 @@ export interface AsyncQuery<T> {
      * Gets the only element in the Query, or returns undefined.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     single<U extends T>(predicate: (element: T) => element is U): Promise<U | undefined>;
 
@@ -861,6 +956,7 @@ export interface AsyncQuery<T> {
      * Gets the only element in the Query, or returns undefined.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     single(predicate?: (element: T) => boolean): Promise<T | undefined>;
 
@@ -869,6 +965,7 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param comparison An optional callback used to compare two elements.
+     * @category Scalar
      */
     min(comparison?: (x: T, y: T) => number): Promise<T | undefined>;
 
@@ -877,13 +974,18 @@ export interface AsyncQuery<T> {
      * callback.
      *
      * @param comparison An optional callback used to compare two elements.
+     * @category Scalar
      */
     max(comparison?: (x: T, y: T) => number): Promise<T | undefined>;
 
+    /** @category Scalar */
     sum(selector: (element: T) => number): Promise<number>;
+    /** @category Scalar */
     sum(): Promise<T extends number ? number : never>;
-
+    
+    /** @category Scalar */
     average(selector: (element: T) => number): Promise<number>;
+    /** @category Scalar */
     average(): Promise<T extends number ? number : never>; // no literal for NaN
 
     /**
@@ -891,6 +993,7 @@ export interface AsyncQuery<T> {
      * optionally filtering the elements using the supplied callback.
      *
      * @param predicate An optional callback used to match each element.
+     * @category Scalar
      */
     some(predicate?: (element: T) => boolean): Promise<boolean>;
 
@@ -899,6 +1002,7 @@ export interface AsyncQuery<T> {
      * match the supplied callback.
      *
      * @param predicate A callback used to match each element.
+     * @category Scalar
      */
     every(predicate: (element: T) => boolean): Promise<boolean>;
 
@@ -907,6 +1011,7 @@ export interface AsyncQuery<T> {
      * in another `AsyncQueryable` at the same position.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Scalar
      */
     corresponds(right: AsyncQueryable<T>): Promise<boolean>;
 
@@ -916,6 +1021,7 @@ export interface AsyncQuery<T> {
      *
      * @param right An `AsyncQueryable` object.
      * @param equalityComparison An optional callback used to compare the equality of two elements.
+     * @category Scalar
      */
     corresponds<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
@@ -923,6 +1029,7 @@ export interface AsyncQuery<T> {
      * Computes a scalar value indicating whether the provided value is included in the query.
      *
      * @param value A value.
+     * @category Scalar
      */
     includes(value: T): Promise<boolean>;
 
@@ -931,6 +1038,7 @@ export interface AsyncQuery<T> {
      * an exact sequence of elements from another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Scalar
      */
     includesSequence(right: AsyncQueryable<T>): Promise<boolean>;
 
@@ -940,6 +1048,7 @@ export interface AsyncQuery<T> {
      *
      * @param right An `AsyncQueryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
+     * @category Scalar
      */
     includesSequence<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
@@ -948,6 +1057,7 @@ export interface AsyncQuery<T> {
      * with the same sequence of elements in another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Scalar
      */
     startsWith(right: AsyncQueryable<T>): Promise<boolean>;
 
@@ -957,6 +1067,7 @@ export interface AsyncQuery<T> {
      *
      * @param right An `AsyncQueryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
+     * @category Scalar
      */
     startsWith<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
@@ -965,6 +1076,7 @@ export interface AsyncQuery<T> {
      * with the same sequence of elements in another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Scalar
      */
     endsWith(right: AsyncQueryable<T>): Promise<boolean>;
 
@@ -974,6 +1086,7 @@ export interface AsyncQuery<T> {
      *
      * @param right An `AsyncQueryable` object.
      * @param equalityComparison A callback used to compare the equality of two elements.
+     * @category Scalar
      */
     endsWith<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
 
@@ -982,6 +1095,7 @@ export interface AsyncQuery<T> {
      * last element.
      *
      * @param offset An offset.
+     * @category Scalar
      */
     elementAt(offset: number): Promise<T | undefined>;
 
@@ -992,6 +1106,7 @@ export interface AsyncQuery<T> {
      * This is an alias for `elementAt`.
      *
      * @param offset An offset.
+     * @category Scalar
      */
     nth(offset: number): Promise<T | undefined>;
 
@@ -1004,6 +1119,7 @@ export interface AsyncQuery<T> {
      * evaluated.
      *
      * @param predicate The predicate used to match elements.
+     * @category Scalar
      */
     span<U extends T>(predicate: (element: T) => element is U): Promise<[Query<U>, AsyncQuery<T>]>;
 
@@ -1016,6 +1132,7 @@ export interface AsyncQuery<T> {
      * evaluated.
      *
      * @param predicate The predicate used to match elements.
+     * @category Scalar
      */
     span(predicate: (element: T) => boolean): Promise<[Query<T>, AsyncQuery<T>]>;
 
@@ -1028,6 +1145,7 @@ export interface AsyncQuery<T> {
      * evaluated.
      *
      * @param predicate The predicate used to match elements.
+     * @category Scalar
      */
     break(predicate: (element: T) => boolean): Promise<[Query<T>, AsyncQuery<T>]>;
 
@@ -1035,21 +1153,25 @@ export interface AsyncQuery<T> {
      * Invokes a callback for each element of the query.
      *
      * @param callback The callback to invoke.
+     * @category Scalar
      */
     forEach(callback: (element: T, offset: number) => void): Promise<void>;
 
     /**
      * Iterates over all of the elements in the query, ignoring the results.
+     * @category Scalar
      */
     drain(): Promise<void>;
 
     /**
      * Eagerly evaluate the query, returning a new `Query`.
+     * @category Scalar
      */
     eval(): Promise<Query<T>>;
 
     /**
      * Creates an Array for the elements of the Query.
+     * @category Scalar
      */
     toArray(): Promise<T[]>;
 
@@ -1057,11 +1179,13 @@ export interface AsyncQuery<T> {
      * Creates an Array for the elements of the Query.
      *
      * @param elementSelector A callback that selects a value for each element.
+     * @category Scalar
      */
     toArray<V>(elementSelector: (element: T) => V): Promise<V[]>;
 
     /**
      * Creates a `Set` for the elements of the `Query`.
+     * @category Scalar
      */
     toSet(): Promise<Set<T>>;
 
@@ -1069,6 +1193,7 @@ export interface AsyncQuery<T> {
      * Creates a `Set` for the elements of the `Query`.
      *
      * @param elementSelector A callback that selects a value for each element.
+     * @category Scalar
      */
     toSet<V>(elementSelector: (element: T) => V): Promise<Set<V>>;
 
@@ -1076,6 +1201,7 @@ export interface AsyncQuery<T> {
      * Creates a `Map` for the elements of the `Query`.
      *
      * @param keySelector A callback used to select a key for each element.
+     * @category Scalar
      */
     toMap<K>(keySelector: (element: T) => K, ): Promise<Map<K, T>>;
 
@@ -1084,6 +1210,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
+     * @category Scalar
      */
     toMap<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V>>;
 
@@ -1091,6 +1218,7 @@ export interface AsyncQuery<T> {
      * Creates a `Lookup` for the elements of the `Query`.
      *
      * @param keySelector A callback used to select a key for each element.
+     * @category Scalar
      */
     toLookup<K>(keySelector: (element: T) => K, ): Promise<Lookup<K, T>>;
 
@@ -1099,6 +1227,7 @@ export interface AsyncQuery<T> {
      *
      * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
+     * @category Scalar
      */
     toLookup<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Lookup<K, V>>;
 
@@ -1107,6 +1236,7 @@ export interface AsyncQuery<T> {
      *
      * @param prototype The prototype for the object.
      * @param keySelector A callback used to select a key for each element.
+     * @category Scalar
      */
     toObject(prototype: object | null, keySelector: (element: T) => PropertyKey): Promise<object>;
 
@@ -1116,6 +1246,7 @@ export interface AsyncQuery<T> {
      * @param prototype The prototype for the object.
      * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
+     * @category Scalar
      */
     toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): Promise<object>;
 
@@ -1156,6 +1287,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery whose elements match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     filter<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1163,6 +1295,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery whose elements match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     filter(predicate: (element: T, offset: number) => boolean): AsyncHierarchyQuery<TNode, T>;
 
@@ -1170,6 +1303,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery whose elements match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     where<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1177,6 +1311,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery whose elements match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     where(predicate: (element: T, offset: number) => boolean): AsyncHierarchyQuery<TNode, T>;
 
@@ -1184,6 +1319,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     do(callback: (element: T, offset: number) => void): AsyncHierarchyQuery<TNode, T>;
 
@@ -1191,6 +1327,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     do(callback: (element: T, offset: number) => PromiseLike<void>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1198,6 +1335,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncHierarchyQuery<TNode, T>;
 
@@ -1206,6 +1344,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     tap(callback: (element: T, offset: number) => void): AsyncHierarchyQuery<TNode, T>;
 
@@ -1222,11 +1361,13 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * This is an alias for `do`.
      *
      * @param callback The callback to invoke.
+     * @category Subquery
      */
     tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery whose elements are in the reverse order.
+     * @category Subquery
      */
     reverse(): AsyncHierarchyQuery<TNode, T>;
 
@@ -1235,6 +1376,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * count.
      *
      * @param count The number of elements to skip.
+     * @category Subquery
      */
     skip(count: number): AsyncHierarchyQuery<TNode, T>;
 
@@ -1243,6 +1385,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * count.
      *
      * @param count The number of elements to skip.
+     * @category Subquery
      */
     skipRight(count: number): AsyncHierarchyQuery<TNode, T>;
 
@@ -1251,14 +1394,25 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     skipWhile(predicate: (element: T) => boolean): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery containing all elements except the first elements that do not match
+     * the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     * @category Subquery
+     */
+    skipUntil(predicate: (element: T) => boolean): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery containing the first elements up to the supplied
      * count.
      *
      * @param count The number of elements to take.
+     * @category Subquery
      */
     take(count: number): AsyncHierarchyQuery<TNode, T>;
 
@@ -1267,6 +1421,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * count.
      *
      * @param count The number of elements to take.
+     * @category Subquery
      */
     takeRight(count: number): AsyncHierarchyQuery<TNode, T>;
 
@@ -1274,6 +1429,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery containing the first elements that match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     takeWhile<U extends T>(predicate: (element: T) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1281,13 +1437,23 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery containing the first elements that match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
+     * @category Subquery
      */
     takeWhile(predicate: (element: T) => boolean): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery containing the first elements that do not match the supplied predicate.
+     *
+     * @param predicate A callback used to match each element.
+     * @category Subquery
+     */
+    takeUntil(predicate: (element: T) => boolean): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     intersect<U extends T>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, U>;
 
@@ -1295,6 +1461,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the set intersection of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     intersect(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1302,6 +1469,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the set union of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     union<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
     
@@ -1309,6 +1477,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the set union of this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     union(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1316,6 +1485,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the set difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     except(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1325,6 +1495,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * This is an alias for `except`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     relativeComplement(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1332,6 +1503,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     symmetricDifference<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
 
@@ -1339,6 +1511,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the symmetric difference between this `AsyncQuery` and another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     symmetricDifference(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1348,6 +1521,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * This is an alias for `symmetricDifference`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     xor<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
 
@@ -1357,6 +1531,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * This is an alias for `symmetricDifference`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     xor(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1364,6 +1539,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery that concatenates this `AsyncQuery` with another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     concat<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
 
@@ -1371,11 +1547,13 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery that concatenates this `AsyncQuery` with another `AsyncQueryable`.
      *
      * @param right An `AsyncQueryable` object.
+     * @category Subquery
      */
     concat(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery that concatenates this `AsyncQuery` with another `AsyncQueryable`.
+     * @category Subquery
      */
     distinct(): AsyncHierarchyQuery<TNode, T>;
 
@@ -1383,6 +1561,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the elements of this `AsyncQuery` with the provided value appended to the end.
      *
      * @param value The value to append.
+     * @category Subquery
      */
     append(value: PromiseLike<T> | T): AsyncHierarchyQuery<TNode, T>;
 
@@ -1390,6 +1569,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the elements of this `AsyncQuery` with the provided value prepended to the beginning.
      *
      * @param value The value to prepend.
+     * @category Subquery
      */
     prepend(value: PromiseLike<T> | T): AsyncHierarchyQuery<TNode, T>;
 
@@ -1400,6 +1580,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * @param start The offset at which to patch the range.
      * @param skipCount The number of elements to skip from start.
      * @param range The range to patch into the result.
+     * @category Subquery
      */
     patch(start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
 
@@ -1408,6 +1589,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * contains no elements.
      *
      * @param defaultValue The default value.
+     * @category Subquery
      */
     defaultIfEmpty(defaultValue: PromiseLike<T> | T): AsyncHierarchyQuery<TNode, T>;
 
@@ -1416,6 +1598,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyQuery<T>;
 
@@ -1424,6 +1607,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyQuery<T>;
 
@@ -1431,6 +1615,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the roots of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     root<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1438,6 +1623,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the roots of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     root(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1445,6 +1631,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the ancestors of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     ancestors<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1452,6 +1639,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the ancestors of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     ancestors(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1459,6 +1647,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the ancestors of each element as well as each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     ancestorsAndSelf<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1466,6 +1655,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the ancestors of each element as well as each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     ancestorsAndSelf(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1473,6 +1663,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the descendants of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     descendants<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1480,6 +1671,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the descendants of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     descendants(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1487,6 +1679,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the descendants of each element as well as each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     descendantsAndSelf<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1494,6 +1687,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the descendants of each element as well as each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     descendantsAndSelf(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1501,6 +1695,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for this query.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     self<U extends T>(predicate: (element: T) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1508,6 +1703,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for this query.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     self<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1515,6 +1711,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for this query.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     self(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1522,6 +1719,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the parents of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     parents<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1529,6 +1727,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the parents of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     parents(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1536,6 +1735,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the children of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     children<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1543,6 +1743,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the children of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     children(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1550,6 +1751,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblings<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1557,6 +1759,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings of each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblings(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1564,6 +1767,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings of each element as well as each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblingsAndSelf<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1571,6 +1775,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings of each element as well as each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblingsAndSelf(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1578,6 +1783,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings before each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblingsBeforeSelf<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1585,6 +1791,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings before each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblingsBeforeSelf(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1592,6 +1799,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings after each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblingsAfterSelf<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
@@ -1599,6 +1807,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the siblings after each element in the hierarchy.
      *
      * @param predicate A callback used to filter the results.
+     * @category Hierarchy
      */
     siblingsAfterSelf(predicate?: (element: TNode) => boolean): AsyncHierarchyQuery<TNode>;
 
@@ -1607,18 +1816,21 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * starts from the last child.
      *
      * @param offset The offset for the child.
+     * @category Hierarchy
      */
     nthChild(offset: number): AsyncHierarchyQuery<TNode>;
 
     /**
      * Creates a subquery for the top-most elements. Elements that are a descendant of any other
      * element are removed.
+     * @category Hierarchy
      */
     topMost(): AsyncHierarchyQuery<TNode>;
 
     /**
      * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
      * element are removed.
+     * @category Hierarchy
      */
     bottomMost(): AsyncHierarchyQuery<TNode>;
 
@@ -1628,6 +1840,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
 
     /**
      * Eagerly evaluate the query, returning a new `Query`.
+     * @category Scalar
      */
     eval(): Promise<HierarchyQuery<T>>;
 
@@ -1658,6 +1871,7 @@ export interface AsyncOrderedQuery<T> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedQuery<T>;
 
@@ -1666,6 +1880,7 @@ export interface AsyncOrderedQuery<T> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedQuery<T>;
 }
@@ -1701,6 +1916,7 @@ export interface AsyncOrderedHierarchyQuery<TNode, T extends TNode = TNode> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyQuery<TNode, T>;
 
@@ -1709,6 +1925,7 @@ export interface AsyncOrderedHierarchyQuery<TNode, T extends TNode = TNode> {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param comparison An optional callback used to compare two keys.
+     * @category Order
      */
     thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyQuery<TNode, T>;
 }

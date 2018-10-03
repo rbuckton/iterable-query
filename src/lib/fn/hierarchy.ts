@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Registry, MakeHierarchyIterable } from "../internal";
 import { HierarchyProvider, HierarchyIterable } from "../types";
@@ -25,6 +26,7 @@ import { once } from "./once";
  * @param condition A callback used to choose a source.
  * @param thenQueryable The source to use when the callback evaluates to `true`.
  * @param elseQueryable The source to use when the callback evaluates to `false`.
+ * @category Hierarchy
  */
 export function hierarchy<TNode, T extends TNode>(root: T, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T> {
     assert.mustBeHierarchyProvider(hierarchy, "hierarchy");

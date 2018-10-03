@@ -1,0 +1,19 @@
+<ul class="tsd-type-parameters">
+    {{#each typeParameters}}
+        <li>
+            {{#compact}}
+                {{name}}
+                {{#if type}}
+                    <span class="tsd-signature-symbol">:&nbsp;</span>
+                    {{#with type}}{{> type}}{{/with}}
+                {{/if}}
+                {{#if comment.hasVisibleComponent}}
+                    &mdash;
+                    <div style="display:inline-block">
+                        {{> comment}}
+                    </div>
+                {{/if}}
+            {{/compact}}
+        </li>
+    {{/each}}
+</ul>

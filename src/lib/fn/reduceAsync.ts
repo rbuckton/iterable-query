@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable } from "../types";
  *
  * @param source An `AsyncQueryable` object.
  * @param accumulator the callback used to compute the result.
+ * @category Scalar
  */
 export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): Promise<T>;
 /**
@@ -29,6 +31,7 @@ export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current:
  *
  * @param source An `AsyncQueryable` object.
  * @param accumulator the callback used to compute the result.
+ * @category Scalar
  * @param seed An optional seed value.
  */
 export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): Promise<U>;
@@ -39,6 +42,7 @@ export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (curre
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.
+ * @category Scalar
  */
 export function reduceAsync<T, U, R>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): Promise<R>;
 export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): Promise<T> {

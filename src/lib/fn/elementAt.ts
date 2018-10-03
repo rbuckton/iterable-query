@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -24,6 +25,7 @@ import { last } from "./last";
  *
  * @param source A `Queryable` object.
  * @param offset An offset.
+ * @category Scalar
  */
 export function elementAt<T>(source: Queryable<T>, offset: number): T | undefined {
     assert.mustBeQueryable(source, "source")

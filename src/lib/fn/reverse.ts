@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -20,10 +21,12 @@ import { toArray } from "./toArray";
 
 /**
  * Creates a subquery whose elements are in the reverse order.
+ * @category Subquery
  */
 export function reverse<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery whose elements are in the reverse order.
+ * @category Subquery
  */
 export function reverse<T>(source: Queryable<T>): Iterable<T>;
 export function reverse<T>(source: Queryable<T>): Iterable<T> {

@@ -13,6 +13,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
+
 import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
 import { HierarchyIterable, Hierarchical } from "../types";
 import { Map, Set } from "../collections";
@@ -24,6 +26,7 @@ import { Axis } from "./axis";
  * element are removed.
  * 
  * @param source A `Queryable` object.
+ * @category Hierarchy
  */
 export function topMost<T>(source: HierarchyIterable<T>): HierarchyIterable<T> {
     assert.mustBeHierarchyIterable(source, "source");

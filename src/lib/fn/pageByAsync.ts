@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, CreatePage } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable, Page, PossiblyAsyncHierarchyIterable, HierarchyPage } from "../types";
@@ -24,6 +25,7 @@ import { AsyncQueryable, PossiblyAsyncIterable, Page, PossiblyAsyncHierarchyIter
  *
  * @param source An `AsyncIterable` object.
  * @param pageSize The number of elements per page.
+ * @category Subquery
  */
 export function pageByAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, pageSize: number): AsyncIterable<HierarchyPage<TNode, T>>;
 /**
@@ -33,6 +35,7 @@ export function pageByAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarc
  *
  * @param source An `AsyncIterable` object.
  * @param pageSize The number of elements per page.
+ * @category Subquery
  */
 export function pageByAsync<T>(source: AsyncQueryable<T>, pageSize: number): AsyncIterable<Page<T>>;
 export function pageByAsync<T>(source: AsyncQueryable<T>, pageSize: number): AsyncIterable<Page<T>> {

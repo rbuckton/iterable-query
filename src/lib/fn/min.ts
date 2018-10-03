@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, CompareValues, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param comparison An optional callback used to compare two elements.
+ * @category Scalar
  */
 export function min<T>(source: Queryable<T>, comparison: (x: T, y: T) => number = CompareValues): T | undefined {
     assert.mustBeQueryable(source, "source");

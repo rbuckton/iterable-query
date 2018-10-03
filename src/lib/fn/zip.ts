@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, MakeTuple, GetIterator, IteratorClose, ToIterable, ToStringTag, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -23,6 +24,7 @@ import { Queryable } from "../types";
  *
  * @param left A `Queryable`.
  * @param right A `Queryable`.
+ * @category Join
  */
 export function zip<T, U>(left: Queryable<T>, right: Queryable<U>): Iterable<[T, U]>;
 /**
@@ -32,6 +34,7 @@ export function zip<T, U>(left: Queryable<T>, right: Queryable<U>): Iterable<[T,
  * @param left A `Queryable`.
  * @param right A `Queryable`.
  * @param selector A callback used to combine two elements.
+ * @category Join
  */
 export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => R): Iterable<R>;
 export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): Iterable<[T, U] | R> {

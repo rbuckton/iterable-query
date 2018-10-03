@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -23,6 +24,7 @@ import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable,
  *
  * @param source An `AsyncQueryable` value.
  * @param value The value to prepend.
+ * @category Subquery
  */
 export function prependAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, value: T): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -31,6 +33,7 @@ export function prependAsync<TNode, T extends TNode>(source: PossiblyAsyncHierar
  *
  * @param source An `AsyncQueryable` value.
  * @param value The value to prepend.
+ * @category Subquery
  */
 export function prependAsync<T>(source: AsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T>;
 export function prependAsync<T>(source: AsyncQueryable<T>, value: PromiseLike<T> | T): AsyncIterable<T> {

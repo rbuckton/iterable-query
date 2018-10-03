@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, True, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param predicate An optional callback used to match each element.
+ * @category Scalar
  */
 export function first<T>(source: Queryable<T>, predicate: (element: T) => boolean = True): T | undefined {
     assert.mustBeQueryable(source, "source");

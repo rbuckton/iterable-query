@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, MakeAsyncHierarchyIterable, Registry } from "../internal";
 import { HierarchyProvider, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { HierarchyProvider, AsyncHierarchyIterable, AsyncOrderedHierarchyIterabl
  *
  * @param source An `AsyncQueryable` object.
  * @param hierarchy A `HierarchyProvider`.
+ * @category Hierarchy
  */
 export function toHierarchyAsync<TNode, T extends TNode>(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyIterable<TNode, T>;
 /**
@@ -29,6 +31,7 @@ export function toHierarchyAsync<TNode, T extends TNode>(source: PossiblyAsyncOr
  *
  * @param source An `AsyncQueryable` object.
  * @param hierarchy A `HierarchyProvider`.
+ * @category Hierarchy
  */
 export function toHierarchyAsync<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T>;
 export function toHierarchyAsync<TNode, T extends TNode>(source: AsyncQueryable<T>, hierarchy: HierarchyProvider<TNode>): AsyncHierarchyIterable<TNode, T> {

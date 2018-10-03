@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -22,25 +23,25 @@ import { Queryable, HierarchyIterable } from "../types";
  * 
  * @param left A `HierarchyIterable` value.
  * @param right A `Queryable` value.
+ * @category Subquery
  */
 export function concat<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery that concatenates two Queryables.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left A `Queryable` value.
+ * @param right A `Queryable` value.
+ * @category Subquery
  */
 export function concat<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
-
 /**
  * Creates a subquery that concatenates two Queryables.
  *
- * @param left A Queryable value.
- * @param right A Queryable value.
+ * @param left A `Queryable` value.
+ * @param right A `Queryable` value.
+ * @category Subquery
  */
 export function concat<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-
 export function concat<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");

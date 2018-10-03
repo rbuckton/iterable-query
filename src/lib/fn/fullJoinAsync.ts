@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, SelectGroupingKey, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, Registry } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -30,6 +31,7 @@ import { defaultIfEmpty } from "../fn/defaultIfEmpty";
  * @param outerKeySelector A callback used to select the key for an element in `outer`.
  * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.
+ * @category Join
  */
 export function fullJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R): AsyncIterable<R> {
     assert.mustBeAsyncQueryable<O>(outer, "outer");

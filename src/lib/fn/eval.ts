@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -20,10 +21,12 @@ import { toArray } from "./toArray";
 
 /**
  * Eagerly evaluate a `Queryable`, returning a new `Iterable`.
+ * @category Scalar
  */
 function _eval<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
  * Eagerly evaluate a `Queryable`, returning a new `Iterable`.
+ * @category Scalar
  */
 function _eval<T>(source: Queryable<T>): Iterable<T>;
 function _eval<T>(source: Queryable<T>): Iterable<T> {

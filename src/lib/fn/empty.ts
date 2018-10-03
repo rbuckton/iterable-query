@@ -13,16 +13,19 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
+import { Registry, ToStringTag } from "../internal";
 
 /**
  * Creates an Iterable with no elements.
+ * @category Query
  */
 export function empty<T>(): Iterable<T> {
     return new EmptyIterable<T>();
 }
 
+@ToStringTag("EmptyIterable")
 class EmptyIterable<T> implements Iterable<T> {
     *[Symbol.iterator](): Iterator<T> {
     }

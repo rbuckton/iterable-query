@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -24,6 +25,7 @@ import { Queryable, HierarchyIterable } from "../types";
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
+ * @category Subquery
  */
 export function patch<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, start: number, skipCount?: number, range?: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
@@ -33,6 +35,7 @@ export function patch<TNode, T extends TNode>(source: HierarchyIterable<TNode, T
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
+ * @category Subquery
  */
 export function patch<T>(source: Queryable<T>, start: number, skipCount?: number, range?: Queryable<T>): Iterable<T>;
 export function patch<T>(source: Queryable<T>, start: number, skipCount: number = 0, range?: Queryable<T>): Iterable<T> {

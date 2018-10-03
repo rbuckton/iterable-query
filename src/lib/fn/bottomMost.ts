@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetHierarchy, ToStringTag, Registry} from "../internal";
 import { HierarchyIterable, Hierarchical } from "../types";
@@ -23,6 +24,8 @@ import { toArray } from "./toArray";
 /**
  * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
  * element are removed.
+ * 
+ * @category Hierarchy
  */
 export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode> {
     assert.mustBeHierarchyIterable(source, "source");

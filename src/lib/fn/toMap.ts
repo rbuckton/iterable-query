@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, Identity, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -23,6 +24,7 @@ import { Map } from "../collections";
  *
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select a key for each element.
+ * @category Scalar
  */
 export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Map<K, T>;
 /**
@@ -31,6 +33,7 @@ export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K
  * @param source A `Queryable` object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
+ * @category Scalar
  */
 export function toMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V>;
 export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Map<K, T> {

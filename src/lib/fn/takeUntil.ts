@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable, HierarchyIterable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeUntil<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => element is U): HierarchyIterable<TNode, U>;
 /**
@@ -29,6 +31,7 @@ export function takeUntil<TNode, T extends TNode, U extends T>(source: Hierarchy
  *
  * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeUntil<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): HierarchyIterable<TNode, T>;
 /**
@@ -36,6 +39,7 @@ export function takeUntil<TNode, T extends TNode>(source: HierarchyIterable<TNod
  *
  * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeUntil<T, U extends T>(source: Queryable<T>, predicate: (element: T) => element is U): Iterable<U>;
 /**
@@ -43,6 +47,7 @@ export function takeUntil<T, U extends T>(source: Queryable<T>, predicate: (elem
  *
  * @param source A `Queryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function takeUntil<T>(source: Queryable<T>, predicate: (element: T) => boolean): Iterable<T>;
 export function takeUntil<T>(source: Queryable<T>, predicate: (element: T) => boolean): Iterable<T> {

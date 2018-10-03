@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable, HierarchyIterable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tap<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, callback: (element: T, offset: number) => void): HierarchyIterable<TNode, T>;
 /**
@@ -29,6 +31,7 @@ export function tap<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>,
  *
  * @param source A `Queryable` object.
  * @param callback The callback to invoke.
+ * @category Subquery
  */
 export function tap<T>(source: Queryable<T>, callback: (element: T, offset: number) => void): Iterable<T>;
 export function tap<T>(source: Queryable<T>, callback: (element: T, offset: number) => void): Iterable<T> {

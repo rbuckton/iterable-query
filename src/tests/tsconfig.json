@@ -13,6 +13,7 @@
         "rootDirs": ["../es5", "../es2015", "../lib"]
     },
     "references": [
+        { "path": "../sandbox/tsconfig.json" },
         { "path": "../lib/tsconfig.json" },
         { "path": "../lib/tsconfig.es5.json" },
         { "path": "../lib/tsconfig.es2015.json" },

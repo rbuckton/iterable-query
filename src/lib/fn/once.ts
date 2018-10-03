@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { ToStringTag, Registry } from "../internal";
 
@@ -20,6 +21,7 @@ import { ToStringTag, Registry } from "../internal";
  * Creates an Iterable over a single element.
  *
  * @param value The only element for the query.
+ * @category Query
  */
 export function once<T>(value: T): Iterable<T> {
     return new OnceIterable(value);

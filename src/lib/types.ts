@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query" */
 
 /// <reference lib="es2015.iterable" />
 /// <reference lib="esnext.asynciterable" />
@@ -56,6 +57,7 @@ export interface Hierarchical<TNode> {
 }
 
 export namespace Hierarchical {
+    /** @ignore */
     export const hierarchy = Symbol("Hierarchical.hierarchy");
 }
 
@@ -116,6 +118,7 @@ export interface OrderedIterable<T> extends Iterable<T> {
 }
 
 export namespace OrderedIterable {
+    /** @ignore */
     export const thenBy = Symbol.for("OrderedIterable.thenBy");
 }
 

@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToStringTag, Registry, AsyncIteratorClose } from "../internal";
 
@@ -27,6 +28,7 @@ export interface ConsumeAsyncOptions {
  * Creates an `AsyncIterable` that, when iterated, consumes the provided `AsyncIterator`.
  *
  * @param iterator An `AsyncIterator` object.
+ * @category Query
  */
 export function consumeAsync<T>(iterator: AsyncIterator<T>, { cacheElements = false, leaveOpen = false }: ConsumeAsyncOptions = {}): AsyncIterable<T> {
     assert.mustBeIterator(iterator, "iterator");

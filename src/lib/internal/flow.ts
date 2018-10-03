@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @internal */
 
 import { IsPossiblyAsyncHierarchyIterable, IsAsyncIterable } from "./guards";
 import { MakeAsyncHierarchyIterable, MakeHierarchyIterable } from "./conversion";

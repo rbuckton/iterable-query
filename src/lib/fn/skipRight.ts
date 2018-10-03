@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -23,6 +24,7 @@ import { Queryable, HierarchyIterable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param count The number of elements to skip.
+ * @category Subquery
  */
 export function skipRight<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, count: number): HierarchyIterable<TNode, T>;
 /**
@@ -31,6 +33,7 @@ export function skipRight<TNode, T extends TNode>(source: HierarchyIterable<TNod
  *
  * @param source A `Queryable` object.
  * @param count The number of elements to skip.
+ * @category Subquery
  */
 export function skipRight<T>(source: Queryable<T>, count: number): Iterable<T>;
 export function skipRight<T>(source: Queryable<T>, count: number): Iterable<T> {

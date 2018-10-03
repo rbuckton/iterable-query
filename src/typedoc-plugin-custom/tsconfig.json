@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "lib": ["esnext"],
+        "module": "commonjs",
+        "outDir": "../../out/typedoc-plugin-custom",
+        "experimentalDecorators": true,
+        "strict": true,
+        "noEmitOnError": true,
+        "sourceMap": true,
+        "stripInternal": true,
+        "declaration": true,
+        "declarationMap": true,
+        "composite": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
+    },
+    "include": [
+        "**/*.ts"
+    ]
+}

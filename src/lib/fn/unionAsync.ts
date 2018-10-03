@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -23,6 +24,7 @@ import { Set } from "../collections";
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Subquery
  */
 export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -30,6 +32,7 @@ export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyI
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Subquery
  */
 export function unionAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -37,6 +40,7 @@ export function unionAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, righ
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Subquery
  */
 export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
 export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {

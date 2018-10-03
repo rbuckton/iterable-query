@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { ToStringTag, Registry } from "../internal";
 
@@ -20,6 +21,7 @@ import { ToStringTag, Registry } from "../internal";
  * Creates an `Iterable` that repeats the provided value forever.
  *
  * @param value The value for each element of the `Iterable`.
+ * @category Query
  */
 export function continuous<T>(value: T): Iterable<T> {
     return new ContinuousIterable(value);

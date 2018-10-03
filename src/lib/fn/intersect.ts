@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
@@ -23,6 +24,7 @@ import { toSet } from "./toSet";
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function intersect<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
@@ -30,6 +32,7 @@ export function intersect<TNode, T extends TNode>(left: HierarchyIterable<TNode,
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function intersect<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
@@ -37,6 +40,7 @@ export function intersect<TNode, T extends TNode>(left: Queryable<T>, right: Hie
  *
  * @param left A `Queryable` object.
  * @param right A `Queryable` object.
+ * @category Subquery
  */
 export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
 export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {

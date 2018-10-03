@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, MakeTuple, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -23,6 +24,7 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
  *
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
+ * @category Join
  */
 export function zipAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>): AsyncIterable<[T, U]>;
 /**
@@ -32,6 +34,7 @@ export function zipAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>
  * @param left An `AsyncQueryable` object.
  * @param right An `AsyncQueryable` object.
  * @param selector A callback used to combine two elements.
+ * @category Join
  */
 export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncIterable<R>;
 export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): AsyncIterable<[T, U] | R> {

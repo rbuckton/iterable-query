@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, ToStringTag, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -22,6 +23,7 @@ import { Queryable } from "../types";
  *
  * @param source A `Queryable` object.
  * @param selector A callback used to map each element.
+ * @category Subquery
  */
 export function map<T, U>(source: Queryable<T>, selector: (element: T, offset: number) => U): Iterable<U> {
     assert.mustBeQueryable(source, "source");

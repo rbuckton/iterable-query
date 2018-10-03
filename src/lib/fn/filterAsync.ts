@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable,
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function filterAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => element is U): AsyncHierarchyIterable<TNode, U>;
 /**
@@ -29,6 +31,7 @@ export function filterAsync<TNode, T extends TNode, U extends T>(source: Possibl
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function filterAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode, offset: number) => element is U): AsyncHierarchyIterable<TNode, U>;
 /**
@@ -36,6 +39,7 @@ export function filterAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarc
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function filterAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -43,6 +47,7 @@ export function filterAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarc
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function filterAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => element is U): AsyncIterable<U>;
 /**
@@ -50,6 +55,7 @@ export function filterAsync<T, U extends T>(source: AsyncQueryable<T>, predicate
  *
  * @param source An `AsyncQueryable` object.
  * @param predicate A callback used to match each element.
+ * @category Subquery
  */
 export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean): AsyncIterable<T>;
 export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean): AsyncIterable<T> {

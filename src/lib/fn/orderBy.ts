@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, CompareValues, FlowHierarchy, ToIterable, ThenBy, ToStringTag, Registry } from "../internal";
 import { Queryable, OrderedIterable, HierarchyIterable, OrderedHierarchyIterable } from "../types";
@@ -23,6 +24,7 @@ import { toArray } from "./toArray";
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
@@ -30,6 +32,7 @@ export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNo
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
 export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
@@ -44,6 +47,7 @@ export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) =>
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
@@ -51,6 +55,7 @@ export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIt
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
 export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
@@ -65,6 +70,7 @@ export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (elem
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
@@ -72,6 +78,7 @@ export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterab
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
 export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {
@@ -86,6 +93,7 @@ export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: 
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
@@ -93,6 +101,7 @@ export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHiera
  *
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
+ * @category Order
  */
 export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
 export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): OrderedIterable<T> {

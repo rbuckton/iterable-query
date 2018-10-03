@@ -13,8 +13,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
- import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag, Registry } from "../internal";
 
 /**
  * Creates an `Iterable` whose values are provided by a callback executed a provided number of
@@ -22,6 +23,7 @@
  *
  * @param count The number of times to execute the callback.
  * @param generator The callback to execute.
+ * @category Query
  */
 export function generate<T>(count: number, generator: (offset: number) => T): Iterable<T> {
     assert.mustBePositiveFiniteNumber(count, "count");

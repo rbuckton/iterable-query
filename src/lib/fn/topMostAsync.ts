@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
 import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
@@ -25,6 +26,7 @@ import { toArrayAsync } from "./toArrayAsync";
  * element are removed.
  * 
  * @param source An `AsyncQueryable` object.
+ * @category Hierarchy
  */
 export function topMostAsync<T>(source: PossiblyAsyncHierarchyIterable<T>): AsyncHierarchyIterable<T> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");

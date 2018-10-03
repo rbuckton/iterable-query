@@ -13,8 +13,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
- import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag, Registry } from "../internal";
 
 /**
  * Creates an `Iterable` over a range of numbers.
@@ -22,6 +23,7 @@
  * @param start The starting number of the range.
  * @param end The ending number of the range.
  * @param increment The amount by which to change between each itereated value.
+ * @category Query
  */
 export function range(start: number, end: number, increment: number = 1): Iterable<number> {
     assert.mustBeFiniteNumber(start, "start");

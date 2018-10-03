@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
@@ -22,6 +23,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIt
  * contains no elements.
  *
  * @param defaultValue The default value.
+ * @category Subquery
  */
 export function defaultIfEmptyAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, defaultValue: PromiseLike<T> | T): AsyncHierarchyIterable<TNode, T>;
 /**
@@ -29,6 +31,7 @@ export function defaultIfEmptyAsync<TNode, T extends TNode>(source: PossiblyAsyn
  * contains no elements.
  *
  * @param defaultValue The default value.
+ * @category Subquery
  */
 export function defaultIfEmptyAsync<T>(source: AsyncQueryable<T>, defaultValue: PromiseLike<T> | T): AsyncIterable<T>;
 export function defaultIfEmptyAsync<T>(source: AsyncQueryable<T>, defaultValue: PromiseLike<T> | T): AsyncIterable<T> {

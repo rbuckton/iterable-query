@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @internal */
 
 import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncOrderedHierarchyIterable } from "../types";
 import { QuerySource, AsyncQuerySource } from "./types";

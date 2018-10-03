@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, IteratorClose, ToStringTag, Registry } from "../internal";
 
@@ -28,6 +29,7 @@ export interface ConsumeOptions {
  * Creates an `Iterable` that, when iterated, consumes the provided `Iterator`.
  *
  * @param iterator An `Iterator` object.
+ * @category Query
  */
 export function consume<T>(iterator: Iterator<T>, { cacheElements = false, leaveOpen = false }: ConsumeOptions = {}): Iterable<T> {
     assert.mustBeIterator(iterator, "iterator");

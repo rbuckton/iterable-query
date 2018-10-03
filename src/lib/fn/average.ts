@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, Identity, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
@@ -21,6 +22,7 @@ import { Queryable } from "../types";
  * Computes the average for a series of numbers.
  * 
  * @param source A `Queryable` object.
+ * @category Scalar
  */
 export function average(source: Queryable<number>): number;
 /**
@@ -28,6 +30,7 @@ export function average(source: Queryable<number>): number;
  * 
  * @param source A `Queryable` object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
+ * @category Scalar
  */
 export function average<T>(source: Queryable<T>, elementSelector: (element: T) => number): number;
 export function average(source: Queryable<number>, elementSelector: (element: number) => number = Identity): number {

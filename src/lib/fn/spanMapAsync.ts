@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, SameValue, Identity, CreateGrouping, ToPossiblyAsyncIterable, ToStringTag, Registry, FlowHierarchy } from "../internal";
 import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyGrouping, Grouping, PossiblyAsyncIterable } from "../types";
@@ -22,6 +23,7 @@ import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyGrouping, Grou
  *
  * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
+ * @category Subquery
  */
 export function spanMapAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K): AsyncIterable<HierarchyGrouping<K, TNode, T>>;
 /**
@@ -29,6 +31,7 @@ export function spanMapAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHie
  *
  * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
+ * @category Subquery
  */
 export function spanMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncIterable<Grouping<K, T>>;
 /**
@@ -37,6 +40,7 @@ export function spanMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (elem
  * @param source An `AsyncQueryable` object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
+ * @category Subquery
  */
 export function spanMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): AsyncIterable<Grouping<K, V>>;
 /**
@@ -46,6 +50,7 @@ export function spanMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (e
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param spanSelector A callback used to select a result from a contiguous range.
+ * @category Subquery
  */
 export function spanMapAsync<T, K, V, R>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Iterable<V>) => R): AsyncIterable<R>;
 export function spanMapAsync<T, K, V, R>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = Identity, spanSelector: (key: K, span: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping): AsyncIterable<Grouping<K, T | V> | R> {

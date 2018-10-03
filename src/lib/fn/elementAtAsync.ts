@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
@@ -24,6 +25,7 @@ import { lastAsync } from "./lastAsync";
  *
  * @param source An `AsyncQueryable` object.
  * @param offset An offset.
+ * @category Scalar
  */
 export async function elementAtAsync<T>(source: AsyncQueryable<T>, offset: number): Promise<T | undefined> {
     assert.mustBeAsyncQueryable<T>(source, "source")

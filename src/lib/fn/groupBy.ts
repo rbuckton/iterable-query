@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/** @module "iterable-query/fn" */
 
 import { assert, ToIterable, CreateGroupings, Identity, CreateGrouping, ToStringTag, CreateSubquery, Registry, GetSource, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
@@ -21,42 +22,33 @@ import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../ty
  * Groups each element of this Query by its key.
  *
  * @param keySelector A callback used to select the key for an element.
+ * @category Subquery
  */
 export function groupBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): Iterable<HierarchyGrouping<K, TNode, T>>;
-
 /**
  * Groups each element of this Query by its key.
  *
  * @param keySelector A callback used to select the key for an element.
+ * @category Subquery
  */
 export function groupBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Iterable<Grouping<K, T>>;
-
 /**
  * Groups each element by its key.
  *
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
+ * @category Subquery
  */
 export function groupBy<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Iterable<Grouping<K, V>>;
-
 /**
  * Groups each element by its key.
  *
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param resultSelector A callback used to select a result from a group.
+ * @category Subquery
  */
 export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Iterable<V>) => R): Iterable<R>;
-
-/** @internal */ export function groupBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector?: (element: T) => T, resultSelector?: (key: K, elements: Iterable<T>) => Grouping<K, T>): Iterable<Grouping<K, T>>;
-
-/**
- * Groups each element by its key.
- *
- * @param keySelector A callback used to select the key for an element.
- * @param elementSelector A callback used to select a value for an element.
- * @param resultSelector A callback used to select a result from a group.
- */
 export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = Identity, resultSelector: (key: K, elements: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
