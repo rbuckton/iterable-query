@@ -41,7 +41,7 @@
     "build": "gulp build",
     "test": "gulp test",
     "prepublishOnly": "gulp prepublishOnly",
-    "postpack": "gulp clean"
+    "postpack": "gulp clean:dist"
   },
   "repository": {
     "type": "git",
