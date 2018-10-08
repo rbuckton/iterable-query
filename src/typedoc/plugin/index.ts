@@ -10,6 +10,7 @@ import { GroupCategoriesPlugin } from "./plugins/groupCategories";
 import { MergePlugin } from "./plugins/merge";
 import { NamingPlugin } from "./plugins/naming";
 import { BiblioPlugin } from "./plugins/biblio";
+import { NoJekyllPlugin } from "./plugins/noJekyll";
 
 function load(host: PluginHost) {
     const app = host.owner;
@@ -23,6 +24,7 @@ function load(host: PluginHost) {
     app.converter.addComponent("naming", NamingPlugin);
     app.converter.addComponent("biblio", BiblioPlugin);
     app.converter.addComponent("node:exportDeclaration", ExportDeclarationConverter);
+    app.renderer.addComponent("no-jekyll", NoJekyllPlugin);
 }
 
 export = load;
