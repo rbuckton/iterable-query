@@ -1,8 +1,6 @@
 // @ts-check
-const fs = require('fs');
 const gulp = require('gulp');
 const del = require('del');
-const path = require('path');
 const mocha = require('gulp-mocha');
 const istanbul = require('gulp-istanbul');
 const { build } = require("./scripts/build");
