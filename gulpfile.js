@@ -1,25 +1,27 @@
 // @ts-check
 const gulp = require('gulp');
+const log = require('fancy-log');
 const del = require('del');
 const mocha = require('gulp-mocha');
 const istanbul = require('gulp-istanbul');
 const { build } = require("./scripts/build");
 const minimist = require("minimist");
 const typedoc = require("./scripts/typedoc");
-const options = /** @type {minimist.ParsedArgs & {force: boolean, verbose: boolean | "minimal"}} */ (minimist(process.argv.slice(2), {
+const options = /** @type {minimist.ParsedArgs & Options} */ (minimist(process.argv.slice(2), {
     boolean: ["force", "verbose"],
     alias: { "f": "force" },
     default: { force: false, verbose: "minimal" }
 }));
 
-var useCoverage = false;
-var watching = false;
+let useDebug = process.env.npm_lifecycle_event !== "prepublishOnly";
+let useCoverage = false;
+let watching = false;
 
 gulp.task("typedoc", build("src/typedoc/plugin"));
-gulp.task("build:lib", build("src/lib/tsconfig.json", { force: options.force, verbose: options.verbose }));
-gulp.task("build:es2015", build("src/lib/tsconfig.es2015.json", { force: options.force, verbose: options.verbose }));
-gulp.task("build:es5", build("src/lib/tsconfig.es5.json", { force: options.force, verbose: options.verbose }));
-gulp.task("build:tests", ["build:lib", "build:es2015", "build:es5"], build("src/tests/tsconfig.json", { force: options.force, verbose: options.verbose }));
+gulp.task("build:lib", build("src/lib/tsconfig.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
+gulp.task("build:es2015", build("src/lib/tsconfig.es2015.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
+gulp.task("build:es5", build("src/lib/tsconfig.es5.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
+gulp.task("build:tests", ["build:lib", "build:es2015", "build:es5"], build("src/tests/tsconfig.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
 gulp.task("build", ["build:lib", "build:es2015", "build:es5", "build:tests"]);
 gulp.task("clean:dist", () => del("dist"));
 gulp.task("clean:docs", () => del("docs"));
@@ -49,7 +51,7 @@ gulp.task("docs", ["typedoc"], () => gulp.src("src/lib/**/*.ts", { read: false }
             "typedoc-plugin-external-module-name",
         ]
     })));
-gulp.task("prepublishOnly", ["clean"], () => gulp.start(["build", "docs"]));
+gulp.task("prepublishOnly", ["clean"], () => gulp.start(["test", "docs"]));
 
 function setCoverage() {
     return function () {
@@ -86,3 +88,10 @@ function watch(src, tasks) {
         return gulp.watch(src, tasks);
     };
 }
+
+/**
+ * @typedef Options
+ * @property {boolean} [force]
+ * @property {boolean|"minimal"} [verbose]
+ */
+void 0;

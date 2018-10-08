@@ -6,9 +6,11 @@ const ts = require("typescript");
 const gulp = require("gulp");
 const gulpif = require("gulp-if");
 const sourcemaps = require("gulp-sourcemaps");
+const sourcemapUrl = require("source-map-url");
 const log = require("fancy-log");
 const merge2 = require("merge2");
 const upToDate = require("./upToDate");
+const { Transform } = require("stream");
 
 // patch gulp-typescript
 const tsc_host = require("gulp-typescript/release/host");
@@ -193,6 +195,7 @@ function resolveDestPath(parsedProject, paths) {
  * @param {string} projectSpec
  * @param {object} [options]
  * @param {boolean} [options.force]
+ * @param {boolean} [options.debug]
  * @param {boolean|"minimal"} [options.verbose]
  * @param {string} [options.cwd]
  * @param {string} [options.base]
@@ -211,21 +214,46 @@ function build(projectSpec, options = {}) {
         const project = tsc.createProject(parsedProject.options.configFilePath, { typescript: require("typescript") });
         const stream = project.src()
             .pipe(gulpif(!options.force, upToDate(parsedProject, { verbose: options.verbose, parseProject })))
-            .pipe(gulpif(sourceMap || inlineSourceMap, sourcemaps.init()))
+            .pipe(gulpif(options.debug && (sourceMap || inlineSourceMap), sourcemaps.init()))
             .pipe(project())
         const js = stream.js
-            .pipe(gulpif(sourceMap || inlineSourceMap, sourcemaps.write(sourceMapPath, sourceMapOptions)));
+            .pipe(gulpif(options.debug && (sourceMap || inlineSourceMap), sourcemaps.write(sourceMapPath, sourceMapOptions)));
         const dts = stream.dts
-            .pipe(gulpif(declarationMap, sourcemaps.write(sourceMapPath, sourceMapOptions)));
+            .pipe(gulpif(options.debug && declarationMap, sourcemaps.write(sourceMapPath, sourceMapOptions)));
         let results = /** @type {NodeJS.ReadWriteStream}*/(merge2([js, dts]));
         if (options.after) results = options.after(results);
+        if (!options.debug) results = results.pipe(stripSourceMaps())
         return results
             .pipe(gulp.dest(destPath));
     };
 }
 exports.build = build;
 
+function stripSourceMaps() {
+    return new Transform({
+        objectMode: true,
+        /**
+         * @param {string|Buffer|File} file 
+         */
+        transform(file, _, cb) {
+            if (typeof file === "string" || Buffer.isBuffer(file)) return cb(new Error("Only Vinyl files are supported."));
+            if (file.extname === ".map") return cb();
+            if (file.extname === ".js" || file.extname === ".ts") {
+                if (file.isBuffer()) {
+                    const contents = file.contents.toString("utf8");
+                    const modified = sourcemapUrl.removeFrom(contents);
+                    if (modified !== contents) {
+                        file.contents = Buffer.from(modified, "utf8");
+                    }
+                }
+            }
+            return cb(null, file);
+        }
+    });
+}
+
 /**
+ * @typedef {import("vinyl")} File
  * @typedef {{cwd: string, base: string}} Paths
  * @typedef {import("typescript").CompilerOptions & { configFilePath?: string }} CompilerOptions
  * @typedef {import("typescript").ParsedCommandLine & { options: CompilerOptions }} ParsedCommandLine

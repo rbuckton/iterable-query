@@ -40,7 +40,8 @@
   "scripts": {
     "build": "gulp build",
     "test": "gulp test",
-    "prepublishOnly": "gulp prepublishOnly"
+    "prepublishOnly": "gulp prepublishOnly",
+    "postpack": "gulp clean"
   },
   "repository": {
     "type": "git",
