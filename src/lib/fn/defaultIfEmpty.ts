@@ -19,17 +19,19 @@ import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../int
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
- * Creates a subquery that contains the provided default value if the source
+ * Creates a [[HierarchyIterable]] that contains the provided default value if `source`
  * contains no elements.
  *
+ * @param source A [[HierarchyIterable]] object.
  * @param defaultValue The default value.
  * @category Subquery
  */
 export function defaultIfEmpty<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, defaultValue: T): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery that contains the provided default value if the source
+ * Creates an [[Iterable]] that contains the provided default value if `source`
  * contains no elements.
  *
+ * @param source A [[Queryable]] object.
  * @param defaultValue The default value.
  * @category Subquery
  */

@@ -21,7 +21,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
 /**
  * Creates a subquery containing the first elements up to the supplied count.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param count The number of elements to take.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function takeAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchy
 /**
  * Creates a subquery containing the first elements up to the supplied count.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param count The number of elements to take.
  * @category Subquery
  */

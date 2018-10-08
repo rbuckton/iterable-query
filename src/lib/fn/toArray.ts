@@ -19,16 +19,16 @@ import { assert, Identity, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Creates an Array for the elements of the `Queryable`.
+ * Creates an Array for the elements of the [[Queryable]].
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export function toArray<T>(source: Queryable<T>): T[];
 /**
- * Creates an Array for the elements of the `Queryable`.
+ * Creates an Array for the elements of the [[Queryable]].
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */

@@ -20,10 +20,10 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "../fn/empty";
 
 /**
- * Creates a grouped subquery for the correlated elements between an outer `AsyncQueryable` object and an inner `AsyncQueryable` object.
+ * Creates a grouped [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner [[AsyncQueryable]] object.
  *
- * @param outer An `AsyncQueryable` object.
- * @param inner An `AsyncQueryable` object.
+ * @param outer An [[AsyncQueryable]] object.
+ * @param inner An [[AsyncQueryable]] object.
  * @param outerKeySelector A callback used to select the key for an element in `outer`.
  * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.

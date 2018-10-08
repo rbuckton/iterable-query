@@ -19,17 +19,17 @@ import { assert, MakeHierarchyIterable, Registry } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyProvider, OrderedIterable, OrderedHierarchyIterable } from "../types";
 
 /**
- * Creates a `HierarchyIterable` using the provided `HierarchyProvider`.
+ * Creates a [[HierarchyIterable]] using the provided `HierarchyProvider`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param hierarchy A `HierarchyProvider`.
  * @category Hierarchy
  */
 export function toHierarchy<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyIterable<TNode, T>;
 /**
- * Creates a `HierarchyIterable` using the provided `HierarchyProvider`.
+ * Creates a [[HierarchyIterable]] using the provided `HierarchyProvider`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param hierarchy A `HierarchyProvider`.
  * @category Hierarchy
  */

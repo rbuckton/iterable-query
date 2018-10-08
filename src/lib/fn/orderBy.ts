@@ -20,16 +20,18 @@ import { Queryable, OrderedIterable, HierarchyIterable, OrderedHierarchyIterable
 import { toArray } from "./toArray";
 
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates an [[OrderedHierarchyIterable]] whose elements are sorted in ascending order by the provided key.
  *
+ * @param source A [[HierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates an [[OrderedIterable]] whose elements are sorted in ascending order by the provided key.
  *
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
@@ -43,16 +45,18 @@ export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) =>
 }
 
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates an [[OrderedHierarchyIterable]] whose elements are sorted in descending order by the provided key.
  *
+ * @param source A [[HierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates an [[OrderedIterable]] whose elements are sorted in descending order by the provided key.
  *
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
@@ -66,16 +70,18 @@ export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (elem
 }
 
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates a subsequent [[OrderedHierarchyIterable]] whose elements are also sorted in ascending order by the provided key.
  *
+ * @param source An [[OrderedHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates a subsequent [[OrderedIterable]] whose elements are also sorted in ascending order by the provided key.
  *
+ * @param source An [[OrderedIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
@@ -89,16 +95,18 @@ export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: 
 }
 
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates a subsequent [[OrderedHierarchyIterable]] whose elements are also sorted in descending order by the provided key.
  *
+ * @param source An [[OrderedHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates a subsequent [[OrderedIterable]] whose elements are also sorted in descending order by the provided key.
  *
+ * @param source An [[OrderedIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order

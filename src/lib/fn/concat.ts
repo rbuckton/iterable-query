@@ -19,26 +19,26 @@ import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../int
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
- * Creates a subquery that concatenates two `Queryable` values.
+ * Creates a [[HierarchyIterable]] that concatenates a [[HierarchyIterable]] and a [[Queryable]].
  * 
- * @param left A `HierarchyIterable` value.
- * @param right A `Queryable` value.
+ * @param left A [[HierarchyIterable]] value.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function concat<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery that concatenates two Queryables.
+ * Creates a [[HierarchyIterable]] that concatenates a [[Queryable]] and a [[HierarchyIterable]].
  *
- * @param left A `Queryable` value.
- * @param right A `Queryable` value.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function concat<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery that concatenates two Queryables.
+ * Creates an [[Iterable]] that concatenates two [[Queryable]] objects.
  *
- * @param left A `Queryable` value.
- * @param right A `Queryable` value.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function concat<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;

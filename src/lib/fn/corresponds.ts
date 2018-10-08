@@ -22,8 +22,8 @@ import { Queryable } from "../types";
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Scalar
  */
 export function corresponds<T>(left: Queryable<T>, right: Queryable<T>): boolean;
@@ -31,8 +31,8 @@ export function corresponds<T>(left: Queryable<T>, right: Queryable<T>): boolean
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  * @category Scalar
  */

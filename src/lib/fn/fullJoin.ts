@@ -23,13 +23,13 @@ import { Lookup } from "../lookup";
 import { defaultIfEmpty } from "./defaultIfEmpty";
 
 /**
- * Creates a subquery for the correlated elements between an outer `Queryable` object and an inner 
- * `Queryable` object.
+ * Creates an [[Iterable]] for the correlated elements between an outer [[Queryable]] object and an inner 
+ * [[Queryable]] object.
  *
- * @param outer A `Queryable` object.
- * @param inner A `Queryable` object.
- * @param outerKeySelector A callback used to select the key for an element in this Query.
- * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+ * @param outer A [[Queryable]] object.
+ * @param inner A [[Queryable]] object.
+ * @param outerKeySelector A callback used to select the key for an element in `outer`.
+ * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.
  * @category Join
  */

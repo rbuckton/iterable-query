@@ -21,7 +21,7 @@ import { Queryable } from "../types";
 /**
  * Computes a scalar value indicating whether all elements match the supplied callback.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Scalar
  */
@@ -29,7 +29,7 @@ export function every<T, U extends T>(source: Queryable<T>, predicate: (element:
 /**
  * Computes a scalar value indicating whether all elements match the supplied callback.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Scalar
  */

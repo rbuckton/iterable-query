@@ -19,9 +19,9 @@ import { assert, ToIterable, ToStringTag, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Creates a subquery by applying a callback to each element.
+ * Creates an [[Iterable]] by applying a callback to each element of a [[Queryable]].
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param selector A callback used to map each element.
  * @category Subquery
  */

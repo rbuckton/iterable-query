@@ -5,6 +5,10 @@
         &nbsp;=&nbsp;
         {{defaultValue}}
         </span>
+    {{else if exportOf}}
+        <span class="tsd-signature-symbol">
+        {{#with exportOf}}{{> exportBinding showStar=true}}{{/with}}
+        </span>
     {{/if}}
 {{/compact}}</div>
 

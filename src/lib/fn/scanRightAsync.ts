@@ -22,7 +22,7 @@ import { toArrayAsync } from "./toArrayAsync";
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator The callback used to compute each result.
  * @category Subquery
  */
@@ -30,7 +30,7 @@ export function scanRightAsync<T>(source: AsyncQueryable<T>, accumulator: (curre
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
  * @category Subquery

@@ -19,9 +19,9 @@ import { assert, ToIterable, CompareValues, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Gets the minimum element, comparing elements using the supplied callback.
+ * Gets the minimum element of a [[Queryable]], optionally comparing elements using the supplied callback.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param comparison An optional callback used to compare two elements.
  * @category Scalar
  */

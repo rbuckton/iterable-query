@@ -21,7 +21,7 @@ import { Queryable } from "../types";
 /**
  * Gets the only element, or returns `undefined`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */

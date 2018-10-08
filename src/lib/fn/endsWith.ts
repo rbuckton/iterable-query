@@ -21,20 +21,20 @@ import { takeRight } from "./takeRight";
 import { toArray } from "./toArray";
 
 /**
- * Computes a scalar value indicating whether the elements of this Query end
- * with the same sequence of elements in another Queryable.
+ * Computes a scalar value indicating whether the elements of `left` end
+ * with the same sequence of elements in `right`.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Scalar
  */
 export function endsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
 /**
- * Computes a scalar value indicating whether the elements of this Query end
- * with the same sequence of elements in another Queryable.
+ * Computes a scalar value indicating whether the elements of `left` end
+ * with the same sequence of elements in `right`.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  * @category Scalar
  */

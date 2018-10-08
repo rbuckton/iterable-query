@@ -21,9 +21,10 @@ import { elementAt } from "./elementAt";
 import { Axis } from "./axis";
 
 /**
- * Creates a subquery for the child of each element at the specified offset. A negative offset
+ * Creates a [[HierarchyIterable]] for the child of each element at the specified offset. A negative offset
  * starts from the last child.
  *
+ * @param source A [[HierarchyIterable]] object.
  * @param offset The offset for the child.
  * @category Hierarchy
  */

@@ -19,19 +19,19 @@ import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable }
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates an `AsyncIterable` for the elements of `source` with the provided `value` appended to the
+ * Creates an [[AsyncIterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source An `AsyncQueryable` value.
+ * @param source An [[AsyncQueryable]] value.
  * @param value The value to append.
  * @category Subquery
  */
 export function appendAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, value: PromiseLike<T> | T): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates an `AsyncIterable` for the elements of `source` with the provided `value` appended to the
+ * Creates an [[AsyncIterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source An `AsyncQueryable` value.
+ * @param source An [[AsyncQueryable]] value.
  * @param value The value to append.
  * @category Subquery
  */

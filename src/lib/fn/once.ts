@@ -18,9 +18,9 @@
 import { ToStringTag, Registry } from "../internal";
 
 /**
- * Creates an Iterable over a single element.
+ * Creates an [[Iterable]] over a single element.
  *
- * @param value The only element for the query.
+ * @param value The only element for the [[Iterable]].
  * @category Query
  */
 export function once<T>(value: T): Iterable<T> {

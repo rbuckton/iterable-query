@@ -21,14 +21,14 @@ import { Queryable } from "../types";
 /**
  * Computes the average for a series of numbers.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export function average(source: Queryable<number>): number;
 /**
  * Computes the average for a series of numbers.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
  * @category Scalar
  */

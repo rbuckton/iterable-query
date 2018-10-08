@@ -1,4 +1,7 @@
 <aside class="tsd-sources">
+    {{#if exportOf}}
+        <p>Export of {{#with exportOf}}{{> exportBinding showStar=false}}{{/with}}</p>
+    {{/if}}
     {{#if implementationOf}}
         <p>Implementation of {{#with implementationOf}}{{> typeAndParent}}{{/with}}</p>
     {{/if}}

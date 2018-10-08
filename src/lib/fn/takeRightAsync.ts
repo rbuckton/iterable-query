@@ -22,7 +22,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
  * Creates a subquery containing the last elements up to the supplied
  * count.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param count The number of elements to take.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function takeRightAsync<TNode, T extends TNode>(source: PossiblyAsyncHier
  * Creates a subquery containing the last elements up to the supplied
  * count.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param count The number of elements to take.
  * @category Subquery
  */

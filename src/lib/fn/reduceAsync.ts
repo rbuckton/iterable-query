@@ -21,7 +21,7 @@ import { AsyncQueryable } from "../types";
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator the callback used to compute the result.
  * @category Scalar
  */
@@ -29,7 +29,7 @@ export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current:
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator the callback used to compute the result.
  * @category Scalar
  * @param seed An optional seed value.
@@ -38,7 +38,7 @@ export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (curre
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.

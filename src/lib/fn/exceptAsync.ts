@@ -20,18 +20,18 @@ import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable,
 import { toSetAsync } from "./toSetAsync";
 
 /**
- * Creates a subquery for the set difference between two `AsyncQueryable` objects.
+ * Creates an [[AsyncHierarchyIterable]] for the set difference between a [[HierarchyIterable]] or an [[AsyncHierarchyIterable]] and an [[AsyncQueryable]] object.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function exceptAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set difference between two `AsyncQueryable` objects.
+ * Creates an [[AsyncIterable]] for the set difference between two [[AsyncQueryable]] objects.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;

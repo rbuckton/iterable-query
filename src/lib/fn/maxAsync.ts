@@ -19,9 +19,9 @@ import { assert, CompareValues, ToPossiblyAsyncIterable, Registry } from "../int
 import { AsyncQueryable } from "../types";
 
 /**
- * Gets the maximum element, comparing elements using the supplied callback.
+ * Gets the maximum element of an [[AsyncQueryable]], optionally comparing elements using the supplied callback.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param comparison An optional callback used to compare two elements.
  * @category Scalar
  */

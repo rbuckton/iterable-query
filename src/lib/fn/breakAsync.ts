@@ -25,27 +25,27 @@ const noCacheAndLeaveOpen: ConsumeAsyncOptions = { cacheElements: false, leaveOp
 const cacheAndClose: ConsumeAsyncOptions = { cacheElements: true, leaveOpen: false };
 
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that do not match the supplied predicate, and whose second element is an `AsyncIterable`
+ * Creates a tuple whose first element is a [[HierarchyIterable]] containing the first span of
+ * elements that do not match the supplied predicate, and whose second element is an [[AsyncHierarchyIterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `ASyncIterable` is lazily
+ * The first [[HierarchyIterable]] is eagerly evaluated, while the second [[AsyncHierarchyIterable]] is lazily
  * evaluated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
 export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that do not match the supplied predicate, and whose second element is an `AsyncIterable`
+ * Creates a tuple whose first element is an [[Iterable]] containing the first span of
+ * elements that do not match the supplied predicate, and whose second element is an [[AsyncIterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `ASyncIterable` is lazily
+ * The first [[Iterable]] is eagerly evaluated, while the second [[AsyncIterable]] is lazily
  * evaluated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */

@@ -19,19 +19,19 @@ import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../int
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
- * Creates a subquery that iterates the results of recursively expanding the
- * elements of the source.
+ * Creates a [[HierarchyIterable]] that iterates the results of recursively expanding the
+ * elements of `source`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[HierarchyIterable]] object.
  * @param projection A callback used to recusively expand each element.
  * @category Subquery
  */
 export function expand<TNode, T extends TNode = TNode, U extends TNode = T>(source: HierarchyIterable<TNode, T>, projection: (element: T) => Queryable<U>): HierarchyIterable<TNode, U>;
 /**
- * Creates a subquery that iterates the results of recursively expanding the
- * elements of the source.
+ * Creates an [[Iterable]] that iterates the results of recursively expanding the
+ * elements of the `source`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param projection A callback used to recusively expand each element.
  * @category Subquery
  */

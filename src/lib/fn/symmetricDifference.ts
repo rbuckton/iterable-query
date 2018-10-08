@@ -21,32 +21,32 @@ import { Set } from "../collections";
 import { toSet } from "./toSet";
 
 /**
- * Creates a subquery for the symmetric difference between two `Queryable` objects.
- * The result is an `Iterable` containings the elements that exist in only left or right, but not 
+ * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
+ * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function symmetricDifference<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the symmetric difference between two `Queryable` objects.
- * The result is an `Iterable` containings the elements that exist in only left or right, but not 
+ * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
+ * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the symmetric difference between two `Queryable` objects.
- * The result is an `Iterable` containings the elements that exist in only left or right, but not 
+ * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
+ * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;

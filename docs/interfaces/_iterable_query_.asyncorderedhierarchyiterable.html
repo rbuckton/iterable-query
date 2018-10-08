@@ -40,8 +40,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -53,7 +51,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../globals.html">package</a>
+					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
 					<a href="../modules/_iterable_query_.html">&quot;iterable-query&quot;</a>
@@ -72,7 +70,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Represents an <code>AsyncIterable</code> with a navigable hierarchy that is inherently ordered.</p>
+						<p>Represents an <a href="https://tc39.github.io/ecma262/#sec-symbol.asyncIterator" class="external">AsyncIterable</a> with a navigable hierarchy that is inherently ordered.</p>
 					</div>
 				</div>
 			</section>
@@ -89,10 +87,10 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="_iterable_query_.asyncorderediterable.html" class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>
+						<a href="_iterable_query_.asyncorderediterable.html"  class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>
 					</li>
 					<li>
-						<a href="_iterable_query_.asynchierarchyiterable.html" class="tsd-signature-type">AsyncHierarchyIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>
+						<a href="_iterable_query_.asynchierarchyiterable.html"  class="tsd-signature-type">AsyncHierarchyIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">AsyncOrderedHierarchyIterable</span>
@@ -104,7 +102,9 @@
 			<section class="tsd-panel">
 				<h3>Implemented by</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../classes/_iterable_query_.asyncorderedhierarchyquery.html" class="tsd-signature-type">AsyncOrderedHierarchyQuery</a></li>
+					<li><a href=""  class="tsd-signature-type">AsyncFromSyncOrderedHierarchyIterable</a></li>
+					<li><a href=""  class="tsd-signature-type">AsyncOrderedHierarchyIterableImpl</a></li>
+					<li><a href="../classes/_iterable_query_.asyncorderedhierarchyquery.html"  class="tsd-signature-type">AsyncOrderedHierarchyQuery</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -112,9 +112,9 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Interfaces</h3>
+							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-interface"><a href="_iterable_query_.asyncorderedhierarchyiterable.asyncorderediterable.html" class="tsd-kind-icon">Async<wbr>Ordered<wbr>Iterable</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_iterable_query_.asyncorderedhierarchyiterable.html#thenbyasync" class="tsd-kind-icon">then<wbr>ByAsync</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-inherited">
@@ -129,20 +129,33 @@
 					</div>
 				</section>
 			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="thenbyasync" class="tsd-anchor"></a>
+					<h3>then<wbr>ByAsync</h3>
+					<div class="tsd-signature tsd-kind-icon">then<wbr>ByAsync<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol.for(&quot;AsyncOrderedIterable.thenByAsync&quot;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/24f9010/src/lib/types.ts#L155">types.ts:155</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-inherited">
 					<a name="_asyncorderediterable_thenbyasync_" class="tsd-anchor"></a>
 					<h3>[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]&lt;K&gt;<span class="tsd-signature-symbol">(</span>keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, comparison<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, descending<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iterable_query_.asyncorderediterable.html" class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]&lt;K&gt;<span class="tsd-signature-symbol">(</span>keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, comparison<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, descending<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iterable_query_.asyncorderediterable.html"  class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_iterable_query_.asyncorderediterable.html">AsyncOrderedIterable</a>.<a href="_iterable_query_.asyncorderediterable.html#_asyncorderediterable_thenbyasync_">[AsyncOrderedIterable.thenByAsync]</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/83ab748/src/lib/types.ts#L151">types.ts:151</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/24f9010/src/lib/types.ts#L151">types.ts:151</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -220,7 +233,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_iterable_query_.asyncorderediterable.html" class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_iterable_query_.asyncorderediterable.html"  class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -228,14 +241,14 @@
 					<a name="_hierarchical_hierarchy_" class="tsd-anchor"></a>
 					<h3>[<wbr>Hierarchical.hierarchy]</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">[<wbr>Hierarchical.hierarchy]<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iterable_query_.hierarchyprovider.html" class="tsd-signature-type">HierarchyProvider</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">[<wbr>Hierarchical.hierarchy]<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iterable_query_.hierarchyprovider.html"  class="tsd-signature-type">HierarchyProvider</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_iterable_query_.hierarchical.html">Hierarchical</a>.<a href="_iterable_query_.hierarchical.html#_hierarchical_hierarchy_">[Hierarchical.hierarchy]</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/83ab748/src/lib/types.ts#L56">types.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/24f9010/src/lib/types.ts#L56">types.ts:56</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -243,7 +256,7 @@
 									<p>Gets an object that provides hierarchical relationships.</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="_iterable_query_.hierarchyprovider.html" class="tsd-signature-type">HierarchyProvider</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_iterable_query_.hierarchyprovider.html"  class="tsd-signature-type">HierarchyProvider</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -251,7 +264,7 @@
 					<a name="_symbol_asynciterator_" class="tsd-anchor"></a>
 					<h3>[<wbr>Symbol.async<wbr>Iterator]</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">[<wbr>Symbol.async<wbr>Iterator]<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">[<wbr>Symbol.async<wbr>Iterator]<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-symbol.asyncIterator" target="external" class="tsd-signature-type">AsyncIterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -261,7 +274,7 @@
 									<li>Defined in C:/dev/iterable-query/node_modules/typescript/lib/lib.esnext.asynciterable.d.ts:39</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-symbol.asyncIterator" target="external" class="tsd-signature-type">AsyncIterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -269,7 +282,7 @@
 					<a name="_symbol_asynciterator_-1" class="tsd-anchor"></a>
 					<h3>[<wbr>Symbol.async<wbr>Iterator]</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">[<wbr>Symbol.async<wbr>Iterator]<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">[<wbr>Symbol.async<wbr>Iterator]<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-symbol.asyncIterator" target="external" class="tsd-signature-type">AsyncIterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -279,7 +292,7 @@
 									<li>Defined in C:/dev/iterable-query/node_modules/typescript/lib/lib.esnext.asynciterable.d.ts:39</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-symbol.asyncIterator" target="external" class="tsd-signature-type">AsyncIterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -289,7 +302,7 @@
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class="globals  ">
-						<a href="../globals.html"><em>package</em></a>
+						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_iterable_query_.html">"iterable-<wbr>query"</a>
@@ -301,6 +314,9 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-export tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_iterable_query_.html#fn" class="tsd-kind-icon">fn</a>
+					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="../classes/_iterable_query_.asynchierarchyquery.html" class="tsd-kind-icon">Async<wbr>Hierarchy<wbr>Query</a>
 					</li>
@@ -336,8 +352,8 @@
 					<li class="current tsd-kind-interface tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="_iterable_query_.asyncorderedhierarchyiterable.html" class="tsd-kind-icon">Async<wbr>Ordered<wbr>Hierarchy<wbr>Iterable</a>
 						<ul>
-							<li class=" tsd-kind-interface tsd-parent-kind-interface">
-								<a href="_iterable_query_.asyncorderedhierarchyiterable.asyncorderediterable.html" class="tsd-kind-icon">Async<wbr>Ordered<wbr>Iterable</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_iterable_query_.asyncorderedhierarchyiterable.html#thenbyasync" class="tsd-kind-icon">then<wbr>ByAsync</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-inherited">
 								<a href="_iterable_query_.asyncorderedhierarchyiterable.html#_asyncorderediterable_thenbyasync_" class="tsd-kind-icon">[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]</a>

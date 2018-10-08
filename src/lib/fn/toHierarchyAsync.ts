@@ -19,17 +19,17 @@ import { assert, MakeAsyncHierarchyIterable, Registry } from "../internal";
 import { HierarchyProvider, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncQueryable } from "../types";
 
 /**
- * Creates an `AsyncHierarchyIterable` using the provided `HierarchyProvider`.
+ * Creates an [[AsyncHierarchyIterable]] using the provided `HierarchyProvider`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param hierarchy A `HierarchyProvider`.
  * @category Hierarchy
  */
 export function toHierarchyAsync<TNode, T extends TNode>(source: PossiblyAsyncOrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): AsyncOrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an `AsyncHierarchyIterable` using the provided `HierarchyProvider`.
+ * Creates an [[AsyncHierarchyIterable]] using the provided `HierarchyProvider`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param hierarchy A `HierarchyProvider`.
  * @category Hierarchy
  */

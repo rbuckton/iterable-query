@@ -18,7 +18,7 @@
 import { assert, ToStringTag, Registry } from "../internal";
 
 /**
- * Creates an `Iterable` whose values are provided by a callback executed a provided number of
+ * Creates an [[Iterable]] whose values are provided by a callback executed a provided number of
  * times.
  *
  * @param count The number of times to execute the callback.

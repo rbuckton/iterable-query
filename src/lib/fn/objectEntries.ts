@@ -15,20 +15,33 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SelectEntry, Registry } from "../internal";
+import { assert, Registry, ToStringTag } from "../internal";
 import { KeyValuePair } from "../types";
-import { map } from "./map";
-import { objectKeys } from "./objectKeys";
 
 /**
- * Creates an `Iterable` for the own property keys of an object.
+ * Creates an [[Iterable]] for the own property entries of an `object`.
  *
- * @param source An object.
+ * @param source An `object`.
  * @category Query
  */
 export function objectEntries<T extends object>(source: T): Iterable<KeyValuePair<T, Extract<keyof T, string>>> {
     assert.mustBeObject(source, "source");
-    return map(objectKeys(source), SelectEntry.bind(source));
+    return new ObjectEntriesIterable(source);
+}
+
+@ToStringTag("ObjectEntriesIterable")
+class ObjectEntriesIterable<T extends object> implements Iterable<KeyValuePair<T, Extract<keyof T, string>>> {
+    private _source: T;
+    constructor(source: T) {
+        this._source = source;
+    }
+    
+    *[Symbol.iterator](): Iterator<KeyValuePair<T, Extract<keyof T, string>>> {
+        const source = this._source;
+        for (const key of Object.keys(source) as Extract<keyof T, string>[]) {
+            yield [key, source[key]] as KeyValuePair<T, Extract<keyof T, string>>;
+        }
+    }
 }
 
 Registry.Query.registerStatic("objectEntries", objectEntries);

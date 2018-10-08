@@ -19,19 +19,21 @@ import { assert, ToIterable, ToStringTag, Registry, CreatePage } from "../intern
 import { Queryable, Page, HierarchyIterable, HierarchyPage } from "../types";
 
 /**
- * Creates a subquery that splits this Query into one or more pages.
+ * Creates a [[HierarchyIterable]] that splits a [[Queryable]] into one or more pages.
  * While advancing from page to page is evaluated lazily, the elements of the page are
  * evaluated eagerly.
  *
+ * @param source A [[HierarchyIterable]] object.
  * @param pageSize The number of elements per page.
  * @category Subquery
  */
 export function pageBy<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, pageSize: number): Iterable<HierarchyPage<TNode, T>>;
 /**
- * Creates a subquery that splits this Query into one or more pages.
+ * Creates an [[Iterable]] that splits a [[Queryable]] into one or more pages.
  * While advancing from page to page is evaluated lazily, the elements of the page are
  * evaluated eagerly.
  *
+ * @param source A [[Queryable]] object.
  * @param pageSize The number of elements per page.
  * @category Subquery
  */

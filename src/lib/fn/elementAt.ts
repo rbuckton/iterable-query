@@ -23,7 +23,7 @@ import { last } from "./last";
  * Finds the value at the provided offset. A negative offset starts from the
  * last element.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param offset An offset.
  * @category Scalar
  */

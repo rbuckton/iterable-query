@@ -22,7 +22,7 @@ import { Lookup } from "../lookup";
 /**
  * Creates a Lookup for the elements of the Query.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select a key for each element.
  * @category Scalar
  */
@@ -30,7 +30,7 @@ export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) =
 /**
  * Creates a Lookup for the elements of the Query.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar

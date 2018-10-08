@@ -20,11 +20,11 @@ import { Queryable, Choice } from "../types";
 import { Map } from "../collections";
 
 /**
- * Creates an `Iterable` that iterates the elements from sources picked from a list based on the
+ * Creates an [[Iterable]] that iterates the elements from sources picked from a list based on the
  * result of a lazily evaluated choice.
  *
  * @param chooser A callback used to choose a source.
- * @param choices A `Queryable` of key/value pairs, where each value is a `Queryable` object.
+ * @param choices A [[Queryable]] of key/value pairs, where each value is a [[Queryable]] object.
  * @param otherwise A default source to use when another choice could not be made.
  * @category Query
  */

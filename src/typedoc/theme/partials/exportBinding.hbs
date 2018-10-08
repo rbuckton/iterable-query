@@ -1,0 +1,34 @@
+{{#compact}}
+    {{#if reflection}}
+        {{#ifTest reflection.parent '!==' ../parent}}
+            {{#if isExportStar}}
+                {{#if showStar}}* from&nbsp;{{/if}}
+                {{#if reflection.url}}
+                    <a href="{{relativeURL reflection.url}}">{{reflection.name}}</a>
+                {{else}}
+                    {{reflection.name}}
+                {{/if}}
+            {{else}}
+                {{#if reflection.url}}
+                    <a href="{{relativeURL reflection.url}}">{{reflection.name}}</a>
+                {{else}}
+                    {{reflection.name}}
+                {{/if}}
+                &nbsp;from&nbsp;
+                {{#if reflection.parent.url}}
+                    <a href="{{relativeURL reflection.parent.url}}">{{reflection.parent.name}}</a>
+                {{else}}
+                    {{reflection.parent.name}}
+                {{/if}}
+            {{/if}}
+        {{else}}
+            {{#if reflection.url}}
+                <a href="{{relativeURL reflection.url}}">{{reflection.name}}</a>
+            {{else}}
+                {{reflection.name}}
+            {{/if}}
+        {{/ifTest}}
+    {{else}}
+        {{this}}
+    {{/if}}
+{{/compact}}

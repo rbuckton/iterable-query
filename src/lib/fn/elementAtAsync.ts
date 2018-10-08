@@ -23,7 +23,7 @@ import { lastAsync } from "./lastAsync";
  * Finds the value at the provided offset. A negative offset starts from the
  * last element.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param offset An offset.
  * @category Scalar
  */

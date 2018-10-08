@@ -19,9 +19,9 @@ import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
- * Invokes a callback for each element.
+ * Invokes a callback for each element of `source`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Scalar
  */

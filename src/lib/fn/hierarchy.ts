@@ -20,12 +20,10 @@ import { HierarchyProvider, HierarchyIterable } from "../types";
 import { once } from "./once";
 
 /**
- * Creates an `Iterable` that iterates the elements from one of two sources based on the result of a
- * lazily evaluated condition.
+ * Creates a [[HierarchyIterable]] for a root element using the provided [[HierarchyProvider]].
  *
- * @param condition A callback used to choose a source.
- * @param thenQueryable The source to use when the callback evaluates to `true`.
- * @param elseQueryable The source to use when the callback evaluates to `false`.
+ * @param root The root element.
+ * @param hierarchy A [[HierarchyProvider]] object.
  * @category Hierarchy
  */
 export function hierarchy<TNode, T extends TNode>(root: T, hierarchy: HierarchyProvider<TNode>): HierarchyIterable<TNode, T> {

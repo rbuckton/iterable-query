@@ -20,13 +20,17 @@ import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
 
 /**
- * Creates a subquery for the distinct elements of the source.
+ * Creates a [[HierarchyIterable]] for the distinct elements of `source`.
  * @category Subquery
+ * 
+ * @param source A [[HierarchyIterable]] object.
  */
 export function distinct<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the distinct elements of the source.
+ * Creates an [[Iterable]] for the distinct elements of `source`.
  * @category Subquery
+ * 
+ * @param source A [[Queryable]] object.
  */
 export function distinct<T>(source: Queryable<T>): Iterable<T>;
 export function distinct<T>(source: Queryable<T>): Iterable<T> {

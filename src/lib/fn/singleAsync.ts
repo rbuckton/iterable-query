@@ -21,7 +21,7 @@ import { AsyncQueryable } from "../types";
 /**
  * Gets the only element, or returns `undefined`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */

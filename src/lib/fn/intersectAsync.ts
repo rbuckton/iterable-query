@@ -20,26 +20,26 @@ import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable,
 import { toSetAsync } from "./toSetAsync";
 
 /**
- * Creates a subquery for the set intersection of two `AsyncQueryable` objects.
+ * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object and an [[AsyncQueryable]] object.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function intersectAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set intersection of two `AsyncQueryable` objects.
+ * Creates a [[HierarchyIterable]] for the set intersection of an [[AsyncQueryable]] object and a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @category Subquery
  */
 export function intersectAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set intersection of two `AsyncQueryable` objects.
+ * Creates an [[AsyncIterable]] for the set intersection of two [[AsyncQueryable]] objects.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function intersectAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;

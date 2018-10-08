@@ -21,14 +21,14 @@ import { AsyncQueryable } from "../types";
 /**
  * Computes the sum for a series of numbers.
  * 
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function sumAsync(source: AsyncQueryable<number>): Promise<number>;
 /**
  * Computes the sum for a series of numbers.
  * 
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
  * @category Scalar
  */

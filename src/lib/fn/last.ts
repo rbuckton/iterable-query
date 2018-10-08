@@ -19,10 +19,10 @@ import { assert, True, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Gets the last element, optionally filtering elements using the supplied
+ * Gets the last element of a [[Queryable]], optionally filtering elements using the supplied
  * callback.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */

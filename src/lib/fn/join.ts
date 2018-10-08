@@ -19,11 +19,12 @@ import { assert, ToIterable, CreateGroupings, Identity, ToStringTag, Registry } 
 import { Queryable } from "../types";
 
 /**
- * Creates a subquery for the correlated elements of the source and another Queryable.
+ * Creates an [[Iterable]] for the correlated elements of two [[Queryable]] objects.
  *
- * @param inner A Queryable.
- * @param outerKeySelector A callback used to select the key for an element in this Query.
- * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+ * @param outer A [[Queryable]] object.
+ * @param inner A [[Queryable]] object.
+ * @param outerKeySelector A callback used to select the key for an element in `outer`.
+ * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.
  * @category Join
  */

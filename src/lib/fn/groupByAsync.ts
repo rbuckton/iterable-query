@@ -19,31 +19,34 @@ import { assert, Identity, CreateGrouping, ToPossiblyAsyncIterable, CreateGroupi
 import { AsyncQueryable, PossiblyAsyncIterable, Grouping, PossiblyAsyncHierarchyIterable, HierarchyGrouping } from "../types";
 
 /**
- * Groups each element of an `AsyncQueryable` by its key.
+ * Groups each element of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] by its key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
 export function groupByAsync<T, K>(source: PossiblyAsyncHierarchyIterable<T>, keySelector: (element: T) => K): AsyncIterable<HierarchyGrouping<K, T>>;
 /**
- * Groups each element of this Query by its key.
+ * Groups each element of an [[AsyncQueryable]] by its key.
  *
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
 export function groupByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncIterable<Grouping<K, T>>;
 /**
- * Groups each element by its key.
+ * Groups each element of an [[AsyncQueryable]] by its key.
  *
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @category Subquery
  */
 export function groupByAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): AsyncIterable<Grouping<K, V>>;
 /**
- * Groups each element by its key.
+ * Groups each element of an [[AsyncQueryable]] by its key.
  *
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param resultSelector A callback used to select a result from a group.

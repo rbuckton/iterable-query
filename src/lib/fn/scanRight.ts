@@ -23,7 +23,7 @@ import { toArray } from "./toArray";
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator The callback used to compute each result.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function scanRight<T>(source: Queryable<T>, accumulator: (current: T, ele
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
  * @category Subquery

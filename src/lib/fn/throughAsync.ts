@@ -19,9 +19,9 @@ import { assert, Registry, GetAsyncSource, CreateAsyncSubquery } from "../intern
 import { AsyncQueryable } from "../types";
 
 /**
- * Pass the entire source to the provided callback, returning an `AsyncQueryable` from the result.
+ * Pass the entire source to the provided callback, returning an [[AsyncQueryable]] from the result.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback A callback function.
  * @category Subquery
  */

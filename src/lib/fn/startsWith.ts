@@ -22,8 +22,8 @@ import { Queryable } from "../types";
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Scalar
  */
 export function startsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
@@ -31,8 +31,8 @@ export function startsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @param equalityComparison A callback used to compare the equality of two elements.
  * @category Scalar
  */

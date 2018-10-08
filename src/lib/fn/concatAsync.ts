@@ -19,26 +19,28 @@ import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable }
 import { AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a `AsyncIterable` that concatenates two `AsyncQueryable` sources.
+ * Creates an [[AsyncHierarchyIterable]] that concatenates a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] 
+ * object with an [[AsyncQueryable]] object.
  *
- * @param left An `AsyncQueryable` value.
- * @param right An `AsyncQueryable` value.
+ * @param left A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a `AsyncIterable` that concatenates two `AsyncQueryable` sources.
+ * Creates an [[AsyncHierarchyIterable]] that concatenates an [[AsyncQueryable]] object with 
+ * a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  *
- * @param left An `AsyncQueryable` value.
- * @param right An `AsyncQueryable` value.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @category Subquery
  */
 export function concatAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a `AsyncIterable` that concatenates two `AsyncQueryable` sources.
+ * Creates an [[AsyncIterable]] that concatenates two [[AsyncQueryable]] objects.
  *
- * @param left An `AsyncQueryable` value.
- * @param right An `AsyncQueryable` value.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function concatAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;

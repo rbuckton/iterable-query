@@ -15,17 +15,30 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry } from "../internal";
+import { assert, Registry, ToStringTag } from "../internal";
 
 /**
- * Creates an `Iterable` for the own property keys of an object.
+ * Creates an [[Iterable]] for the own property keys of an `object`.
  *
- * @param source An object.
+ * @param source An `object`.
  * @category Query
  */
 export function objectKeys<T extends object>(source: T): Iterable<Extract<keyof T, string>> {
     assert.mustBeObject(source, "source");
-    return Object.keys(source) as Extract<keyof T, string>[];
+    return new ObjectKeysIterable(source);
+}
+
+@ToStringTag("ObjectKeysIterable")
+class ObjectKeysIterable<T extends object> implements Iterable<Extract<keyof T, string>> {
+    private _source: T;
+    constructor(source: T) {
+        this._source = source;
+    }
+    
+    *[Symbol.iterator](): Iterator<Extract<keyof T, string>> {
+        const source = this._source;
+        yield* Object.keys(source) as Extract<keyof T, string>[];
+    }
 }
 
 Registry.Query.registerStatic("objectKeys", objectKeys);

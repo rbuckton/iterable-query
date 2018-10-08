@@ -15,35 +15,50 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, Registry} from "../internal";
+import { assert, GetHierarchy, ToStringTag, Registry, True} from "../internal";
 import { HierarchyIterable, Hierarchical } from "../types";
 import { Map, Set } from "../collections";
 import { Axis } from "./axis";
 import { toArray } from "./toArray";
 
 /**
- * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
- * element are removed.
+ * Creates a [[HierarchyIterable]] for the bottom-most elements of a [[HierarchyIterable]]. 
+ * Elements of `source` that are an ancestor of any other element of `source` are removed.
  * 
+ * @param source A [[HierarchyIterable]] object.
+ * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
  */
-export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode> {
+export function bottomMost<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (value: T) => value is U): HierarchyIterable<TNode, U>;
+/**
+ * Creates a [[HierarchyIterable]] for the bottom-most elements of a [[HierarchyIterable]]. 
+ * Elements of `source` that are an ancestor of any other element of `source` are removed.
+ * 
+ * @param source A [[HierarchyIterable]] object.
+ * @param predicate An optional callback used to filter the results.
+ * @category Hierarchy
+ */
+export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate?: (value: T) => boolean): HierarchyIterable<TNode, T>;
+export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (value: T) => boolean = True): HierarchyIterable<TNode, T> {
     assert.mustBeHierarchyIterable(source, "source");
-    return new BottomMostIterable(source);
+    return new BottomMostIterable(source, predicate);
 }
 
 @ToStringTag("BottomMostIterable")
-class BottomMostIterable<TNode, T extends TNode> implements HierarchyIterable<TNode> {
+class BottomMostIterable<TNode, T extends TNode> implements HierarchyIterable<TNode, T> {
     private _source: HierarchyIterable<TNode, T>;
+    private _predicate: (value: T) => boolean;
 
-    constructor(source: HierarchyIterable<TNode, T>) {
+    constructor(source: HierarchyIterable<TNode, T>, predicate: (value: T) => boolean) {
         this._source = source;
+        this._predicate = predicate;
     }
 
-    *[Symbol.iterator](): Iterator<TNode> {
+    *[Symbol.iterator](): Iterator<T> {
         const source = this._source;
+        const predicate = this._predicate;
         const hierarchy = GetHierarchy(source);
-        const bottomMostNodes = toArray(this._source);
+        const bottomMostNodes = toArray(source);
         const ancestors = new Map<TNode, Set<TNode>>();
         for (let i = bottomMostNodes.length - 1; i >= 1; i--) {
             const node = bottomMostNodes[i];
@@ -73,7 +88,9 @@ class BottomMostIterable<TNode, T extends TNode> implements HierarchyIterable<TN
             }
         }
 
-        yield* bottomMostNodes;
+        for (const node of bottomMostNodes) {
+            if (predicate(node)) yield node;
+        }
     }
 
     [Hierarchical.hierarchy]() {

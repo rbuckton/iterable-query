@@ -19,19 +19,19 @@ import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../int
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
- * Creates a `HierarchyIterable` for the elements of `source` with the provided `value` appended to the
+ * Creates a [[HierarchyIterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source A `HierarchyIterable` value.
+ * @param source A [[HierarchyIterable]] value.
  * @param value The value to append.
  * @category Subquery
  */
 export function append<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, value: T): HierarchyIterable<TNode, T>;
 /**
- * Creates an `Iterable` for the elements of `source` with the provided `value` appended to the
+ * Creates an [[Iterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source A `Queryable` value.
+ * @param source A [[Queryable]] value.
  * @param value The value to append.
  * @category Subquery
  */

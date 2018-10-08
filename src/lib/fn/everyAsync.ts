@@ -21,7 +21,7 @@ import { AsyncQueryable } from "../types";
 /**
  * Computes a scalar value indicating whether all elements match the supplied callback.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Scalar
  */

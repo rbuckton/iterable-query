@@ -21,7 +21,7 @@ import { Queryable } from "../types";
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator The callback used to compute each result.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function scan<T>(source: Queryable<T>, accumulator: (current: T, element:
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
  * @category Subquery

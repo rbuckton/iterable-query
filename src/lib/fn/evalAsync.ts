@@ -20,12 +20,18 @@ import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyIterable } fro
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
- * Eagerly evaluate an `AsyncQueryable`, returning a new `AsyncIterable`.
+ * Eagerly evaluate a [[HierarchyIterable]] or [[AsyncHierarchyIterable]], returning a [[Promise]]
+ * for a [[HierarchyIterable]] for the resolved elements of the original sequence.
+ * 
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @category Scalar
  */
 export async function evalAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): Promise<HierarchyIterable<TNode, T>>;
 /**
- * Eagerly evaluate an `AsyncQueryable`, returning a new `AsyncIterable`.
+ * Eagerly evaluate an [[AsyncQueryable]], returning a [[Promise]] for an [[Iterable]] for the 
+ * resolved elements of the original sequence.
+ * 
+ * @param An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function evalAsync<T>(source: AsyncQueryable<T>): Promise<Iterable<T>>;

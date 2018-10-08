@@ -13,6 +13,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/**
+ * @module "iterable-query/fn" 
+ * @preferred
+ */
+
 // statics
 export * from "./choose";
 export * from "./chooseAsync";

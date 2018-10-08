@@ -15,35 +15,51 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, GetHierarchy, ToStringTag, Registry, True } from "../internal";
 import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Map, Set } from "../collections";
 import { Axis } from "./axis";
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
- * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
- * element are removed.
+ * Creates an [[AsyncHierarchyIterable]] for the bottom-most elements. Elements of `source` that are an ancestor of any other
+ * element of `source` are removed.
  * 
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
+ * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
  */
-export function bottomMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode> {
+export function bottomMostAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): AsyncHierarchyIterable<TNode, U>;
+/**
+ * Creates an [[AsyncHierarchyIterable]] for the bottom-most elements. Elements of `source` that are an ancestor of any other
+ * element of `source` are removed.
+ * 
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
+ * @param predicate An optional callback used to filter the results.
+ * @category Hierarchy
+ */
+export function bottomMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate?: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
+export function bottomMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean = True): AsyncHierarchyIterable<TNode, T> {
     assert.mustBePossiblyAsyncHierarchyIterable<TNode, T>(source, "source");
-    return new AsyncBottomMostIterable(source);
+    return new AsyncBottomMostIterable(source, predicate);
 }
 
 @ToStringTag("AsyncBottomMostIterable")
-class AsyncBottomMostIterable<T> implements AsyncHierarchyIterable<T> {
-    private _source: PossiblyAsyncHierarchyIterable<T>;
+class AsyncBottomMostIterable<TNode, T extends TNode> implements AsyncHierarchyIterable<TNode, T> {
+    private _source: PossiblyAsyncHierarchyIterable<TNode, T>;
+    private _predicate: (value: T) => boolean;
 
-    constructor(source: PossiblyAsyncHierarchyIterable<T>) {
+    constructor(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (value: T) => boolean) {
         this._source = source;
+        this._predicate = predicate;
     }
 
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
-        const hierarchy = GetHierarchy(this._source);
-        const bottomMostNodes = await toArrayAsync(this._source);
-        const ancestors = new Map<T, Set<T>>();
+        const source = this._source;
+        const predicate = this._predicate;
+        const hierarchy = GetHierarchy(source);
+        const bottomMostNodes = await toArrayAsync(source);
+        const ancestors = new Map<TNode, Set<TNode>>();
         for (let i = bottomMostNodes.length - 1; i >= 1; i--) {
             const node = bottomMostNodes[i];
             for (let j = i - 1; j >= 0; j--) {
@@ -72,7 +88,9 @@ class AsyncBottomMostIterable<T> implements AsyncHierarchyIterable<T> {
             }
         }
 
-        yield* bottomMostNodes;
+        for (const node of bottomMostNodes) {
+            if (predicate(node)) yield node;
+        }
     }
 
     [Hierarchical.hierarchy]() {

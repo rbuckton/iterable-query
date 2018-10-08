@@ -22,7 +22,7 @@ import { Queryable, HierarchyIterable } from "../types";
  * Creates a subquery containing the last elements up to the supplied
  * count.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param count The number of elements to take.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function takeRight<TNode, T extends TNode>(source: HierarchyIterable<TNod
  * Creates a subquery containing the last elements up to the supplied
  * count.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param count The number of elements to take.
  * @category Subquery
  */

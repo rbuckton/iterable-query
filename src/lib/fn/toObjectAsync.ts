@@ -21,7 +21,7 @@ import { AsyncQueryable } from "../types";
 /**
  * Creates an Object for the elements of `source`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  * @category Scalar
@@ -30,7 +30,7 @@ export async function toObjectAsync<T>(source: AsyncQueryable<T>, prototype: obj
 /**
  * Creates an Object for the elements of `source`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.

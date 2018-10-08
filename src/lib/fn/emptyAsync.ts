@@ -18,7 +18,7 @@
 import { Registry, ToStringTag } from "../internal";
 
 /**
- * Creates an `AsyncIterable` with no elements.
+ * Creates an [[AsyncIterable]] with no elements.
  * @category Query
  */
 export function emptyAsync<T>(): AsyncIterable<T> {

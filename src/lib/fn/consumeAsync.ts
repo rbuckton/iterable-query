@@ -25,9 +25,9 @@ export interface ConsumeAsyncOptions {
 }
 
 /**
- * Creates an `AsyncIterable` that, when iterated, consumes the provided `AsyncIterator`.
+ * Creates an [[AsyncIterable]] that, when iterated, consumes the provided [[AsyncIterator]].
  *
- * @param iterator An `AsyncIterator` object.
+ * @param iterator An [[AsyncIterator]] object.
  * @category Query
  */
 export function consumeAsync<T>(iterator: AsyncIterator<T>, { cacheElements = false, leaveOpen = false }: ConsumeAsyncOptions = {}): AsyncIterable<T> {

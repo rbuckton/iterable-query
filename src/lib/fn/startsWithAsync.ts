@@ -22,8 +22,8 @@ import { AsyncQueryable } from "../types";
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function startsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
@@ -31,8 +31,8 @@ export async function startsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQu
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @param equalityComparison A callback used to compare the equality of two elements.
  * @category Scalar
  */

@@ -22,7 +22,7 @@ import { Queryable, HierarchyIterable } from "../types";
  * Creates a subquery containing all elements except the first elements that do not match
  * the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function skipUntil<TNode, T extends TNode>(source: HierarchyIterable<TNod
  * Creates a subquery containing all elements except the first elements that do not match
  * the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */

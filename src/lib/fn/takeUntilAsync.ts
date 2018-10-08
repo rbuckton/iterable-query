@@ -21,7 +21,7 @@ import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable,
 /**
  * Creates a subquery containing the first elements that do not match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function takeUntilAsync<TNode, T extends TNode, U extends T>(source: Poss
 /**
  * Creates a subquery containing the first elements that do not match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -37,7 +37,7 @@ export function takeUntilAsync<TNode, T extends TNode>(source: PossiblyAsyncHier
 /**
  * Creates a subquery containing the first elements that do not match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -45,7 +45,7 @@ export function takeUntilAsync<T, U extends T>(source: AsyncQueryable<T>, predic
 /**
  * Creates a subquery containing the first elements that do not match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */

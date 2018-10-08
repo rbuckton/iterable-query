@@ -105,7 +105,7 @@ export interface HierarchyPage<TNode, T extends TNode = TNode> extends Page<T>, 
 // Iteration
 
 /**
- * Represents an `Iterable` that is inherently ordered.
+ * Represents an [[Iterable]] that is inherently ordered.
  */
 export interface OrderedIterable<T> extends Iterable<T> {
     /**
@@ -123,13 +123,13 @@ export namespace OrderedIterable {
 }
 
 /**
- * Represents an `Iterable` with a navigable hierarchy.
+ * Represents an [[Iterable]] with a navigable hierarchy.
  */
 export interface HierarchyIterable<TNode, T extends TNode = TNode> extends Iterable<T>, Hierarchical<TNode> {
 }
 
 /**
- * Represents an `Iterable` with a navigable hierarchy that is inherently ordered.
+ * Represents an [[Iterable]] with a navigable hierarchy that is inherently ordered.
  */
 export interface OrderedHierarchyIterable<TNode, T extends TNode = TNode> extends OrderedIterable<T>, HierarchyIterable<TNode, T> {
 }
@@ -139,7 +139,7 @@ export type Choice<K, V> = [K, Queryable<V>];
 // Async iteration
 
 /**
- * Represents an `AsyncIterable` that is inherently ordered.
+ * Represents an [[AsyncIterable]] that is inherently ordered.
  */
 export interface AsyncOrderedIterable<T> extends AsyncIterable<T> {
     /**
@@ -156,13 +156,13 @@ export namespace AsyncOrderedIterable {
 }
 
 /**
- * Represents an `AsyncIterable` with a navigable hierarchy.
+ * Represents an [[AsyncIterable]] with a navigable hierarchy.
  */
 export interface AsyncHierarchyIterable<TNode, T extends TNode = TNode> extends AsyncIterable<T>, Hierarchical<TNode> {
 }
 
 /**
- * Represents an `AsyncIterable` with a navigable hierarchy that is inherently ordered.
+ * Represents an [[AsyncIterable]] with a navigable hierarchy that is inherently ordered.
  */
 export interface AsyncOrderedHierarchyIterable<TNode, T extends TNode = TNode> extends AsyncOrderedIterable<T>, AsyncHierarchyIterable<TNode, T> {
 }

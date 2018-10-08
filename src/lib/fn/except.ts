@@ -20,18 +20,18 @@ import { Queryable, HierarchyIterable } from "../types";
 import { toSet } from "./toSet";
 
 /**
- * Creates a subquery for the set difference between two `Queryable` objects.
+ * Creates a [[HierarchyIterable]] for the set difference between a [[HierarchyIterable]] and a [[Queryable]] object.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[HierarchyIterable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function except<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set difference between two `Queryable` objects.
+ * Creates a subquery for the set difference between two [[Queryable]] objects.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;

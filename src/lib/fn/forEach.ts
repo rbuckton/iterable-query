@@ -19,9 +19,9 @@ import { assert, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Invokes a callback for each element.
+ * Invokes a callback for each element of `source`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param callback The callback to invoke.
  * @category Scalar
  */

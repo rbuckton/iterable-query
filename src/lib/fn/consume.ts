@@ -26,12 +26,13 @@ export interface ConsumeOptions {
 }
 
 /**
- * Creates an `Iterable` that, when iterated, consumes the provided `Iterator`.
+ * Creates an [[Iterable]] that, when iterated, consumes the provided [[Iterator]].
  *
- * @param iterator An `Iterator` object.
+ * @param iterator An [[Iterator]] object.
  * @category Query
  */
-export function consume<T>(iterator: Iterator<T>, { cacheElements = false, leaveOpen = false }: ConsumeOptions = {}): Iterable<T> {
+export function consume<T>(iterator: Iterator<T>, options: ConsumeOptions = {}): Iterable<T> {
+    const { cacheElements = false, leaveOpen = false } = options;
     assert.mustBeIterator(iterator, "iterator");
     assert.mustBeBoolean(cacheElements, "cacheElements");
     return new ConsumeIterable(iterator, cacheElements, leaveOpen);

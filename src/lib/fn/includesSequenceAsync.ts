@@ -23,8 +23,8 @@ import { toArrayAsync } from "./toArrayAsync";
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
@@ -32,8 +32,8 @@ export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: A
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @param equalityComparison A callback used to compare the equality of two elements.
  * @category Scalar
  */

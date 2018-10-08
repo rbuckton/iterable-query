@@ -19,9 +19,9 @@ import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
- * Iterates over all of the elements in the query, ignoring the results.
+ * Iterates over all of the elements in an [[AsyncQueryable]], ignoring the results.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export async function drainAsync<T>(source: AsyncQueryable<T>): Promise<void> {

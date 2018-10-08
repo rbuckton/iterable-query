@@ -23,8 +23,8 @@ import { toArray } from "./toArray";
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Scalar
  */
 export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>): boolean;
@@ -32,8 +32,8 @@ export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>): bo
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @param equalityComparison A callback used to compare the equality of two elements.
  * @category Scalar
  */

@@ -21,32 +21,32 @@ import { Set } from "../collections";
 import { toSetAsync } from "./toSetAsync";
 
 /**
- * Creates a subquery for the symmetric difference between two `Queryable` objects.
- * The result is an `AsyncIterable` containings the elements that exist in only left or right, but not 
+ * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
+ * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the symmetric difference between two `Queryable` objects.
- * The result is an `AsyncIterable` containings the elements that exist in only left or right, but not 
+ * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
+ * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the symmetric difference between two `Queryable` objects.
- * The result is an `AsyncIterable` containings the elements that exist in only left or right, but not 
+ * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
+ * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not 
  * in both.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;

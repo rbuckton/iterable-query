@@ -1,4 +1,5 @@
 // @ts-check
+const fs = require('fs');
 const gulp = require('gulp');
 const del = require('del');
 const path = require('path');
@@ -17,14 +18,12 @@ const options = /** @type {minimist.ParsedArgs & {force: boolean, verbose: boole
 var useCoverage = false;
 var watching = false;
 
-gulp.task("build:sandbox", build("src/sandbox/tsconfig.json"));
-gulp.task("build:typedoc-plugin-custom", build("src/typedoc-plugin-custom/tsconfig.json", {
-    after: stream => merge2([stream, gulp.src(["src/typedoc-plugin-custom/theme/**/*", "!src/typedoc-plugin-custom/theme/**/*.ts"], { base: "src/typedoc-plugin-custom" })])
-}));
+gulp.task("sandbox", build("src/sandbox/tsconfig.json"));
+gulp.task("typedoc-plugin", build("src/typedoc/plugin"));
 gulp.task("build:lib", build("src/lib/tsconfig.json", { force: options.force, verbose: options.verbose }));
 gulp.task("build:es2015", build("src/lib/tsconfig.es2015.json", { force: options.force, verbose: options.verbose }));
 gulp.task("build:es5", build("src/lib/tsconfig.es5.json", { force: options.force, verbose: options.verbose }));
-gulp.task("build:tests", ["build:lib", "build:es2015", "build:es5", "build:sandbox"], build("src/tests/tsconfig.json", { force: options.force, verbose: options.verbose }));
+gulp.task("build:tests", ["build:lib", "build:es2015", "build:es5", "sandbox"], build("src/tests/tsconfig.json", { force: options.force, verbose: options.verbose }));
 gulp.task("build", ["build:lib", "build:es2015", "build:es5", "build:tests"]);
 gulp.task("clean", cb => del("out", cb));
 gulp.task("cover", setCoverage());
@@ -32,19 +31,32 @@ gulp.task("test:pre-test", ["build"], preTest());
 gulp.task("test", ["test:pre-test"], test({ main: "out/tests/index.js", coverage: { thresholds: { global: 80 } } }));
 gulp.task("watch", watch(["src/**/*"], ["test"]));
 gulp.task("default", ["test"]);
-gulp.task("docs", ["build:sandbox", "build:typedoc-plugin-custom"], () => gulp.src("src/lib/**/*.ts", { read: false })
+gulp.task("docs", ["sandbox", "typedoc-plugin"], () => gulp.src("src/lib/**/*.ts", { read: false })
     .pipe(typedoc({
+        tsconfig: "src/lib/tsconfig.typedoc.json",
         out: "docs",
         mode: "modules",
+        theme: "src/typedoc/theme",
         excludePrivate: true,
-        plugin: [
-            "typedoc-plugin-markdown",
-            "typedoc-plugin-internal-external",
-            "typedoc-plugin-external-module-name",
-            require.resolve("./out/typedoc-plugin-custom")
+        excludeNotExported: true,
+        excludeEmpty: true,
+        groupCategories: true,
+        renameModuleToNamespace: true,
+        categoryOrder: [
+            "Query",
+            "Scalar",
+            "Subquery",
+            "Order",
+            "Join",
+            "Hierarchy",
+            "*",
+            "Other"
         ],
-        theme: "out/typedoc-plugin-custom/theme",
-        tsconfig: "src/lib/tsconfig.typedoc.json"
+        biblio: "./biblio.json",
+        plugin: [
+            require.resolve("./out/typedoc/plugin"),
+            require.resolve("typedoc-plugin-external-module-name"),
+        ]
     })));
 
 function setCoverage() {

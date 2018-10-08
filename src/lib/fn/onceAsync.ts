@@ -18,9 +18,9 @@
 import { ToStringTag, Registry } from "../internal";
 
 /**
- * Creates an `AsyncIterable` over a single element.
+ * Creates an [[AsyncIterable]] over a single element.
  *
- * @param value The only element for the `AsyncIterable`.
+ * @param value The only element for the [[AsyncIterable]].
  * @category Query
  */
 export function onceAsync<T>(value: PromiseLike<T> | T): AsyncIterable<T> {

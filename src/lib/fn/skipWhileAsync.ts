@@ -22,7 +22,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
  * Creates a subquery containing all elements except the first elements that match
  * the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function skipWhileAsync<TNode, T extends TNode>(source: PossiblyAsyncHier
  * Creates a subquery containing all elements except the first elements that match
  * the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */

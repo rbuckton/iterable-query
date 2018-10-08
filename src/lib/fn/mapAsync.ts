@@ -19,9 +19,9 @@ import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../inter
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery by applying a callback to each element.
+ * Creates an [[AsyncIterable]] by applying a callback to each element of an [[AsyncQueryable]].
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param selector A callback used to map each element.
  * @category Subquery
  */

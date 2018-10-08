@@ -20,7 +20,7 @@ import { Queryable } from "../types";
 import { empty } from "./empty";
 
 /**
- * Creates an `Iterable` that iterates the elements from one of two sources based on the result of a
+ * Creates an [[Iterable]] that iterates the elements from one of two sources based on the result of a
  * lazily evaluated condition.
  *
  * @param condition A callback used to choose a source.

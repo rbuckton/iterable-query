@@ -19,21 +19,21 @@ import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, CreatePage } fr
 import { AsyncQueryable, PossiblyAsyncIterable, Page, PossiblyAsyncHierarchyIterable, HierarchyPage } from "../types";
 
 /**
- * Creates a subquery that splits an `AsyncIterable` into one or more pages.
- * While advancing from page to page is evaluated lazily, the elements of the page are
- * evaluated eagerly.
+ * Creates an [[AsyncHierarchyIterable]] that splits a [[HierarchyIterable]] or 
+ * [[AsyncHierarchyIterable]] into one or more pages. While advancing from page 
+ * to page is evaluated lazily, the elements of the page are evaluated eagerly.
  *
- * @param source An `AsyncIterable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param pageSize The number of elements per page.
  * @category Subquery
  */
 export function pageByAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, pageSize: number): AsyncIterable<HierarchyPage<TNode, T>>;
 /**
- * Creates a subquery that splits an `AsyncIterable` into one or more pages.
+ * Creates an [[AsyncIterable]] that splits an [[AsyncQueryable]] into one or more pages.
  * While advancing from page to page is evaluated lazily, the elements of the page are
  * evaluated eagerly.
  *
- * @param source An `AsyncIterable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param pageSize The number of elements per page.
  * @category Subquery
  */

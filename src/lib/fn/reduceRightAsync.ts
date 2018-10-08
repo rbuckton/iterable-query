@@ -22,7 +22,7 @@ import { toArrayAsync } from "./toArrayAsync";
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator the callback used to compute the result.
  * @category Scalar
  */
@@ -30,7 +30,7 @@ export function reduceRightAsync<T>(source: AsyncQueryable<T>, accumulator: (cur
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @category Scalar
@@ -39,7 +39,7 @@ export function reduceRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.

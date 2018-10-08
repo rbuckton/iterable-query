@@ -21,7 +21,7 @@ import { Queryable } from "../types";
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator the callback used to compute the result.
  * @category Scalar
  */
@@ -29,7 +29,7 @@ export function reduce<T>(source: Queryable<T>, accumulator: (current: T, elemen
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @category Scalar
@@ -38,7 +38,7 @@ export function reduce<T, U>(source: Queryable<T>, accumulator: (current: U, ele
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.

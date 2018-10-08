@@ -19,9 +19,9 @@ import { assert, ToIterable, SameValue, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Computes a scalar value indicating whether the provided value is included in the query.
+ * Computes a scalar value indicating whether the provided value is included in a [[Queryable]].
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param value A value.
  * @category Scalar
  */

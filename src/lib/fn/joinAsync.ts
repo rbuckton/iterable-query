@@ -19,10 +19,10 @@ import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStri
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery for the correlated elements of two `AsyncQueryable` objects.
+ * Creates an [[AsyncIterable]] for the correlated elements of two [[AsyncQueryable]] objects.
  *
- * @param outer An `AsyncQueryable`.
- * @param inner An `AsyncQueryable`.
+ * @param outer An [[AsyncQueryable]].
+ * @param inner An [[AsyncQueryable]].
  * @param outerKeySelector A callback used to select the key for an element in `outer`.
  * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.

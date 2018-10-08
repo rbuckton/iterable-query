@@ -19,19 +19,19 @@ import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry }
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery that iterates the results of recursively expanding the
- * elements of the source.
+ * Creates an [[AsyncHierarchyIterable]] that iterates the results of recursively expanding the
+ * elements of `source`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param projection A callback used to recusively expand each element.
  * @category Subquery
  */
 export function expandAsync<TNode, T extends TNode = TNode, U extends TNode = T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, projection: (element: T) => AsyncQueryable<U>): AsyncHierarchyIterable<TNode, U>;
 /**
- * Creates a subquery that iterates the results of recursively expanding the
- * elements of the source.
+ * Creates an [[AsyncIterable]] that iterates the results of recursively expanding the
+ * elements of `source`.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param projection A callback used to recusively expand each element.
  * @category Subquery
  */

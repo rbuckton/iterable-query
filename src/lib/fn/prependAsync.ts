@@ -19,19 +19,19 @@ import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable }
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates an `AsyncIterable` for the elements of `source` with the provided `value` prepended to the
+ * Creates an [[AsyncIterable]] for the elements of `source` with the provided `value` prepended to the
  * beginning.
  *
- * @param source An `AsyncQueryable` value.
+ * @param source An [[AsyncQueryable]] value.
  * @param value The value to prepend.
  * @category Subquery
  */
 export function prependAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, value: T): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates an `AsyncIterable` for the elements of `source` with the provided `value` prepended to the
+ * Creates an [[AsyncIterable]] for the elements of `source` with the provided `value` prepended to the
  * beginning.
  *
- * @param source An `AsyncQueryable` value.
+ * @param source An [[AsyncQueryable]] value.
  * @param value The value to prepend.
  * @category Subquery
  */

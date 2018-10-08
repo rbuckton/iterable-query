@@ -21,7 +21,7 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator The callback used to compute each result.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function scanAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param accumulator The callback used to compute each result.
  * @param seed An optional seed value.
  * @category Subquery

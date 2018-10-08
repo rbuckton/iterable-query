@@ -19,30 +19,34 @@ import { assert, ToIterable, CreateGroupings, Identity, CreateGrouping, ToString
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
 
 /**
- * Groups each element of this Query by its key.
+ * Groups each element of a [[HierarchyIterable]] by its key.
  *
+ * @param source A [[HierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
 export function groupBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): Iterable<HierarchyGrouping<K, TNode, T>>;
 /**
- * Groups each element of this Query by its key.
+ * Groups each element of a [[Queryable]] by its key.
  *
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
 export function groupBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Iterable<Grouping<K, T>>;
 /**
- * Groups each element by its key.
+ * Groups each element of a [[Queryable]] by its key.
  *
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @category Subquery
  */
 export function groupBy<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Iterable<Grouping<K, V>>;
 /**
- * Groups each element by its key.
+ * Groups each element of a [[Queryable]] by its key.
  *
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param resultSelector A callback used to select a result from a group.

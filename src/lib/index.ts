@@ -13,6 +13,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  */
+/**
+ * @module "iterable-query" 
+ * @preferred
+ */
 
 export * from "./types";
 export * from "./query";

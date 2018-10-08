@@ -21,7 +21,7 @@ import { Queryable } from "../types";
 /**
  * Creates an Object for the elements of `source`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  * @category Scalar
@@ -30,7 +30,7 @@ export function toObject<T>(source: Queryable<T>, prototype: object | null, keyS
 /**
  * Creates an Object for the elements of `source`.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param prototype The prototype for the object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.

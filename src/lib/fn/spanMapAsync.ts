@@ -21,7 +21,7 @@ import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyGrouping, Grou
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function spanMapAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHie
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
@@ -37,7 +37,7 @@ export function spanMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (elem
 /**
  * Creates a subquery whose values are computed from each element of the contiguous ranges of elements that share the same key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @category Subquery
@@ -46,7 +46,7 @@ export function spanMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (e
 /**
  * Creates a subquery whose values are computed from the contiguous ranges of elements that share the same key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param spanSelector A callback used to select a result from a contiguous range.

@@ -22,7 +22,7 @@ import { AsyncQueryable } from "../types";
  * Computes a scalar value indicating whether `source` contains any elements,
  * optionally filtering the elements using the supplied callback.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */

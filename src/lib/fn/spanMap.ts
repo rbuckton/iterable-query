@@ -21,7 +21,7 @@ import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../ty
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function spanMap<TNode, T extends TNode, K>(source: HierarchyIterable<TNo
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @category Subquery
  */
@@ -37,7 +37,7 @@ export function spanMap<T, K>(source: Queryable<T>, keySelector: (element: T) =>
 /**
  * Creates a subquery whose values are computed from each element of the contiguous ranges of elements that share the same key.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @category Subquery
@@ -46,7 +46,7 @@ export function spanMap<T, K, V>(source: Queryable<T>, keySelector: (element: T)
 /**
  * Creates a subquery whose values are computed from the contiguous ranges of elements that share the same key.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param spanSelector A callback used to select a result from a contiguous range.

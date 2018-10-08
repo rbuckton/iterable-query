@@ -19,10 +19,10 @@ import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
- * Gets the last element, optionally filtering elements using the supplied
+ * Gets the last element of a [[Queryable]], optionally filtering elements using the supplied
  * callback.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */

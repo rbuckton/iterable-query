@@ -19,9 +19,9 @@ import { assert, Registry, GetSource, CreateSubquery } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Pass the entire source to the provided callback, returning a `Queryable` from the result.
+ * Pass the entire source to the provided callback, returning a [[Queryable]] from the result.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param callback A callback function.
  * @category Subquery
  */

@@ -21,14 +21,14 @@ import { Queryable } from "../types";
 /**
  * Computes the sum for a series of numbers.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export function sum(source: Queryable<number>): number;
 /**
  * Computes the sum for a series of numbers.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
  * @category Scalar
  */

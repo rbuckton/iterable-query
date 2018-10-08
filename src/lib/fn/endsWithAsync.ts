@@ -21,20 +21,20 @@ import { takeRightAsync } from "./takeRightAsync";
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
- * Computes a scalar value indicating whether the elements of this Query end
- * with the same sequence of elements in another Queryable.
+ * Computes a scalar value indicating whether the elements of `left` end
+ * with the same sequence of elements in `right`.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function endsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
 /**
- * Computes a scalar value indicating whether the elements of this Query end
- * with the same sequence of elements in another Queryable.
+ * Computes a scalar value indicating whether the elements of `left` end
+ * with the same sequence of elements in `right`.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  * @category Scalar
  */

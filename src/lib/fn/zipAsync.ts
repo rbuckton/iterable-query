@@ -19,20 +19,20 @@ import { assert, MakeTuple, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyn
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery that combines two `AsyncQueryable` objects by combining elements
+ * Creates a subquery that combines two [[AsyncQueryable]] objects by combining elements
  * in tuples.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Join
  */
 export function zipAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>): AsyncIterable<[T, U]>;
 /**
- * Creates a subquery that combines two `AsyncQueryable` objects by combining elements
+ * Creates a subquery that combines two [[AsyncQueryable]] objects by combining elements
  * using the supplied callback.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @param selector A callback used to combine two elements.
  * @category Join
  */

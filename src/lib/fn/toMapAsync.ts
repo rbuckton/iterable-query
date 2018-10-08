@@ -22,7 +22,7 @@ import { Map } from "../collections";
 /**
  * Creates a Map for the elements of the source.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select a key for each element.
  * @category Scalar
  */
@@ -30,7 +30,7 @@ export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (
 /**
  * Creates a Map for the elements of the source.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar

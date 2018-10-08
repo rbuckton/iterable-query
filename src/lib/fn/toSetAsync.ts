@@ -22,14 +22,14 @@ import { Set } from "../collections";
 /**
  * Creates a Set for the elements of the Query.
  * 
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export function toSetAsync<T>(source: AsyncQueryable<T>): Promise<Set<T>>;
 /**
  * Creates a Set for the elements of the Query.
  * 
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */

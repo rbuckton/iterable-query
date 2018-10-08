@@ -20,13 +20,17 @@ import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIt
 import { Set } from "../collections";
 
 /**
- * Creates a subquery for the distinct elements of the source.
+ * Creates an [[AsyncHierarchyIterable]] for the distinct elements of `source`.
  * @category Subquery
+ * 
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  */
 export function distinctAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the distinct elements of the source.
+ * Creates an [[AsyncIterable]] for the distinct elements of source.
  * @category Subquery
+ * 
+ * @param source An [[AsyncQueryable]] object.
  */
 export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
 export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T> {

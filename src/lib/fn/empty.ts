@@ -18,7 +18,7 @@
 import { Registry, ToStringTag } from "../internal";
 
 /**
- * Creates an Iterable with no elements.
+ * Creates an [[Iterable]] with no elements.
  * @category Query
  */
 export function empty<T>(): Iterable<T> {

@@ -20,12 +20,12 @@ import { Queryable, HierarchyIterable } from "../types";
 import { toArray } from "./toArray";
 
 /**
- * Eagerly evaluate a `Queryable`, returning a new `Iterable`.
+ * Eagerly evaluate a [[HierarchyIterable]], returning a [[HierarchyIterable]] for the elements of the original sequence.
  * @category Scalar
  */
 function _eval<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
- * Eagerly evaluate a `Queryable`, returning a new `Iterable`.
+ * Eagerly evaluate a [[Queryable]], returning an [[Iterable]] for the elements of the original sequence.
  * @category Scalar
  */
 function _eval<T>(source: Queryable<T>): Iterable<T>;

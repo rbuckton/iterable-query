@@ -21,7 +21,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyI
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */
@@ -37,7 +37,7 @@ export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyI
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */
@@ -45,7 +45,7 @@ export function tapAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyI
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */
@@ -53,7 +53,7 @@ export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, of
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */
@@ -61,7 +61,7 @@ export function tapAsync<T>(source: AsyncQueryable<T>, callback: (element: T, of
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */

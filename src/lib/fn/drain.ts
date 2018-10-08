@@ -19,9 +19,9 @@ import { assert, ToIterable, Registry } from "../internal";
 import { Queryable } from "../types";
 
 /**
- * Iterates over all of the elements in the query, ignoring the results.
+ * Iterates over all of the elements in a [[Queryable]], ignoring the results.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export function drain<T>(source: Queryable<T>): void {

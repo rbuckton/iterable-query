@@ -19,17 +19,19 @@ import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry }
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 
 /**
- * Creates a subquery that contains the provided default value if the source
+ * Creates an [[AsyncHierarchyIterable]] that contains the provided default value if `source`
  * contains no elements.
  *
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param defaultValue The default value.
  * @category Subquery
  */
 export function defaultIfEmptyAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, defaultValue: PromiseLike<T> | T): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery that contains the provided default value if the source
+ * Creates an [[AsyncIterable]] that contains the provided default value if `source`
  * contains no elements.
  *
+ * @param source An [[AsyncQueryable]] object.
  * @param defaultValue The default value.
  * @category Subquery
  */

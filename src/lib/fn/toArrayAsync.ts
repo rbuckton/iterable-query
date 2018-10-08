@@ -19,16 +19,16 @@ import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal
 import { AsyncQueryable } from "../types";
 
 /**
- * Creates an Array for the elements of the `AsyncIterable`.
+ * Creates an Array for the elements of the [[AsyncIterable]].
  * 
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function toArrayAsync<T>(source: AsyncQueryable<T>): Promise<T[]>;
 /**
- * Creates an Array for the elements of the `AsyncIterable`.
+ * Creates an Array for the elements of the [[AsyncIterable]].
  * 
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */

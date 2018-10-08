@@ -19,41 +19,41 @@ import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../int
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
- * Creates an `Iterable` whose elements match the supplied predicate.
+ * Creates a [[HierarchyIterable]] whose elements match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[HierarchyIterable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filter<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => element is U): HierarchyIterable<TNode, U>;
 /**
- * Creates an `Iterable` whose elements match the supplied predicate.
+ * Creates a [[HierarchyIterable]] whose elements match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[HierarchyIterable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filter<TNode, U extends TNode>(source: HierarchyIterable<TNode>, predicate: (element: TNode, offset: number) => element is U): HierarchyIterable<TNode, U>;
 /**
- * Creates an `Iterable` whose elements match the supplied predicate.
+ * Creates a [[HierarchyIterable]] whose elements match the supplied predicate.
  *
- * @param source A `Queryable` object.
- * @param predicate A callback used to match each element.
- * @category Subquery
- */
-export function filter<T, U extends T>(source: Queryable<T>, predicate: (element: T, offset: number) => element is U): Iterable<U>;
-/**
- * Creates an `Iterable` whose elements match the supplied predicate.
- *
- * @param source A `Queryable` object.
+ * @param source A [[HierarchyIterable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filter<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean): HierarchyIterable<TNode, T>;
 /**
- * Creates an `Iterable` whose elements match the supplied predicate.
+ * Creates an [[Iterable]] whose elements match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
+ * @param predicate A callback used to match each element.
+ * @category Subquery
+ */
+export function filter<T, U extends T>(source: Queryable<T>, predicate: (element: T, offset: number) => element is U): Iterable<U>;
+/**
+ * Creates an [[Iterable]] whose elements match the supplied predicate.
+ *
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */

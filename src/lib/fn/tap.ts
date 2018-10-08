@@ -21,7 +21,7 @@ import { Queryable, HierarchyIterable } from "../types";
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function tap<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>,
 /**
  * Lazily invokes a callback as each element of the iterable is iterated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param callback The callback to invoke.
  * @category Subquery
  */

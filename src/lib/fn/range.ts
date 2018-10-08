@@ -18,7 +18,7 @@
 import { assert, ToStringTag, Registry } from "../internal";
 
 /**
- * Creates an `Iterable` over a range of numbers.
+ * Creates an [[Iterable]] over a range of numbers.
  *
  * @param start The starting number of the range.
  * @param end The ending number of the range.

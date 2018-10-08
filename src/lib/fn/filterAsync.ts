@@ -19,41 +19,41 @@ import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry }
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates an `AsyncIterable` whose elements match the supplied predicate.
+ * Creates an [[AsyncHierarchyIterable]] whose elements match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filterAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => element is U): AsyncHierarchyIterable<TNode, U>;
 /**
- * Creates an `AsyncIterable` whose elements match the supplied predicate.
+ * Creates an [[AsyncHierarchyIterable]] whose elements match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filterAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode, offset: number) => element is U): AsyncHierarchyIterable<TNode, U>;
 /**
- * Creates an `AsyncIterable` whose elements match the supplied predicate.
+ * Creates an [[AsyncHierarchyIterable]] whose elements match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filterAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates an `AsyncIterable` whose elements match the supplied predicate.
+ * Creates an [[AsyncIterable]] whose elements match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
 export function filterAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => element is U): AsyncIterable<U>;
 /**
- * Creates an `AsyncIterable` whose elements match the supplied predicate.
+ * Creates an [[AsyncIterable]] whose elements match the supplied predicate.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */

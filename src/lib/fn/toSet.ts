@@ -22,14 +22,14 @@ import { Set } from "../collections";
 /**
  * Creates a Set for the elements of the Query.
  * 
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export function toSet<T>(source: Queryable<T>): Set<T>;
 /**
  * Creates a Set for the elements of the Query.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */

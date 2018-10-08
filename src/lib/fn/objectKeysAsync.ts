@@ -18,12 +18,13 @@
 import { assert, Registry, ToStringTag } from "../internal";
 
 /**
- * Creates an `AsyncIterable` for the own property keys of an object.
+ * Creates an [[AsyncIterable]] for the own property keys of an `object`.
  *
- * @param source An object.
+ * @param source An `object` or a [[Promise]] for an `object`.
  * @category Query
  */
 export function objectKeysAsync<T extends object>(source: PromiseLike<T> | T): AsyncIterable<Extract<keyof T, string>> {
+    assert.mustBeObject(source, "source");
     return new AsyncObjectKeysIterable(source);
 }
 

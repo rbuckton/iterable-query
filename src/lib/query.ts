@@ -24,53 +24,53 @@ import { ConsumeOptions } from "./fn";
 Registry.addRegistry(fn);
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  */
 export function from<TNode, T extends TNode>(source: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyQuery<TNode, T>;
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  */
 export function from<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  */
 export function from<T>(source: OrderedIterable<T>): OrderedQuery<T>;
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  */
 export function from<T>(source: Queryable<T>): Query<T>;
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param hierarchy A `HierarchyProvider` object.
  */
 export function from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyQuery<TNode, T>;
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param hierarchy A `HierarchyProvider` object.
  */
 export function from<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T>;
 
 /**
- * Creates a `Query` from a `Queryable` source.
+ * Creates a `Query` from a [[Queryable]] source.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  */
 export function from<T>(source: Queryable<T>, hierarchy?: HierarchyProvider<T>): any {
     if (hierarchy) source = MakeHierarchyIterable(source, hierarchy);
@@ -103,9 +103,9 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     private _source: Queryable<T>;
 
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      */
     constructor(source: Queryable<T>) {
         assert.mustBeQueryable(source, "source");
@@ -129,50 +129,50 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
 
 export declare namespace Query {
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      * @category Query
      */
     export function from<TNode, T extends TNode>(source: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      * @category Query
      */
     export function from<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      * @category Query
      */
     export function from<T>(source: OrderedIterable<T>): OrderedQuery<T>;
 
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      * @category Query
      */
     export function from<T>(source: Queryable<T>): Query<T>;
 
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      * @param hierarchy A `HierarchyProvider` object.
      * @category Query
      */
     export function from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyQuery<TNode, T>;
 
     /**
-     * Creates a `Query` from a `Queryable` source.
+     * Creates a `Query` from a [[Queryable]] source.
      *
-     * @param source A `Queryable` object.
+     * @param source A [[Queryable]] object.
      * @param hierarchy A `HierarchyProvider` object.
      * @category Query
      */
@@ -261,7 +261,6 @@ export declare namespace Query {
      * @param condition A callback used to choose a source.
      * @param thenQueryable The source to use when the callback evaluates to `true`.
      * @param elseQueryable The source to use when the callback evaluates to `false`.
-     * @alias if
      * @category Query
      */
     function _if<T>(condition: () => boolean, thenQueryable: Queryable<T>, elseQueryable?: Queryable<T>): Query<T>;
@@ -508,101 +507,101 @@ export interface Query<T> {
     takeUntil(predicate: (element: T) => boolean): Query<T>;
 
     /**
-     * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     intersect<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     intersect(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the set union of this `Query` and another `Queryable`.
+     * Creates a subquery for the set union of this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     union<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set union of this `Query` and another `Queryable`.
+     * Creates a subquery for the set union of this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     union(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the set difference between this and another `Queryable`.
+     * Creates a subquery for the set difference between this and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     except(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the set difference between this and another `Queryable`.
+     * Creates a subquery for the set difference between this and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     relativeComplement(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     symmetricDifference<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     symmetricDifference(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
      * This is an alias for `symmetricDifference`.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     xor<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
      * This is an alias for `symmetricDifference`.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     xor(right: Queryable<T>): Query<T>;
 
     /**
-     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     concat<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     concat(right: Queryable<T>): Query<T>;
@@ -660,19 +659,19 @@ export interface Query<T> {
     pageBy(pageSize: number): Query<Page<T>>;
 
     /**
-     * Creates a subquery that combines this `Query` with another `Queryable` by combining elements
+     * Creates a subquery that combines this `Query` with another [[Queryable]] by combining elements
      * in tuples.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Join
      */
     zip<U>(right: Queryable<U>): Query<[T, U]>;
 
     /**
-     * Creates a subquery that combines this `Query` with another `Queryable` by combining elements
+     * Creates a subquery that combines this `Query` with another [[Queryable]] by combining elements
      * using the supplied callback.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @param selector A callback used to combine two elements.
      * @category Join
      */
@@ -751,20 +750,20 @@ export interface Query<T> {
     groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R): Query<R>;
 
     /**
-     * Creates a grouped subquery for the correlated elements of this `Query` and another `Queryable` object.
+     * Creates a grouped subquery for the correlated elements of this `Query` and another [[Queryable]] object.
      *
-     * @param inner A `Queryable` object.
+     * @param inner A [[Queryable]] object.
      * @param outerKeySelector A callback used to select the key for an element in this `Query`.
-     * @param innerKeySelector A callback used to select the key for an element in the other `Queryable` object.
+     * @param innerKeySelector A callback used to select the key for an element in the other [[Queryable]] object.
      * @param resultSelector A callback used to select the result for the correlated elements.
      * @category Join
      */
     groupJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): Query<R>;
 
     /**
-     * Creates a subquery for the correlated elements of this `Query` and another `Queryable`.
+     * Creates a subquery for the correlated elements of this `Query` and another [[Queryable]].
      *
-     * @param inner A `Queryable` object.
+     * @param inner A [[Queryable]] object.
      * @param outerKeySelector A callback used to select the key for an element in this `Query`.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
@@ -773,9 +772,9 @@ export interface Query<T> {
     join<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): Query<R>
 
     /**
-     * Creates a subquery for the correlated elements of this `Query` and another `Queryable`.
+     * Creates a subquery for the correlated elements of this `Query` and another [[Queryable]].
      *
-     * @param inner A `Queryable` object.
+     * @param inner A [[Queryable]] object.
      * @param outerKeySelector A callback used to select the key for an element in this `Query`.
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
@@ -1047,18 +1046,18 @@ export interface Query<T> {
 
     /**
      * Computes a scalar value indicating whether every element in this `Query` corresponds to a matching element
-     * in another `Queryable` at the same position.
+     * in another [[Queryable]] at the same position.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Scalar
      */
     corresponds(right: Queryable<T>): boolean;
 
     /**
      * Computes a scalar value indicating whether every element in this `Query` corresponds to a matching element
-     * in another `Queryable` at the same position.
+     * in another [[Queryable]] at the same position.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @param equalityComparison An optional callback used to compare the equality of two elements.
      * @category Scalar
      */
@@ -1074,18 +1073,18 @@ export interface Query<T> {
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` include
-     * an exact sequence of elements from another `Queryable`.
+     * an exact sequence of elements from another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Scalar
      */
     includesSequence(right: Queryable<T>): boolean;
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` include
-     * an exact sequence of elements from another `Queryable`.
+     * an exact sequence of elements from another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @param equalityComparison A callback used to compare the equality of two elements.
      * @category Scalar
      */
@@ -1093,18 +1092,18 @@ export interface Query<T> {
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` start
-     * with the same sequence of elements in another `Queryable`.
+     * with the same sequence of elements in another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Scalar
      */
     startsWith(right: Queryable<T>): boolean;
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` start
-     * with the same sequence of elements in another `Queryable`.
+     * with the same sequence of elements in another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @param equalityComparison A callback used to compare the equality of two elements.
      * @category Scalar
      */
@@ -1112,18 +1111,18 @@ export interface Query<T> {
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` end
-     * with the same sequence of elements in another `Queryable`.
+     * with the same sequence of elements in another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Scalar
      */
     endsWith(right: Queryable<T>): boolean;
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` end
-     * with the same sequence of elements in another `Queryable`.
+     * with the same sequence of elements in another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @param equalityComparison A callback used to compare the equality of two elements.
      * @category Scalar
      */
@@ -1437,67 +1436,67 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode>{
     takeWhile(predicate: (element: T) => boolean): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set intersection of this `Query` and another `Queryable`.
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     intersect(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set union of this `Query` and another `Queryable`.
+     * Creates a subquery for the set union of this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     union(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set difference between this `Query` and another `Queryable`.
+     * Creates a subquery for the set difference between this `Query` and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     except(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the set difference between this `Query` and another `Queryable`.
+     * Creates a subquery for the set difference between this `Query` and another [[Queryable]].
      *
      * This is an alias for `except`.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     relativeComplement(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     symmetricDifference(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery for the symmetric difference between this and another `Queryable`.
+     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
      * This is an alias for `symmetricDifference`.
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     xor(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
      *
-     * @param right A `Queryable` object.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
     concat(right: Queryable<T>): HierarchyQuery<TNode, T>;
 
     /**
-     * Creates a subquery that concatenates this `Query` with another `Queryable`.
+     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
      * @category Subquery
      */
     distinct(): HierarchyQuery<TNode, T>;
@@ -1776,14 +1775,28 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode>{
      * element are removed.
      * @category Hierarchy
      */
-    topMost(): HierarchyQuery<TNode>;
+    topMost<U extends T>(predicate: (element: T) => element is U): HierarchyQuery<TNode, U>;
+
+    /**
+     * Creates a subquery for the top-most elements. Elements that are a descendant of any other
+     * element are removed.
+     * @category Hierarchy
+     */
+    topMost(predicate?: (element: T) => boolean): HierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
      * element are removed.
      * @category Hierarchy
      */
-    bottomMost(): HierarchyQuery<TNode>;
+    bottomMost<U extends T>(predicate: (element: T) => element is U): HierarchyQuery<TNode, U>;
+
+    /**
+     * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
+     * element are removed.
+     * @category Hierarchy
+     */
+    bottomMost(predicate?: (element: T) => boolean): HierarchyQuery<TNode, T>;
 
     /**
      * Computes a scalar value indicating whether all elements of the Query

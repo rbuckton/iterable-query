@@ -7,7 +7,7 @@
                 <section class="tsd-index-section {{cssClasses}}">
                     {{#if categories}}
                         {{#each categories}}
-                            <h3>{{#ifCond ../title '==' "Modules"}}Namespaces{{else}}{{../title}}{{/ifCond}}{{#ifCond title '==' "Other"}}{{else}} ({{title}}){{/ifCond}}</h3>
+                            <h3>{{../title}}{{#if title}} ({{title}}){{/if}}</h3>
                             <ul class="tsd-index-list">
                                 {{#each children}}
                                     <li class="{{cssClasses}}"><a href="{{relativeURL url}}" class="tsd-kind-icon">{{#if name}}{{{wbr name}}}{{else}}<em>{{{wbr kindString}}}</em>{{/if}}</a></li>
@@ -15,7 +15,7 @@
                             </ul>
                         {{/each}}
                     {{else}}
-                        <h3>{{#ifCond title '==' "Modules"}}Namespaces{{else}}{{title}}{{/ifCond}}</h3>
+                        <h3>{{title}}</h3>
                         <ul class="tsd-index-list">
                             {{#each children}}
                             <li class="{{cssClasses}}"><a href="{{relativeURL url}}" class="tsd-kind-icon">{{#if name}}{{{wbr name}}}{{else}}<em>{{{wbr kindString}}}</em>{{/if}}</a></li>

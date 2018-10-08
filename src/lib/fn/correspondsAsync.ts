@@ -22,8 +22,8 @@ import { AsyncQueryable } from "../types";
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
@@ -31,8 +31,8 @@ export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQ
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @param equalityComparison An optional callback used to compare the equality of two elements.
  * @category Scalar
  */

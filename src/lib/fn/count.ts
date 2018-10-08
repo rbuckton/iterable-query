@@ -22,7 +22,7 @@ import { Map, Set } from "../collections";
 /**
  * Counts the number of elements, optionally filtering elements using the supplied callback.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */

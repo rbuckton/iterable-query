@@ -20,26 +20,26 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
 import { Set } from "../collections";
 
 /**
- * Creates a subquery for the set union of two `AsyncQueryable` objects.
+ * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set union of two `AsyncQueryable` objects.
+ * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function unionAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set union of two `AsyncQueryable` objects.
+ * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
  *
- * @param left An `AsyncQueryable` object.
- * @param right An `AsyncQueryable` object.
+ * @param left An [[AsyncQueryable]] object.
+ * @param right An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;

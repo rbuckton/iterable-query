@@ -25,53 +25,53 @@ const noCacheAndLeaveOpen: ConsumeOptions = { cacheElements: false, leaveOpen: t
 const cacheAndClose: ConsumeOptions = { cacheElements: true, leaveOpen: false };
 
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that match the supplied predicate, and whose second element is an `Iterable`
+ * Creates a tuple whose first element is an [[Iterable]] containing the first span of
+ * elements that match the supplied predicate, and whose second element is an [[Iterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `Iterable` is lazily
+ * The first [[Iterable]] is eagerly evaluated, while the second [[Iterable]] is lazily
  * evaluated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
 export function span<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => element is U): [HierarchyIterable<TNode, U>, HierarchyIterable<TNode, T>];
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that match the supplied predicate, and whose second element is an `Iterable`
+ * Creates a tuple whose first element is an [[Iterable]] containing the first span of
+ * elements that match the supplied predicate, and whose second element is an [[Iterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `Iterable` is lazily
+ * The first [[Iterable]] is eagerly evaluated, while the second [[Iterable]] is lazily
  * evaluated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
 export function span<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that match the supplied predicate, and whose second element is an `Iterable`
+ * Creates a tuple whose first element is an [[Iterable]] containing the first span of
+ * elements that match the supplied predicate, and whose second element is an [[Iterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `Iterable` is lazily
+ * The first [[Iterable]] is eagerly evaluated, while the second [[Iterable]] is lazily
  * evaluated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
 export function span<T, U extends T>(source: Queryable<T>, predicate: (element: T) => element is U): [Iterable<U>, Iterable<T>];
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that match the supplied predicate, and whose second element is an `Iterable`
+ * Creates a tuple whose first element is an [[Iterable]] containing the first span of
+ * elements that match the supplied predicate, and whose second element is an [[Iterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `Iterable` is lazily
+ * The first [[Iterable]] is eagerly evaluated, while the second [[Iterable]] is lazily
  * evaluated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */

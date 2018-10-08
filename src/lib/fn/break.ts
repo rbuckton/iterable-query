@@ -25,27 +25,27 @@ const noCacheAndLeaveOpen: ConsumeOptions = { cacheElements: false, leaveOpen: t
 const cacheAndClose: ConsumeOptions = { cacheElements: true, leaveOpen: false };
 
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that do not match the supplied predicate, and whose second element is an `Iterable`
+ * Creates a tuple whose first element is a [[HierarchyIterable]] containing the first span of
+ * elements that do not match the supplied predicate, and whose second element is a [[HierarchyIterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `Iterable` is lazily
+ * The first [[HierarchyIterable]] is eagerly evaluated, while the second [[HierarchyIterable]] is lazily
  * evaluated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[HierarchyIterable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
 function _break<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
 /**
- * Creates a tuple whose first element is an `Iterable` containing the first span of
- * elements that do not match the supplied predicate, and whose second element is an `Iterable`
+ * Creates a tuple whose first element is an [[Iterable]] containing the first span of
+ * elements that do not match the supplied predicate, and whose second element is an [[Iterable]]
  * containing the remaining elements.
  *
- * The first `Iterable` is eagerly evaluated, while the second `Iterable` is lazily
+ * The first [[Iterable]] is eagerly evaluated, while the second [[Iterable]] is lazily
  * evaluated.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */

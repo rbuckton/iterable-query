@@ -21,7 +21,7 @@ import { Queryable, HierarchyIterable } from "../types";
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -29,7 +29,7 @@ export function takeWhile<TNode, T extends TNode, U extends T>(source: Hierarchy
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -37,7 +37,7 @@ export function takeWhile<TNode, T extends TNode>(source: HierarchyIterable<TNod
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
@@ -45,7 +45,7 @@ export function takeWhile<T, U extends T>(source: Queryable<T>, predicate: (elem
 /**
  * Creates a subquery containing the first elements that match the supplied predicate.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param predicate A callback used to match each element.
  * @category Subquery
  */

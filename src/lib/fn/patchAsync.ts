@@ -22,7 +22,7 @@ import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable,
  * Creates a subquery for the elements of the source with the provided range
  * patched into the results.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
@@ -33,7 +33,7 @@ export function patchAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarch
  * Creates a subquery for the elements of the source with the provided range
  * patched into the results.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.

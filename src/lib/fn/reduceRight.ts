@@ -22,7 +22,7 @@ import { toArray } from "./toArray";
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator the callback used to compute the result.
  * @category Scalar
  */
@@ -30,7 +30,7 @@ export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, e
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @category Scalar
@@ -39,7 +39,7 @@ export function reduceRight<T, U>(source: Queryable<T>, accumulator: (current: U
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
  *
- * @param source A `Queryable` object.
+ * @param source A [[Queryable]] object.
  * @param accumulator the callback used to compute the result.
  * @param seed An optional seed value.
  * @param resultSelector An optional callback used to compute the final result.

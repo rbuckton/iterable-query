@@ -20,26 +20,26 @@ import { Queryable, HierarchyIterable } from "../types";
 import { toSet } from "./toSet";
 
 /**
- * Creates a subquery for the set intersection of two Queryables.
+ * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] object and a [[Queryable]] object.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[HierarchyIterable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function intersect<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set intersection of two Queryables.
+ * Creates a [[HierarchyIterable]] for the set intersection of a [[Queryable]] object and a [[HierarchyIterable]] object.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[HierarchyIterable]] object.
  * @category Subquery
  */
 export function intersect<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set intersection of two Queryables.
+ * Creates an [[Iterable]] for the set intersection of two [[Queryable]] objects.
  *
- * @param left A `Queryable` object.
- * @param right A `Queryable` object.
+ * @param left A [[Queryable]] object.
+ * @param right A [[Queryable]] object.
  * @category Subquery
  */
 export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;

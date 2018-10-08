@@ -19,9 +19,9 @@ import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../interna
 import { AsyncQueryable } from "../types";
 
 /**
- * Computes a scalar value indicating whether the provided value is included in the query.
+ * Computes a scalar value indicating whether the provided value is included in an [[AsyncQueryable]].
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param value A value.
  * @category Scalar
  */

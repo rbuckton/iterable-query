@@ -20,18 +20,18 @@ import { PossiblyAsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncQue
 import { toArrayAsync } from "./toArrayAsync";
 
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates an [[AsyncOrderedHierarchyIterable]] whose elements are sorted in ascending order by the provided key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function orderByAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates an [[AsyncOrderedIterable]] whose elements are sorted in ascending order by the provided key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
@@ -45,18 +45,18 @@ export function orderByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (elem
 }
 
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates an [[AsyncOrderedHierarchyIterable]] whose elements are sorted in descending order by the provided key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function orderByDescendingAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates an [[AsyncOrderedIterable]] whose elements are sorted in descending order by the provided key.
  *
- * @param source An `AsyncQueryable` object.
+ * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
@@ -70,18 +70,18 @@ export function orderByDescendingAsync<T, K>(source: AsyncQueryable<T>, keySelec
 }
 
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates a subsequent [[AsyncOrderedHierarchyIterable]] whose elements are also sorted in ascending order by the provided key.
  *
- * @param source An `AsyncOrderedIterable` object.
+ * @param source An [[OrderedHierarchyIterable]] or [[AsyncOrderedHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function thenByAsync<TNode, T extends TNode, K>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+ * Creates a subsequent [[AsyncOrderedIterable]] whose elements are also sorted in ascending order by the provided key.
  *
- * @param source An `AsyncOrderedIterable` object.
+ * @param source An [[OrderedIterable]] or [[AsyncOrderedIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
@@ -95,18 +95,18 @@ export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySe
 }
 
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates a subsequent [[AsyncOrderedHierarchyIterable]] whose elements are also sorted in descending order by the provided key.
  *
- * @param source An `AsyncOrderedIterable` object.
+ * @param source An [[OrderedHierarchyIterable]] or [[AsyncOrderedHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
 export function thenByDescendingAsync<TNode, T extends TNode, K>(source: PossiblyAsyncOrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedHierarchyIterable<TNode, T>;
 /**
- * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+ * Creates a subsequent [[AsyncOrderedIterable]] whose elements are also sorted in descending order by the provided key.
  *
- * @param source An `AsyncOrderedIterable` object.
+ * @param source An [[OrderedIterable]] or [[AsyncOrderedIterable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param comparison An optional callback used to compare two keys.
  * @category Order

@@ -19,11 +19,11 @@ import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, SameValue } fro
 import { AsyncQueryable, PossiblyAsyncIterable, AsyncChoice } from "../types";
 
 /**
- * Creates an `Iterable` that iterates the elements from sources picked from a list based on the
+ * Creates an [[Iterable]] that iterates the elements from sources picked from a list based on the
  * result of a lazily evaluated choice.
  *
  * @param chooser A callback used to choose a source.
- * @param choices An `AsyncQueryable` of key/value pairs, where each value is an `AsyncQueryable` object.
+ * @param choices An [[AsyncQueryable]] of key/value pairs, where each value is an [[AsyncQueryable]] object.
  * @param otherwise A default source to use when another choice could not be made.
  * @category Query
  */
