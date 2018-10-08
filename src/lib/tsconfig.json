@@ -3,7 +3,7 @@
         "target": "es2017",
         "module": "commonjs",
         "lib": ["esnext"],
-        "outDir": "../../out/lib",
+        "outDir": "../../dist/lib",
         "experimentalDecorators": true,
         "noEmitOnError": true,
         "noImplicitAny": true,

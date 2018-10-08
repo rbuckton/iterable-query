@@ -22,7 +22,7 @@ import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable,
  * Creates an [[AsyncIterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source An [[AsyncQueryable]] value.
+ * @param source The [[HierarchyIterable]] or [[AsyncHierarchyIterable]] to append to.
  * @param value The value to append.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function appendAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarc
  * Creates an [[AsyncIterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source An [[AsyncQueryable]] value.
+ * @param source The [[AsyncQueryable]] to append to.
  * @param value The value to append.
  * @category Subquery
  */

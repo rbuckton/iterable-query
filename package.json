@@ -1,9 +1,9 @@
 {
   "name": "iterable-query",
-  "version": "0.1.4",
-  "description": "Query library for ES6 iterables.",
-  "main": "./out/lib/index.js",
-  "typings": "./out/lib/index.d.ts",
+  "version": "1.0.0-dev.0",
+  "description": "Query library for ECMAScript iterables.",
+  "main": "dist/lib",
+  "typings": "dist/lib",
   "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.1.4",
@@ -34,15 +34,17 @@
     "source-map-support": "^0.5.6",
     "typedoc": "^0.12.0",
     "typedoc-plugin-external-module-name": "^1.1.3",
-    "typescript": "^3.1.0-dev.20180922"
+    "typescript": "^3.1.0-dev.20180922",
+    "vm-sandbox": "0.0.0"
   },
   "scripts": {
     "build": "gulp build",
-    "test": "gulp test"
+    "test": "gulp test",
+    "prepublishOnly": "gulp prepublishOnly"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rbuckton/queryjs.git"
+    "url": "https://github.com/rbuckton/iterable-query.git"
   },
   "keywords": [
     "query",
@@ -58,7 +60,7 @@
   "author": "Ron Buckton (rbuckton@outlook.com)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/rbuckton/queryjs/issues"
+    "url": "https://github.com/rbuckton/iterable-query/issues"
   },
-  "homepage": "https://github.com/rbuckton/queryjs"
+  "homepage": "https://github.com/rbuckton/iterable-query"
 }

@@ -19,10 +19,10 @@ import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry }
 import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates a subquery for the elements of the source with the provided range
+ * Creates an [[AsyncHierarchyIterable]] for the elements of the source with the provided range
  * patched into the results.
  *
- * @param source An [[AsyncQueryable]] object.
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] to patch.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
@@ -30,10 +30,10 @@ import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable,
  */
 export function patchAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the elements of the source with the provided range
+ * Creates an [[AsyncIterable]] for the elements of the source with the provided range
  * patched into the results.
  *
- * @param source An [[AsyncQueryable]] object.
+ * @param source An [[AsyncQueryable]] to patch.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.

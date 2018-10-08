@@ -3,6 +3,7 @@ node_modules
 coverage
 src
 scripts
-out/tests
-out/sandbox
+dist/tests
+dist/typedoc
 gulpfile.js
+biblio.json

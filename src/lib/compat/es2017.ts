@@ -14,4 +14,9 @@
   limitations under the License.
  */
 
-export * from "./sandbox";
+import "./es2015";
+
+// ES2017 compatibility for ES2015 hosts.
+if (typeof Symbol.asyncIterator === "undefined") {
+    Object.defineProperty(Symbol, "asyncIterator", { value: Symbol.for("Symbol.asyncIterator") });
+}

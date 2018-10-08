@@ -3,7 +3,7 @@
     "compilerOptions": {
         "target": "es5",
         "lib": ["es2015"],
-        "outDir": "../../out/es5",
+        "outDir": "../../dist/es5",
         "downlevelIteration": true
     }
 }

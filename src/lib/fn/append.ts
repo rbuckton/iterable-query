@@ -22,7 +22,7 @@ import { Queryable, HierarchyIterable } from "../types";
  * Creates a [[HierarchyIterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source A [[HierarchyIterable]] value.
+ * @param source The [[HierarchyIterable]] to append to.
  * @param value The value to append.
  * @category Subquery
  */
@@ -31,7 +31,7 @@ export function append<TNode, T extends TNode>(source: HierarchyIterable<TNode, 
  * Creates an [[Iterable]] for the elements of `source` with the provided `value` appended to the
  * end.
  *
- * @param source A [[Queryable]] value.
+ * @param source The [[Queryable]] to append to.
  * @param value The value to append.
  * @category Subquery
  */

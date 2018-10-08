@@ -1,5 +1,5 @@
 // @ts-check
-const { Sandbox } = require("../out/sandbox");
+const { Sandbox } = require("vm-sandbox");
 const sandbox = new Sandbox({
     base: __dirname,
     context: global,

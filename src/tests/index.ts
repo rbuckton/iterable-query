@@ -1,5 +1,5 @@
 import "source-map-support/register";
-import { Sandbox } from "../sandbox";
+import { Sandbox } from "vm-sandbox";
 
 const requires = {
     "mocha": require("mocha"),

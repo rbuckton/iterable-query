@@ -19,9 +19,10 @@ import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../int
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
- * Creates a subquery for the elements of the source with the provided range
+ * Creates a [[HierarchyIterable]] for the elements of `source` with the provided range
  * patched into the results.
  *
+ * @param source The [[HierarchyIterable]] to patch.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.
@@ -29,9 +30,10 @@ import { Queryable, HierarchyIterable } from "../types";
  */
 export function patch<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, start: number, skipCount?: number, range?: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the elements of the source with the provided range
+ * Creates an [[Iterable]] for the elements of `source` with the provided range
  * patched into the results.
  *
+ * @param source The [[Queryable]] to patch.
  * @param start The offset at which to patch the range.
  * @param skipCount The number of elements to skip from start.
  * @param range The range to patch into the result.

@@ -14,5 +14,5 @@
   limitations under the License.
  */
 
-import "./es5";
 import "./es2015";
+import "./es2017";
