@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetIterator, FlowHierarchy, ToIterable, CreateSubquery, Registry, GetSource, MakeTuple } from "../internal";
+import { assert, GetIterator, FlowHierarchy, ToIterable } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { prepend } from "./prepend";
 import { consume, ConsumeOptions } from "./consume";
@@ -71,9 +71,6 @@ function _break<T>(source: Queryable<T>, predicate: (element: T) => boolean): [I
     ];
 }
 
+// TODO: remove comment once auto-import is fixed
+/** @internal */
 export { _break as break };
-
-Registry.Query.registerCustom("break", _break, function (predicate) {
-    const [first, rest] = _break(GetSource(this), predicate);
-    return MakeTuple(CreateSubquery(this, first), CreateSubquery(this, rest));
-});

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
 
@@ -46,7 +46,7 @@ export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>)
 export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable(left, "left");
     assert.mustBeAsyncQueryable(right, "right");
-    return FlowHierarchy(new AsyncUnionIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left);
+    return FlowHierarchy(new AsyncUnionIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
 }
 
 @ToStringTag("AsyncUnionIterable")
@@ -75,5 +75,3 @@ class AsyncUnionIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("union", unionAsync);

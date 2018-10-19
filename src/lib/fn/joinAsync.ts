@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, Registry } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -28,7 +28,7 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
  * @param resultSelector A callback used to select the result for the correlated elements.
  * @category Join
  */
-export function joinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: I) => R): AsyncIterable<R> {
+export function joinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: I) => R | PromiseLike<R>): AsyncIterable<R> {
     assert.mustBeAsyncQueryable<O>(outer, "outer");
     assert.mustBeAsyncQueryable<I>(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
@@ -43,9 +43,9 @@ class AsyncJoinIterable<O, I, K, R> implements AsyncIterable<R> {
     private _inner: PossiblyAsyncIterable<I>;
     private _outerKeySelector: (element: O) => K;
     private _innerKeySelector: (element: I) => K;
-    private _resultSelector: (outer: O, inner: I) => R;
+    private _resultSelector: (outer: O, inner: I) => R | PromiseLike<R>;
 
-    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: I) => R) {
+    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: I) => R | PromiseLike<R>) {
         this._outer = outer;
         this._inner = inner;
         this._outerKeySelector = outerKeySelector;
@@ -68,5 +68,3 @@ class AsyncJoinIterable<O, I, K, R> implements AsyncIterable<R> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("join", joinAsync);

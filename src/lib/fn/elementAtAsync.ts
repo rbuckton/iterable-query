@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { lastAsync } from "./lastAsync";
 
@@ -52,5 +52,3 @@ export async function elementAtAsync<T>(source: AsyncQueryable<T>, offset: numbe
     }
     return undefined;
 }
-
-Registry.AsyncQuery.registerScalar("elementAt", elementAtAsync);

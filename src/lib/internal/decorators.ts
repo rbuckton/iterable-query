@@ -24,3 +24,11 @@ export function ToStringTag(tag: string) {
         return ctor;
     };
 }
+
+/** @internal */
+export function ClassName(name: string) {
+    return <T extends Function>(ctor: T) => {
+        Object.defineProperty(ctor, "name", { value: name, writable: false, enumerable: false, configurable: true });
+        return ctor;
+    };
+}

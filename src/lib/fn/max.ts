@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CompareValues, Registry } from "../internal";
+import { assert, ToIterable, CompareValues} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -41,5 +41,3 @@ export function max<T>(source: Queryable<T>, comparison: (x: T, y: T) => number 
     }
     return result;
 }
-
-Registry.Query.registerScalar("max", max);

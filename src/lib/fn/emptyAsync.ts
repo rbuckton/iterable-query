@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry, ToStringTag } from "../internal";
+import { ToStringTag } from "../internal";
 
 /**
  * Creates an [[AsyncIterable]] with no elements.
@@ -30,5 +30,3 @@ class AsyncEmptyIterable<T> implements AsyncIterable<T> {
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
     }
 }
-
-Registry.AsyncQuery.registerStatic("empty", emptyAsync);

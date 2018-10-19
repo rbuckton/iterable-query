@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CompareValues, FlowHierarchy, ToIterable, ThenBy, ToStringTag, Registry } from "../internal";
+import { assert, CompareValues, FlowHierarchy, ToIterable, ThenBy, ToStringTag} from "../internal";
 import { Queryable, OrderedIterable, HierarchyIterable, OrderedHierarchyIterable } from "../types";
 import { toArray } from "./toArray";
 
@@ -173,10 +173,3 @@ class OrderByIterable<T, K> implements OrderedIterable<T> {
         return parent ? parent._getSorter(elements, sorter) : sorter;
     }
 }
-
-Registry.Query.registerSubquery("orderBy", orderBy);
-Registry.Query.registerSubquery("orderByDescending", orderByDescending);
-Registry.OrderedQuery.registerSubquery("thenBy", thenBy);
-Registry.OrderedQuery.registerSubquery("thenByDescending", thenByDescending);
-Registry.OrderedHierarchyQuery.registerSubquery("thenBy", thenBy);
-Registry.OrderedHierarchyQuery.registerSubquery("thenByDescending", thenByDescending);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, SameValue } from "../internal";
+import { assert, ToPossiblyAsyncIterable, ToStringTag, SameValue } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable, AsyncChoice } from "../types";
 
 /**
@@ -60,5 +60,3 @@ class AsyncChooseIterable<K, V> implements AsyncIterable<V> {
         }
     }
 }
-
-Registry.AsyncQuery.registerStatic("choose", chooseAsync);

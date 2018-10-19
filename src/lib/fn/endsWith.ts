@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, Registry } from "../internal";
+import { assert, SameValue} from "../internal";
 import { Queryable } from "../types";
 import { takeRight } from "./takeRight";
 import { toArray } from "./toArray";
@@ -59,5 +59,3 @@ export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityCom
     }
     return true;
 }
-
-Registry.Query.registerScalar("endsWith", endsWith);

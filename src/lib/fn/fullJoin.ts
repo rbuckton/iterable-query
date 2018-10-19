@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, SelectGroupingKey, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, CreateGroupings, Identity, SelectGroupingKey, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 import { union } from "./union";
 import { map } from "./map";
@@ -74,5 +74,3 @@ class FullJoinIterable<O, I, K, R> implements Iterable<R> {
         }
     }
 }
-
-Registry.Query.registerSubquery("fullJoin", fullJoin);

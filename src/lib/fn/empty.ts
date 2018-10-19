@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry, ToStringTag } from "../internal";
+import { ToStringTag } from "../internal";
 
 /**
  * Creates an [[Iterable]] with no elements.
@@ -30,5 +30,3 @@ class EmptyIterable<T> implements Iterable<T> {
     *[Symbol.iterator](): Iterator<T> {
     }
 }
-
-Registry.Query.registerStatic("empty", empty);

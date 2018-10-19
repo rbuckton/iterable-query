@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -48,5 +48,3 @@ class AsyncFlatMapIterable<T, U> implements AsyncIterable<U> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("flatMap", flatMapAsync);

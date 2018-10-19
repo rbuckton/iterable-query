@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, CreateGrouping, ToStringTag, CreateSubquery, Registry, GetSource, FlowHierarchy } from "../internal";
+import { assert, ToIterable, CreateGroupings, Identity, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
 
 /**
@@ -85,15 +85,3 @@ class GroupByIterable<T, K, V, R> implements Iterable<R> {
         }
     }
 }
-
-Registry.Query.registerCustom("groupBy", groupBy, function (keySelector, elementSelector = Identity, resultSelector = CreateGrouping) {
-    assert.mustBeQuerySource(this, "this");
-    assert.mustBeFunction(keySelector, "keySelector");
-    assert.mustBeFunction(elementSelector, "elementSelector");
-    assert.mustBeFunction(resultSelector, "resultSelector");
-    return CreateSubquery(this, new GroupByIterable(
-        ToIterable(GetSource(this)),
-        keySelector,
-        elementSelector,
-        resultSelector === CreateGrouping ? CreateGrouping : (key, values) => resultSelector(key, CreateSubquery(this, values))));
-});

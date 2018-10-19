@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, SelectGroupingKey, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, Registry } from "../internal";
+import { assert, Identity, SelectGroupingKey, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { Lookup } from "../lookup";
 import { union } from "../fn/union";
@@ -23,7 +23,7 @@ import { map } from "../fn/map";
 import { defaultIfEmpty } from "../fn/defaultIfEmpty";
 
 /**
- * Creates an [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner 
+ * Creates an [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner
  * [[AsyncQueryable]] object.
  *
  * @param outer An [[AsyncQueryable]] object.
@@ -33,7 +33,7 @@ import { defaultIfEmpty } from "../fn/defaultIfEmpty";
  * @param resultSelector A callback used to select the result for the correlated elements.
  * @category Join
  */
-export function fullJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R): AsyncIterable<R> {
+export function fullJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>): AsyncIterable<R> {
     assert.mustBeAsyncQueryable<O>(outer, "outer");
     assert.mustBeAsyncQueryable<I>(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
@@ -48,9 +48,9 @@ class AsyncFullJoinIterable<O, I, K, R> implements AsyncIterable<R> {
     private _inner: PossiblyAsyncIterable<I>;
     private _outerKeySelector: (element: O) => K;
     private _innerKeySelector: (element: I) => K;
-    private _resultSelector: (outer: O | undefined, inner: I | undefined) => R;
+    private _resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>;
 
-    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R) {
+    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>) {
         this._outer = outer;
         this._inner = inner;
         this._outerKeySelector = outerKeySelector;
@@ -74,5 +74,3 @@ class AsyncFullJoinIterable<O, I, K, R> implements AsyncIterable<R> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("fullJoin", fullJoinAsync);

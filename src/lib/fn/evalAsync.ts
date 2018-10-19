@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, Registry, CreateSubquery, GetAsyncSource } from "../internal";
+import { assert, FlowHierarchy } from "../internal";
 import { AsyncQueryable, PossiblyAsyncHierarchyIterable, HierarchyIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
@@ -39,7 +39,3 @@ export async function evalAsync<T>(source: AsyncQueryable<T>): Promise<Iterable<
     assert.mustBeAsyncQueryable<T>(source, "source");
     return FlowHierarchy(await toArrayAsync(source), source);
 }
-
-Registry.AsyncQuery.registerCustom("eval", evalAsync, async function () {
-    return CreateSubquery(this, await evalAsync(GetAsyncSource(this)));
-});

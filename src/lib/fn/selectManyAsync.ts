@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { flatMapAsync } from "./flatMapAsync";
-export { flatMapAsync as selectManyAsync };
-
-Registry.AsyncQuery.registerAlias("selectMany", flatMapAsync);
+export { flatMapAsync as selectManyAsync } from "./flatMapAsync";

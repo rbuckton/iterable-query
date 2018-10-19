@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToIterable, Registry } from "../internal";
+import { assert, Identity, ToIterable } from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -46,5 +46,3 @@ export function average(source: Queryable<number>, elementSelector: (element: nu
     }
     return count > 0 ? sum / count : 0;
 }
-
-Registry.Query.registerScalar("average", average);

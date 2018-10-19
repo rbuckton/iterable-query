@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToIterable, Registry } from "../internal";
+import { assert, Identity, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -42,6 +42,4 @@ export function toArray<T>(source: Queryable<T>, elementSelector: (element: T) =
     }
     return result;
 }
-
-Registry.Query.registerScalar("toArray", toArray);
-Registry.Query.registerAlias("toJSON", toArray);
+;;

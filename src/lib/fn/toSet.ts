@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity, Registry } from "../internal";
+import { assert, ToIterable, Identity} from "../internal";
 import { Queryable } from "../types";
 import { Set } from "../collections";
 
@@ -44,5 +44,3 @@ export function toSet<T>(source: Queryable<T>, elementSelector: (element: T) => 
     }
     return set;
 }
-
-Registry.Query.registerScalar("toSet", toSet);

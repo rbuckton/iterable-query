@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry} from "../internal";
+import { assert, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
@@ -26,7 +26,7 @@ import { toArrayAsync } from "./toArrayAsync";
  * @param accumulator The callback used to compute each result.
  * @category Subquery
  */
-export function scanRightAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): AsyncIterable<T>;
+export function scanRightAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>): AsyncIterable<T>;
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
  *
@@ -35,8 +35,8 @@ export function scanRightAsync<T>(source: AsyncQueryable<T>, accumulator: (curre
  * @param seed An optional seed value.
  * @category Subquery
  */
-export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U): AsyncIterable<U>;
-export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, seed?: T | U): AsyncIterable<T | U> {
+export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U | PromiseLike<U>, seed: U): AsyncIterable<U>;
+export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U | PromiseLike<T | U>, seed?: T | U): AsyncIterable<T | U> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");
     return new AsyncScanRightIterable<T, U>(ToPossiblyAsyncIterable(source), accumulator, arguments.length > 2, seed);
@@ -45,11 +45,11 @@ export function scanRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (cu
 @ToStringTag("AsyncScanRightIterable")
 class AsyncScanRightIterable<T, U> implements AsyncIterable<T | U> {
     private _source: PossiblyAsyncIterable<T>;
-    private _accumulator: (current: T | U, element: T, offset: number) => T | U;
+    private _accumulator: (current: T | U, element: T, offset: number) => T | U | PromiseLike<T | U>;
     private _isSeeded: boolean;
     private _seed: T | U | undefined;
 
-    constructor(source: PossiblyAsyncIterable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, isSeeded: boolean, seed: T | U | undefined) {
+    constructor(source: PossiblyAsyncIterable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U | PromiseLike<T | U>, isSeeded: boolean, seed: T | U | undefined) {
         this._source = source;
         this._accumulator = accumulator;
         this._isSeeded = isSeeded;
@@ -68,10 +68,8 @@ class AsyncScanRightIterable<T, U> implements AsyncIterable<T | U> {
                 hasCurrent = true;
                 continue;
             }
-            current = accumulator(current!, value, offset);
+            current = await accumulator(current!, value, offset);
             yield current;
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("scanRight", scanRightAsync);

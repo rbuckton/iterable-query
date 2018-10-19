@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag } from "../internal";
 
 /**
  * Creates an [[AsyncIterable]] whose values are provided by a callback executed a provided number of
@@ -49,5 +49,3 @@ class AsyncGenerateIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerStatic("generate", generateAsync);

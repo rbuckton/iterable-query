@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Map } from "../collections";
 
@@ -35,18 +35,16 @@ export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
-export async function toMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V>>;
-export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Map<K, T>> {
+export async function toMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Map<K, V>>;
+export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<Map<K, T>> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const map = new Map<K, T>();
     for await (const item of ToPossiblyAsyncIterable(source)) {
         const key = keySelector(item);
-        const element = elementSelector(item);
+        const element = await elementSelector(item);
         map.set(key, element);
     }
     return map;
 }
-
-Registry.AsyncQuery.registerScalar("toMap", toMapAsync);

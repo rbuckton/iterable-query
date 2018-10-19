@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, ToStringTag } from "../internal";
+import { assert, ToStringTag } from "../internal";
 import { KeyValuePair } from "../types";
 
 /**
@@ -44,5 +44,3 @@ class AsyncObjectEntriesIterable<T extends object> implements AsyncIterable<KeyV
         }
     }
 }
-
-Registry.AsyncQuery.registerStatic("objectEntries", objectEntriesAsync);

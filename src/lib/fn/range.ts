@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag} from "../internal";
 
 /**
  * Creates an [[Iterable]] over a range of numbers.
@@ -60,5 +60,3 @@ class RangeIterable implements Iterable<number> {
         }
     }
 }
-
-Registry.Query.registerStatic("range", range);

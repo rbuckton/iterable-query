@@ -15,14 +15,14 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
 import { toSetAsync } from "./toSetAsync";
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
- * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not 
+ * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
  * in both.
  *
  * @param left An [[AsyncQueryable]] object.
@@ -32,7 +32,7 @@ import { toSetAsync } from "./toSetAsync";
 export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
- * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not 
+ * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
  * in both.
  *
  * @param left An [[AsyncQueryable]] object.
@@ -42,7 +42,7 @@ export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyA
 export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
- * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not 
+ * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
  * in both.
  *
  * @param left An [[AsyncQueryable]] object.
@@ -82,5 +82,3 @@ class AsyncSymmetricDifferenceIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("symmetricDifference", symmetricDifferenceAsync);

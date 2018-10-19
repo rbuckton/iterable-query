@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Registry } from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -28,5 +28,3 @@ export function drain<T>(source: Queryable<T>): void {
     assert.mustBeQueryable(source, "source");
     for (const _ of ToIterable(source)) ;
 }
-
-Registry.Query.registerScalar("drain", drain);

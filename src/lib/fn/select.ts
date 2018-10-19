@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { map } from "./map";
-export { map as select };
-
-Registry.Query.registerAlias("select", map);
+export { map as select } from "./map";

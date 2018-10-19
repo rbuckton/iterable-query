@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, SameValue, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
@@ -66,5 +66,3 @@ export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right
     }
     return false;
 }
-
-Registry.AsyncQuery.registerScalar("includesSequence", includesSequenceAsync);

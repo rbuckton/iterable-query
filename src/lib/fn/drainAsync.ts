@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -28,5 +28,3 @@ export async function drainAsync<T>(source: AsyncQueryable<T>): Promise<void> {
     assert.mustBeAsyncQueryable(source, "source");
     for await (const _ of ToPossiblyAsyncIterable(source)) ;
 }
-
-Registry.AsyncQuery.registerScalar("drain", drainAsync);

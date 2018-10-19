@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { filter } from "./filter";
-export { filter as where };
-
-Registry.Query.registerAlias("where", filter);
+export { filter as where } from "./filter";

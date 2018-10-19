@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, SameValue, Registry } from "../internal";
+import { assert, ToIterable, SameValue} from "../internal";
 import { Queryable } from "../types";
 import { toArray } from "./toArray";
 
@@ -66,5 +66,3 @@ export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equ
     }
     return false;
 }
-
-Registry.Query.registerScalar("includesSequence", includesSequence);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, True, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -25,15 +25,23 @@ import { AsyncQueryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export async function firstAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<T | undefined> {
+export async function firstAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T) => element is U): Promise<U | undefined>;
+/**
+ * Gets the first element, optionally filtering elements using the supplied callback.
+ *
+ * @param source A [[Queryable]] object.
+ * @param predicate An optional callback used to match each element.
+ * @category Scalar
+ */
+export async function firstAsync<T>(source: AsyncQueryable<T>, predicate?: (element: T) => boolean | PromiseLike<boolean>): Promise<T | undefined>;
+export async function firstAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): Promise<T | undefined> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        if (predicate(element)) {
+        const result = predicate(element);
+        if (typeof result === "boolean" ? result : await result) {
             return element;
         }
     }
     return undefined;
 }
-
-Registry.AsyncQuery.registerScalar("first", firstAsync);

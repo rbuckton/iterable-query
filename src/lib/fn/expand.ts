@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
@@ -64,5 +64,3 @@ class ExpandIterable<T> implements Iterable<T> {
         }
     }
 }
-
-Registry.Query.registerSubquery("expand", expand);

@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { filterDefinedAsync } from "./filterDefinedAsync";
-export { filterDefinedAsync as whereDefinedAsync };
-
-Registry.AsyncQuery.registerAlias("whereDefined", filterDefinedAsync);
+export { filterDefinedAsync as whereDefinedAsync } from "./filterDefinedAsync";

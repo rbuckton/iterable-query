@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, GetHierarchy, ToStringTag } from "../internal";
 import { HierarchyProvider, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, Hierarchical } from "../types";
 import { Axis } from "./axis";
 import { elementAt } from "./elementAt";
@@ -67,5 +67,3 @@ class AsyncNthChildIterable<TNode, T extends TNode> implements AsyncIterable<TNo
         return GetHierarchy(this._source);
     }
 }
-
-Registry.AsyncHierarchyQuery.registerSubquery("nthChild", nthChildAsync);

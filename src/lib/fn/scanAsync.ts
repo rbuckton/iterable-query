@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -25,7 +25,7 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
  * @param accumulator The callback used to compute each result.
  * @category Subquery
  */
-export function scanAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): AsyncIterable<T>;
+export function scanAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>): AsyncIterable<T>;
 /**
  * Creates a subquery containing the cumulative results of applying the provided callback to each element.
  *
@@ -34,8 +34,8 @@ export function scanAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T
  * @param seed An optional seed value.
  * @category Subquery
  */
-export function scanAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U): AsyncIterable<U>;
-export function scanAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, seed?: T | U): AsyncIterable<T | U> {
+export function scanAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U | PromiseLike<U>, seed: U): AsyncIterable<U>;
+export function scanAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U | PromiseLike<T | U>, seed?: T | U): AsyncIterable<T | U> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");
     return new AsyncScanIterable<T, U>(ToPossiblyAsyncIterable(source), accumulator, arguments.length > 2, seed!);
@@ -44,11 +44,11 @@ export function scanAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current
 @ToStringTag("AsyncScanIterable")
 class AsyncScanIterable<T, U> implements AsyncIterable<T | U> {
     private _source: PossiblyAsyncIterable<T>;
-    private _accumulator: (current: T | U, element: T, offset: number) => T | U;
+    private _accumulator: (current: T | U, element: T, offset: number) => T | U | PromiseLike<T | U>;
     private _isSeeded: boolean;
     private _seed: T | U | undefined;
 
-    constructor(source: PossiblyAsyncIterable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U, isSeeded: boolean, seed: T | U | undefined) {
+    constructor(source: PossiblyAsyncIterable<T>, accumulator: (current: T | U, element: T, offset: number) => T | U | PromiseLike<T | U>, isSeeded: boolean, seed: T | U | undefined) {
         this._source = source;
         this._accumulator = accumulator;
         this._isSeeded = isSeeded;
@@ -66,12 +66,10 @@ class AsyncScanIterable<T, U> implements AsyncIterable<T | U> {
                 hasCurrent = true;
             }
             else {
-                current = accumulator(current!, value, offset);
+                current = await accumulator(current!, value, offset);
                 yield current;
             }
             offset++;
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("scan", scanAsync);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -25,7 +25,7 @@ import { AsyncQueryable } from "../types";
  * @param accumulator the callback used to compute the result.
  * @category Scalar
  */
-export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T): Promise<T>;
+export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>): Promise<T>;
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
@@ -34,7 +34,7 @@ export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current:
  * @category Scalar
  * @param seed An optional seed value.
  */
-export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector?: (result: U, count: number) => U): Promise<U>;
+export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U | PromiseLike<U>, seed: U): Promise<U>;
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
  *
@@ -44,12 +44,12 @@ export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (curre
  * @param resultSelector An optional callback used to compute the final result.
  * @category Scalar
  */
-export function reduceAsync<T, U, R>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): Promise<R>;
-export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): Promise<T> {
+export function reduceAsync<T, U, R>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U | PromiseLike<T>, seed: U, resultSelector: (result: U, count: number) => R | PromiseLike<R>): Promise<R>;
+export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>, seed?: T, resultSelector: (result: T, count: number) => T | PromiseLike<T> = Identity): Promise<T> {
     return reduceAsyncCore(source, accumulator, seed, arguments.length > 2, resultSelector);
 }
 
-async function reduceAsyncCore<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T, current: T | undefined, hasCurrent: boolean, resultSelector: (result: T, count: number) => T): Promise<T> {
+async function reduceAsyncCore<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>, current: T | undefined, hasCurrent: boolean, resultSelector: (result: T, count: number) => T | PromiseLike<T>): Promise<T> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");
     assert.mustBeFunction(resultSelector, "resultSelector");
@@ -60,11 +60,9 @@ async function reduceAsyncCore<T>(source: AsyncQueryable<T>, accumulator: (curre
             current = value;
         }
         else {
-            current = accumulator(current!, value, count);
+            current = await accumulator(current!, value, count);
         }
         count++;
     }
     return resultSelector(current!, count);
 }
-
-Registry.AsyncQuery.registerScalar("reduce", reduceAsync);

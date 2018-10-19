@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, MakeTuple, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, MakeTuple, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -36,8 +36,8 @@ export function zipAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>
  * @param selector A callback used to combine two elements.
  * @category Join
  */
-export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => R): AsyncIterable<R>;
-export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): AsyncIterable<[T, U] | R> {
+export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => R | PromiseLike<R>): AsyncIterable<R>;
+export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => PromiseLike<[T, U] | R> | [T, U] | R = MakeTuple): AsyncIterable<[T, U] | R> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<U>(right, "right");
     assert.mustBeFunction(selector, "selector");
@@ -48,9 +48,9 @@ export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable
 class AsyncZipIterable<T, U, R> implements AsyncIterable<R> {
     private _left: PossiblyAsyncIterable<T>;
     private _right: PossiblyAsyncIterable<U>;
-    private _selector: (left: T, right: U) => R;
+    private _selector: (left: T, right: U) => PromiseLike<R> | R;
 
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<U>, selector: (left: T, right: U) => R) {
+    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<U>, selector: (left: T, right: U) => PromiseLike<R> | R) {
         this._left = left;
         this._right = right;
         this._selector = selector;
@@ -82,5 +82,3 @@ class AsyncZipIterable<T, U, R> implements AsyncIterable<R> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("zip", zipAsync);

@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { symmetricDifferenceAsync } from "./symmetricDifferenceAsync";
-export { symmetricDifferenceAsync as xorAsync };
-
-Registry.AsyncQuery.registerAlias("xor", symmetricDifferenceAsync);
+export { symmetricDifferenceAsync as xorAsync } from "./symmetricDifferenceAsync";

@@ -441,7 +441,10 @@ describe("AsyncQuery", () => {
             "non-queryable": [TypeError, {}]
         });
         typeOnly(() => {
-            type.exact(type<AsyncQuery<AB>>(), type<AsyncQuery<ABC>>().intersect(type<Iterable<AB>>()));
+            type.exact(type<AsyncQuery<AB>>(), type<AsyncQuery<ABC>>().intersect(type<Iterable<AB>>()));;
+            
+            type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<ABC>>());
+
             type.exact(type<AsyncHierarchyQuery<ABC>>(), type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<ABC>>()));
             type.exact(type<AsyncHierarchyQuery<ABC, A>>(), type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<ABC, A>>()));
             type.exact(type<AsyncHierarchyQuery<AB, A>>(), type<AsyncQuery<ABC>>().intersect(type<HierarchyIterable<AB, A>>()));

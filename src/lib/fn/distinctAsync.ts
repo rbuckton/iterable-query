@@ -15,21 +15,21 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 import { Set } from "../collections";
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the distinct elements of `source`.
  * @category Subquery
- * 
+ *
  * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  */
 export function distinctAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates an [[AsyncIterable]] for the distinct elements of source.
  * @category Subquery
- * 
+ *
  * @param source An [[AsyncQueryable]] object.
  */
 export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
@@ -56,5 +56,3 @@ class AsyncDistinctIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("distinct", distinctAsync);

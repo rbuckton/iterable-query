@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, ToStringTag } from "../internal";
 import { Queryable, Choice } from "../types";
 import { Map } from "../collections";
 
@@ -61,5 +61,3 @@ class ChooseIterable<K, T> implements Iterable<T> {
         }
     }
 }
-
-Registry.Query.registerStatic("choose", choose);

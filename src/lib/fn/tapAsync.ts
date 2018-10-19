@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry, IsPromiseLike } from "../internal";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -88,10 +88,8 @@ class AsyncTapterable<T> implements AsyncIterable<T> {
         let offset = 0;
         for await (const element of source) {
             const result = callback(element, offset++);
-            if (IsPromiseLike(result)) await result;
+            if (result !== undefined) await result;
             yield element;
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("tap", tapAsync);

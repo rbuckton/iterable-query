@@ -187,6 +187,7 @@ export * from "./unionAsync";
 export * from "./zip";
 export * from "./zipAsync";
 export * from "./through";
+export * from "./throughAsync";
 export * from "./toHierarchy";
 export * from "./toHierarchyAsync";
 export * from "./toLookup";

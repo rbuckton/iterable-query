@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToStringTag, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, FlowHierarchy, ToStringTag, ToPossiblyAsyncIterable } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
@@ -48,5 +48,3 @@ class AsyncReverseIterable<T> implements AsyncIterable<T> {
         yield* list;
     }
 }
-
-Registry.AsyncQuery.registerSubquery("reverse", reverseAsync);

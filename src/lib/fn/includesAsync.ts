@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, SameValue, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -25,14 +25,22 @@ import { AsyncQueryable } from "../types";
  * @param value A value.
  * @category Scalar
  */
-export async function includesAsync<T>(source: AsyncQueryable<T>, value: T): Promise<boolean> {
+export async function includesAsync<T>(source: AsyncQueryable<T>, value: T): Promise<boolean>;
+/**
+ * Computes a scalar value indicating whether the provided value is included in an [[AsyncQueryable]].
+ *
+ * @param source An [[AsyncQueryable]] object.
+ * @param value A value.
+ * @param equalityComparison An optional callback used to compare the equality of two elements.
+ * @category Scalar
+ */
+export async function includesAsync<T, U>(source: AsyncQueryable<T>, value: U, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
+export async function includesAsync<T>(source: AsyncQueryable<T>, value: T, equalityComparison: (left: T, right: T) => boolean = SameValue): Promise<boolean> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        if (SameValue(value, element)) {
+        if (equalityComparison(value, element)) {
             return true;
         }
     }
     return false;
 }
-
-Registry.AsyncQuery.registerScalar("includes", includesAsync);

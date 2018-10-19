@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToIterable, Registry } from "../internal";
+import { assert, True, ToIterable} from "../internal";
 import { Queryable } from "../types";
 import { Map, Set } from "../collections";
 
@@ -44,5 +44,3 @@ export function count<T>(source: Queryable<T>, predicate: (element: T) => boolea
 
     return count;
 }
-
-Registry.Query.registerScalar("count", count);

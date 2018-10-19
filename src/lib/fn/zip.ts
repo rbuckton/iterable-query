@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, MakeTuple, GetIterator, IteratorClose, ToIterable, ToStringTag, Registry } from "../internal";
+import { assert, MakeTuple, GetIterator, IteratorClose, ToIterable, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -82,5 +82,3 @@ class ZipIterable<T, U, R> implements Iterable<R> {
         }
     }
 }
-
-Registry.Query.registerSubquery("zip", zip);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetIterator, IteratorClose, ToIterable, Registry } from "../internal";
+import { assert, SameValue, GetIterator, IteratorClose, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -64,5 +64,3 @@ export function startsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityC
         if (!leftDone) IteratorClose(leftIterator);
     }
 }
-
-Registry.Query.registerScalar("startsWith", startsWith);

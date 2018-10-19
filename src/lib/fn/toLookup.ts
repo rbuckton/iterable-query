@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, CreateGroupings, Registry } from "../internal";
+import { assert, Identity, CreateGroupings} from "../internal";
 import { Queryable } from "../types";
 import { Lookup } from "../lookup";
 
@@ -42,5 +42,3 @@ export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) =
     assert.mustBeFunction(elementSelector, "elementSelector");
     return new Lookup(CreateGroupings(source, keySelector, elementSelector));
 }
-
-Registry.Query.registerScalar("toLookup", toLookup);

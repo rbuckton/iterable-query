@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, ToStringTag, Registry, CreateSubquery, GetSource } from "../internal";
+import { assert, ToIterable, CreateGroupings, Identity, ToStringTag } from "../internal";
 import { Queryable } from "../types";
 import { empty } from "./empty";
 
@@ -65,12 +65,3 @@ class GroupJoinIterable<O, I, K, R> implements Iterable<R> {
         }
     }
 }
-
-Registry.Query.registerCustom("groupJoin", groupJoin, function (inner, outerKeySelector, innerKeySelector, resultSelector) {
-    assert.mustBeQuerySource(this, "this");
-    assert.mustBeQueryable(inner, "inner");
-    assert.mustBeFunction(outerKeySelector, "outerKeySelector");
-    assert.mustBeFunction(innerKeySelector, "innerKeySelector");
-    assert.mustBeFunction(resultSelector, "resultSelector");
-    return CreateSubquery(this, new GroupJoinIterable(ToIterable(GetSource(this)), ToIterable(inner), outerKeySelector, innerKeySelector, (outer, inner) => resultSelector(outer, CreateSubquery(this, inner))));
-});

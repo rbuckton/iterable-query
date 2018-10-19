@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { assert, FlowHierarchy, ToStringTag, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -56,5 +56,3 @@ class AsyncPrependIterable<T> implements AsyncIterable<T> {
         yield* this._source;
     }
 }
-
-Registry.AsyncQuery.registerSubquery("prepend", prependAsync);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, Registry } from "../internal";
+import { assert, SameValue } from "../internal";
 import { AsyncQueryable } from "../types";
 import { takeRightAsync } from "./takeRightAsync";
 import { toArrayAsync } from "./toArrayAsync";
@@ -59,5 +59,3 @@ export async function endsWithAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQ
     }
     return true;
 }
-
-Registry.AsyncQuery.registerScalar("endsWith", endsWithAsync);

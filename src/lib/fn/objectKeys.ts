@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, ToStringTag } from "../internal";
+import { assert, ToStringTag } from "../internal";
 
 /**
  * Creates an [[Iterable]] for the own property keys of an `object`.
@@ -40,5 +40,3 @@ class ObjectKeysIterable<T extends object> implements Iterable<Extract<keyof T, 
         yield* Object.keys(source) as Extract<keyof T, string>[];
     }
 }
-
-Registry.Query.registerStatic("objectKeys", objectKeys);

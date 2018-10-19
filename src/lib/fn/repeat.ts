@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag} from "../internal";
 
 /**
  * Creates an Iterable for a value repeated a provided number of times.
@@ -46,5 +46,3 @@ class RepeatIterable<T> implements Iterable<T> {
         }
     }
 }
-
-Registry.Query.registerStatic("repeat", repeat);

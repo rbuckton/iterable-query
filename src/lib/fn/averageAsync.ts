@@ -15,11 +15,12 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable, Identity } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
  * Computes the average for a series of numbers.
+ * NOTE: If any element is not a `number`, this overload will throw.
  *
  * @param source An [[AsyncQueryable]] object.
  * @category Scalar
@@ -32,19 +33,19 @@ export async function averageAsync(source: AsyncQueryable<number>): Promise<numb
  * @param elementSelector A callback used to convert a value in `source` to a number.
  * @category Scalar
  */
-export async function averageAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
-export async function averageAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number = Number): Promise<number> {
-    assert.mustBeAsyncQueryable<T>(source, "source");
-    assert.mustBeFunctionOrUndefined(elementSelector, "elementSelector");
+export async function averageAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number | PromiseLike<number>): Promise<number>;
+export async function averageAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number | PromiseLike<number> = Identity): Promise<number> {
+    assert.mustBeAsyncQueryable(source, "source");
+    assert.mustBeFunction(elementSelector, "elementSelector");
     let sum = 0;
     let count = 0;
-    for await (const value of ToPossiblyAsyncIterable(source)) {
-        const result = elementSelector(value);
-        if (typeof result !== "number") throw new TypeError();
+    for await (const element of ToPossiblyAsyncIterable(source)) {
+        const value = elementSelector(element);
+        const result = typeof value === "number" ? value : await value;
+        assert.mustBeNumber(result);
         sum += result;
         count++;
     }
     return count > 0 ? sum / count : 0;
 }
 
-Registry.AsyncQuery.registerScalar("average", averageAsync);

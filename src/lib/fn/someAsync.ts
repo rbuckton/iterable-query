@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, True, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -26,15 +26,14 @@ import { AsyncQueryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export async function someAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<boolean> {
+export async function someAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): Promise<boolean> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        if (predicate(element)) {
+        const result = predicate(element);
+        if (typeof result === "boolean" ? result : await result) {
             return true;
         }
     }
     return false;
 }
-
-Registry.AsyncQuery.registerScalar("some", someAsync);

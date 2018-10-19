@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, ToStringTag, Registry, CreatePage } from "../internal";
+import { assert, ToIterable, ToStringTag, CreatePage } from "../internal";
 import { Queryable, Page, HierarchyIterable, HierarchyPage } from "../types";
 
 /**
@@ -71,5 +71,3 @@ class PageByIterable<T> implements Iterable<Page<T>> {
         }
     }
 }
-
-Registry.Query.registerSubquery("pageBy", pageBy);

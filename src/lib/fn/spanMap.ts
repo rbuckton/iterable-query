@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, SameValue, Identity, CreateGrouping, ToStringTag, Registry, FlowHierarchy } from "../internal";
+import { assert, ToIterable, SameValue, Identity, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
 
 /**
@@ -100,5 +100,3 @@ class SpanMapIterable<T, K, V, R> implements Iterable<R> {
         }
     }
 }
-
-Registry.Query.registerSubquery("spanMap", spanMap);

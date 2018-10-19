@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -49,5 +49,3 @@ class MapIterable<T, U> implements Iterable<U> {
         }
     }
 }
-
-Registry.Query.registerSubquery("map", map);

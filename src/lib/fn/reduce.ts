@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity, Registry } from "../internal";
+import { assert, ToIterable, Identity} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -64,5 +64,3 @@ export function reduce<T>(source: Queryable<T>, accumulator: (current: T, elemen
     }
     return resultSelector(current!, count);
 }
-
-Registry.Query.registerScalar("reduce", reduce);

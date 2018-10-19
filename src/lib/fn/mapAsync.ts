@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -25,7 +25,7 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
  * @param selector A callback used to map each element.
  * @category Subquery
  */
-export function mapAsync<T, U>(source: AsyncQueryable<T>, selector: (element: T, offset: number) => U): AsyncIterable<U> {
+export function mapAsync<T, U>(source: AsyncQueryable<T>, selector: (element: T, offset: number) => U | PromiseLike<U>): AsyncIterable<U> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(selector, "selector");
     return new AsyncMapIterable(ToPossiblyAsyncIterable(source), selector);
@@ -34,9 +34,9 @@ export function mapAsync<T, U>(source: AsyncQueryable<T>, selector: (element: T,
 @ToStringTag("AsyncMapIterable")
 class AsyncMapIterable<T, U> implements AsyncIterable<U> {
     private _source: PossiblyAsyncIterable<T>;
-    private _selector: (element: T, offset: number) => U;
+    private _selector: (element: T, offset: number) => U | PromiseLike<U>;
 
-    constructor(source: PossiblyAsyncIterable<T>, selector: (element: T, offset: number) => U) {
+    constructor(source: PossiblyAsyncIterable<T>, selector: (element: T, offset: number) => U | PromiseLike<U>) {
         this._source = source;
         this._selector = selector;
     }
@@ -49,5 +49,3 @@ class AsyncMapIterable<T, U> implements AsyncIterable<U> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("map", mapAsync);

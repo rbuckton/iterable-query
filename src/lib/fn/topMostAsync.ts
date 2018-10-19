@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, Registry, True } from "../internal";
+import { assert, GetHierarchy, ToStringTag, True } from "../internal";
 import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Axis } from "./axis";
 import { Map, Set } from "../collections";
@@ -38,8 +38,8 @@ export function topMostAsync<TNode, T extends TNode, U extends T>(source: Possib
  * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
  */
-export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate?: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
-export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean = True): AsyncHierarchyIterable<TNode, T> {
+export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate?: (element: T) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode, T>;
+export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode, T> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     return new AsyncTopMostIterable(source, predicate);
 }
@@ -47,9 +47,9 @@ export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierar
 @ToStringTag("AsyncTopMostIterable")
 class AsyncTopMostIterable<TNode, T extends TNode> implements AsyncHierarchyIterable<TNode, T> {
     private _source: PossiblyAsyncHierarchyIterable<TNode, T>;
-    private _predicate: (value: T) => boolean;
+    private _predicate: (value: T) => boolean | PromiseLike<boolean>;
 
-    constructor(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (value: T) => boolean) {
+    constructor(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (value: T) => boolean | PromiseLike<boolean>) {
         this._source = source;
         this._predicate = predicate;
     }
@@ -88,8 +88,13 @@ class AsyncTopMostIterable<TNode, T extends TNode> implements AsyncHierarchyIter
             }
         }
 
-        for (const node of topMostNodes) {
-            if (predicate(node)) yield node;
+        if (predicate === True) {
+            yield* topMostNodes;
+        }
+        else {
+            for (const node of topMostNodes) {
+                if (await predicate(node)) yield node;
+            }
         }
     }
 
@@ -97,5 +102,3 @@ class AsyncTopMostIterable<TNode, T extends TNode> implements AsyncHierarchyIter
         return GetHierarchy(this._source);
     }
 }
-
-Registry.AsyncHierarchyQuery.registerSubquery("topMost", topMostAsync);

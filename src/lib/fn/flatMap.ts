@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -48,5 +48,3 @@ class FlatMapIterable<T, U> implements Iterable<U> {
         }
     }
 }
-
-Registry.Query.registerSubquery("flatMap", flatMap);

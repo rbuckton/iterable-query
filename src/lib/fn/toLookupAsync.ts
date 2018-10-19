@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, CreateGroupingsAsync, Registry } from "../internal";
+import { assert, Identity, CreateGroupingsAsync } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Lookup } from "../lookup";
 
@@ -35,12 +35,10 @@ export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
-export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Lookup<K, V>>;
-export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Promise<Lookup<K, T>> {
+export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Lookup<K, V>>;
+export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<Lookup<K, T>> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
     return new Lookup(await CreateGroupingsAsync(source, keySelector, elementSelector));
 }
-
-Registry.AsyncQuery.registerScalar("toLookup", toLookupAsync);

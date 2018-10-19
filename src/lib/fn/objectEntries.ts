@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, ToStringTag } from "../internal";
+import { assert, ToStringTag } from "../internal";
 import { KeyValuePair } from "../types";
 
 /**
@@ -43,5 +43,3 @@ class ObjectEntriesIterable<T extends object> implements Iterable<KeyValuePair<T
         }
     }
 }
-
-Registry.Query.registerStatic("objectEntries", objectEntries);

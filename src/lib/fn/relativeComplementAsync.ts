@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { exceptAsync } from "./exceptAsync";
-export { exceptAsync as relativeComplementAsync };
-
-Registry.AsyncQuery.registerAlias("relativeComplement", exceptAsync);
+export { exceptAsync as relativeComplementAsync } from "./exceptAsync";

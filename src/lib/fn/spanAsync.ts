@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetAsyncIterator, FlowHierarchy, ToAsyncIterable, Registry, MakeTuple, CreateSubquery, CreateAsyncSubquery, GetAsyncSource } from "../internal";
+import { assert, GetAsyncIterator, FlowHierarchy, ToAsyncIterable } from "../internal";
 import { HierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable } from "../types";
 import { prependAsync } from "./prependAsync";
 import { consumeAsync, ConsumeAsyncOptions } from "./consumeAsync";
@@ -49,7 +49,7 @@ export async function spanAsync<TNode, T extends TNode, U extends T>(source: Pos
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function spanAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
+export async function spanAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an [[Iterable]] containing the first span of
  * elements that match the supplied predicate, and whose second element is an [[AsyncIterable]]
@@ -75,14 +75,15 @@ export async function spanAsync<T, U extends T>(source: AsyncQueryable<T>, predi
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
-export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {
+export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]>;
+export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     const prefix: T[] = [];
     const iterator = GetAsyncIterator(ToAsyncIterable(source));
     for await (const value of consumeAsync(iterator, noCacheAndLeaveOpen)) {
-        if (!predicate(value)) {
+        const result = predicate(value);
+        if (!(typeof result === "boolean" ? result : await result)) {
             const remaining = prependAsync(consumeAsync(iterator, cacheAndClose), value);
             return [
                 FlowHierarchy(prefix, source),
@@ -96,8 +97,3 @@ export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (elemen
         FlowHierarchy(emptyAsync<T>(), source),
     ];
 }
-
-Registry.AsyncQuery.registerCustom("span", spanAsync, async function (predicate) {
-    const [first, rest] = await spanAsync(GetAsyncSource(this), predicate);
-    return MakeTuple(CreateSubquery(this, first), CreateAsyncSubquery(this, rest));
-});

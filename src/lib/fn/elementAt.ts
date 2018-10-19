@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Registry } from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
 import { last } from "./last";
 
@@ -52,5 +52,3 @@ export function elementAt<T>(source: Queryable<T>, offset: number): T | undefine
     }
     return undefined;
 }
-
-Registry.Query.registerScalar("elementAt", elementAt);

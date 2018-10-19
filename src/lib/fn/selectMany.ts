@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { flatMap } from "./flatMap";
-export { flatMap as selectMany };
-
-Registry.Query.registerSubquery("selectMany", flatMap);
+export { flatMap as selectMany } from "./flatMap";

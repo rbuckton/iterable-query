@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 
 /**
@@ -64,5 +64,3 @@ class AsyncDefaultIfEmptyIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("defaultIfEmpty", defaultIfEmptyAsync);

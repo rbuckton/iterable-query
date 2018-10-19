@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToStringTag, Registry } from "../internal";
+import { assert, ToStringTag} from "../internal";
 
 /**
  * Creates an [[Iterable]] whose values are provided by a callback executed a provided number of
@@ -49,5 +49,3 @@ class GenerateIterable<T> implements Iterable<T> {
         }
     }
 }
-
-Registry.Query.registerStatic("generate", generate);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, True, Registry } from "../internal";
+import { assert, ToIterable, True} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -36,5 +36,3 @@ export function some<T>(source: Queryable<T>, predicate: (element: T) => boolean
     }
     return false;
 }
-
-Registry.Query.registerScalar("some", some);

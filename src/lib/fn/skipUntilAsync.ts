@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -26,7 +26,7 @@ import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable,
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
-export function skipUntilAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
+export function skipUntilAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery containing all elements except the first elements that do not match
  * the supplied predicate.
@@ -35,8 +35,8 @@ export function skipUntilAsync<TNode, T extends TNode>(source: PossiblyAsyncHier
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
-export function skipUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
-export function skipUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {
+export function skipUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncIterable<T>;
+export function skipUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     return FlowHierarchy(new AsyncSkipWhileIterable(ToPossiblyAsyncIterable(source), predicate), source);
@@ -45,9 +45,9 @@ export function skipUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element
 @ToStringTag("AsyncSkipWhileIterable")
 class AsyncSkipWhileIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _predicate: (element: T) => boolean;
+    private _predicate: (element: T) => boolean | PromiseLike<boolean>;
 
-    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T) => boolean) {
+    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>) {
         this._source = source;
         this._predicate = predicate;
     }
@@ -57,7 +57,8 @@ class AsyncSkipWhileIterable<T> implements AsyncIterable<T> {
         let skipping = true;
         for await (const element of this._source) {
             if (skipping) {
-                skipping = !predicate(element);
+                const result = predicate(element);
+                skipping = !(typeof result === "boolean" ? result : await result);
             }
             if (!skipping) {
                 yield element;
@@ -65,5 +66,3 @@ class AsyncSkipWhileIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("skipUntil", skipUntilAsync);

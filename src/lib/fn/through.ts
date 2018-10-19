@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, CreateSubquery } from "../internal";
+import { assert } from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -32,7 +32,3 @@ export function through<T, U, S extends Queryable<T> = Queryable<T>, R extends Q
     assert.mustBeQueryable(result);
     return result;
 }
-
-Registry.Query.registerCustom("through", through, function (callback) {
-    return CreateSubquery(this, through(this, callback as <S, R>(source: S) => R));
-});

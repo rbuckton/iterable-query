@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { ToStringTag, Registry } from "../internal";
+import { ToStringTag } from "../internal";
 
 /**
  * Creates an [[AsyncIterable]] over a single element.
@@ -39,5 +39,3 @@ class AsyncOnceIterable<T> implements AsyncIterable<T> {
         yield this._value;
     }
 }
-
-Registry.AsyncQuery.registerStatic("once", onceAsync);

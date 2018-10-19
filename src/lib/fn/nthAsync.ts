@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { elementAtAsync } from "./elementAtAsync";
-export { elementAtAsync as nthAsync };
-
-Registry.AsyncQuery.registerAlias("nth", elementAtAsync);
+export { elementAtAsync as nthAsync } from "./elementAtAsync";

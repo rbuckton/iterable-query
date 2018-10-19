@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
@@ -52,5 +52,3 @@ class PrependIterable<T> implements Iterable<T> {
         yield* this._source;
     }
 }
-
-Registry.Query.registerSubquery("prepend", prepend);

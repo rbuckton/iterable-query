@@ -15,5 +15,41 @@
  */
 /** @module "iterable-query/fn" */
 
-import { if as _if } from "./if";
-export { _if as conditional };
+import { assert, ToIterable, ToStringTag} from "../internal";
+import { Queryable } from "../types";
+import { empty } from "./empty";
+
+/**
+ * Creates an [[Iterable]] that iterates the elements from one of two sources based on the result of a
+ * lazily evaluated condition.
+ *
+ * @param condition A callback used to choose a source.
+ * @param thenQueryable The source to use when the callback evaluates to `true`.
+ * @param elseQueryable The source to use when the callback evaluates to `false`.
+ * @category Query
+ */
+export function conditional<T>(condition: () => boolean, thenQueryable: Queryable<T>, elseQueryable?: Queryable<T>): Iterable<T> {
+    assert.mustBeFunction(condition, "condition");
+    assert.mustBeQueryable(thenQueryable, "thenQueryable");
+    assert.mustBeQueryableOrUndefined(elseQueryable, "elseQueryable");
+    return new IfIterable(condition, ToIterable(thenQueryable), elseQueryable && ToIterable(elseQueryable));
+}
+
+@ToStringTag("IfIterable")
+class IfIterable<T> implements Iterable<T> {
+    private _condition: () => boolean;
+    private _thenQueryable: Iterable<T>;
+    private _elseQueryable: Iterable<T> | undefined;
+
+    constructor(condition: () => boolean, thenQueryable: Iterable<T>, elseQueryable?: Iterable<T>) {
+        this._condition = condition;
+        this._thenQueryable = thenQueryable;
+        this._elseQueryable = elseQueryable;
+    }
+
+    *[Symbol.iterator](): Iterator<T> {
+        const condition = this._condition;
+        const iterable = condition() ? this._thenQueryable : (this._elseQueryable || empty());
+        yield* iterable;
+    }
+}

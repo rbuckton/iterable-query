@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { assert, True, ToPossiblyAsyncIterable, GetAsyncSource } from "../internal";
 import { Map, Set } from "../collections";
 import { AsyncQueryable } from "../types";
 
@@ -26,23 +26,22 @@ import { AsyncQueryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export async function countAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True): Promise<number> {
+export async function countAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): Promise<number> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
 
     if (predicate === True) {
-        if (Array.isArray(source)) return source.length;
-        if (source instanceof Set || source instanceof Map) return source.size;
+        const realSource = GetAsyncSource(source);
+        if (Array.isArray(realSource)) return realSource.length;
+        if (realSource instanceof Set || realSource instanceof Map) return realSource.size;
     }
 
     let count = 0;
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        if (predicate(element)) {
+        if (predicate === True || await predicate(element)) {
             count++;
         }
     }
 
     return count;
 }
-
-Registry.AsyncQuery.registerScalar("count", countAsync);

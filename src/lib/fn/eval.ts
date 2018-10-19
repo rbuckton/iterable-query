@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, Registry } from "../internal";
+import { assert, FlowHierarchy} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { toArray } from "./toArray";
 
@@ -35,5 +35,3 @@ function _eval<T>(source: Queryable<T>): Iterable<T> {
 }
 
 export { _eval as eval };
-
-Registry.Query.registerSubquery("eval", _eval);

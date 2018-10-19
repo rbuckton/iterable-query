@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetIterator, ToIterable, FlowHierarchy, Registry, GetSource, CreateSubquery, MakeTuple } from "../internal";
+import { assert, GetIterator, ToIterable, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { prepend } from "./prepend";
 import { consume, ConsumeOptions } from "./consume";
@@ -96,8 +96,3 @@ export function span<T>(source: Queryable<T>, predicate: (element: T) => boolean
         FlowHierarchy(empty<T>(), source)
     ];
 }
-
-Registry.Query.registerCustom("span", span, function (predicate) {
-    const [first, rest] = span(GetSource(this), predicate);
-    return MakeTuple(CreateSubquery(this, first), CreateSubquery(this, rest));
-});

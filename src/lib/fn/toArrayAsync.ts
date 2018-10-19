@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -32,15 +32,13 @@ export async function toArrayAsync<T>(source: AsyncQueryable<T>): Promise<T[]>;
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
-export async function toArrayAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V): Promise<V[]>;
-export async function toArrayAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<T[]> {
+export async function toArrayAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V | PromiseLike<V>): Promise<V[]>;
+export async function toArrayAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<T[]> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const result: T[] = [];
     for await (const item of ToPossiblyAsyncIterable(source)) {
-        result.push(elementSelector(item));
+        result.push(elementSelector === Identity ? item : await elementSelector(item));
     }
     return result;
 }
-
-Registry.AsyncQuery.registerScalar("toArray", toArrayAsync);

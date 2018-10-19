@@ -16,12 +16,38 @@
 /** @module "iterable-query" */
 
 import * as fn from "./fn";
-import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, Registry, GetIterator, QuerySource } from "./internal";
+import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, GetIterator, QuerySource } from "./internal";
 import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, KeyValuePair, Page, Choice } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeOptions } from "./fn";
 
-Registry.addRegistry(fn);
+/**
+ * Flows the base type of a [[Query]] as an unordered query with a new iterated type.
+ */
+export type UnorderedFlow<S extends Queryable<any>, T> = 
+    S extends Hierarchical<infer TNode> ? HierarchyQuery<TNode, TNode & T> : 
+    Query<T>;
+
+/**
+ * Flows the base type of a [[Query]] as an ordered query with a new iterated type.
+ */
+export type OrderedFlow<S extends Queryable<any>, T> = 
+    S extends Hierarchical<infer TNode> ? OrderedHierarchyQuery<TNode, TNode & T> : 
+    OrderedQuery<T>;
+
+/**
+ * Flows the base type of a [[Query]] as a hierarchical query with a new iterated type.
+ */
+export type HierarchyFlow<S extends Queryable<any>, T> =
+    S extends OrderedIterable<T> ? OrderedHierarchyQuery<T, T> :
+    HierarchyQuery<T, T>;
+
+/**
+ * Flows the base type of a [[Query]] with a new iterated type.
+ */
+export type Flow<S extends Queryable<any>, T> =
+    S extends OrderedIterable<T> ? OrderedFlow<S, T> :
+    UnorderedFlow<S, T>;
 
 /**
  * Creates a `Query` from a [[Queryable]] source.
@@ -80,17 +106,6 @@ export function from<T>(source: Queryable<T>, hierarchy?: HierarchyProvider<T>):
         new Query(source);
 }
 
-Registry.Query.registerStatic("from", from);
-
-function of<T>(...elements: T[]): Query<T>;
-function of<T>(): Query<T> {
-    return from(arguments);
-}
-
-Registry.Query.registerStatic("of", of);
-
-Registry.addRegistry({ from, of });
-
 /**
  * A `Query` represents a series of operations that act upon an Iterable or ArrayLike. Evaluation of
  * these operations is deferred until the either a scalar value is requested from the `Query` or the
@@ -98,7 +113,6 @@ Registry.addRegistry({ from, of });
  *
  * @typeparam T The type for each element.
  */
-@Registry.QueryConstructor("Query")
 export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     private _source: Queryable<T>;
 
@@ -114,27 +128,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
             : source;
     }
 
-    [Symbol.iterator](): Iterator<T> {
-        return GetIterator(ToIterable(GetSource(this)));
-    }
-
-    /** @internal */ [QuerySource.source]() {
-        return this._source;
-    }
-
-    /** @internal */ [QuerySource.create]<U>(value: Queryable<U>): QuerySource<U> {
-        return from(value);
-    }
-}
-
-export declare namespace Query {
-    /**
-     * Creates a `Query` from a [[Queryable]] source.
-     *
-     * @param source A [[Queryable]] object.
-     * @category Query
-     */
-    export function from<TNode, T extends TNode>(source: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyQuery<TNode, T>;
+    // #region Query
 
     /**
      * Creates a `Query` from a [[Queryable]] source.
@@ -142,7 +136,7 @@ export declare namespace Query {
      * @param source A [[Queryable]] object.
      * @category Query
      */
-    export function from<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
+    static from<TNode, T extends TNode>(source: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyQuery<TNode, T>;
 
     /**
      * Creates a `Query` from a [[Queryable]] source.
@@ -150,7 +144,7 @@ export declare namespace Query {
      * @param source A [[Queryable]] object.
      * @category Query
      */
-    export function from<T>(source: OrderedIterable<T>): OrderedQuery<T>;
+    static from<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
 
     /**
      * Creates a `Query` from a [[Queryable]] source.
@@ -158,7 +152,15 @@ export declare namespace Query {
      * @param source A [[Queryable]] object.
      * @category Query
      */
-    export function from<T>(source: Queryable<T>): Query<T>;
+    static from<T>(source: OrderedIterable<T>): OrderedQuery<T>;
+
+    /**
+     * Creates a `Query` from a [[Queryable]] source.
+     *
+     * @param source A [[Queryable]] object.
+     * @category Query
+     */
+    static from<T>(source: Queryable<T>): Query<T>;
 
     /**
      * Creates a `Query` from a [[Queryable]] source.
@@ -167,7 +169,7 @@ export declare namespace Query {
      * @param hierarchy A `HierarchyProvider` object.
      * @category Query
      */
-    export function from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyQuery<TNode, T>;
+    static from<TNode, T extends TNode>(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>): OrderedHierarchyQuery<TNode, T>;
 
     /**
      * Creates a `Query` from a [[Queryable]] source.
@@ -176,7 +178,10 @@ export declare namespace Query {
      * @param hierarchy A `HierarchyProvider` object.
      * @category Query
      */
-    export function from<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T>;
+    static from<TNode, T extends TNode>(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T>;
+    static from<T>(source: Queryable<T>, hierarchy?: HierarchyProvider<T>): Query<T> {
+        return from(source, hierarchy!);
+    }
 
     /**
      * Creates a `Query` for the provided elements.
@@ -184,13 +189,18 @@ export declare namespace Query {
      * @param elements The elements of the `Query`.
      * @category Query
      */
-    export function of<T>(...elements: T[]): Query<T>;
+    static of<T>(...elements: T[]): Query<T>;
+    static of<T>(): Query<T> {
+        return from(arguments);
+    }
 
     /**
      * Creates a `Query` with no elements.
      * @category Query
      */
-    export function empty<T>(): Query<T>;
+    static empty<T>(): Query<T> {
+        return from(fn.empty<T>());
+    }
 
     /**
      * Creates a `Query` over a single element.
@@ -198,7 +208,9 @@ export declare namespace Query {
      * @param value The only element for the `Query`.
      * @category Query
      */
-    export function once<T>(value: T): Query<T>;
+    static once<T>(value: T): Query<T> {
+        return from(fn.once(value));
+    }
 
     /**
      * Creates a `Query` for a value repeated a provided number of times.
@@ -207,7 +219,9 @@ export declare namespace Query {
      * @param count The number of times to repeat the value.
      * @category Query
      */
-    export function repeat<T>(value: T, count: number): Query<T>;
+    static repeat<T>(value: T, count: number): Query<T> {
+        return from(fn.repeat(value, count));
+    }
 
     /**
      * Creates a `Query` over a range of numbers.
@@ -217,7 +231,9 @@ export declare namespace Query {
      * @param increment The amount by which to change between each itereated value.
      * @category Query
      */
-    export function range(start: number, end: number, increment?: number): Query<number>;
+    static range(start: number, end: number, increment?: number): Query<number> {
+        return from(fn.range(start, end, increment));
+    }
 
     /**
      * Creates a `Query` that repeats the provided value forever.
@@ -225,7 +241,9 @@ export declare namespace Query {
      * @param value The value for each element of the `Query`.
      * @category Query
      */
-    export function continuous<T>(value: T): Query<T>;
+    static continuous<T>(value: T): Query<T> {
+        return from(fn.continuous(value));
+    }
 
     /**
      * Creates a `Query` whose values are provided by a callback executed a provided number of
@@ -235,7 +253,9 @@ export declare namespace Query {
      * @param generator The callback to execute.
      * @category Query
      */
-    export function generate<T>(count: number, generator: (offset: number) => T): Query<T>;
+    static generate<T>(count: number, generator: (offset: number) => T): Query<T> {
+        return from(fn.generate(count, generator));
+    }
 
     /**
      * Creates a HierarchyQuery from a root node and a HierarchyProvider.
@@ -244,7 +264,9 @@ export declare namespace Query {
      * @param hierarchy A `HierarchyProvider` object.
      * @category Query
      */
-    export function hierarchy<TNode, T extends TNode>(root: T, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T>;
+    static hierarchy<TNode, T extends TNode>(root: T, hierarchy: HierarchyProvider<TNode>): HierarchyQuery<TNode, T> {
+        return from(fn.hierarchy(root, hierarchy));
+    }
 
     /**
      * Creates a `Query` that, when iterated, consumes the provided `Iterator`.
@@ -252,7 +274,9 @@ export declare namespace Query {
      * @param iterator An `Iterator` object.
      * @category Query
      */
-    export function consume<T>(iterator: Iterator<T>, options?: ConsumeOptions): Query<T>;
+    static consume<T>(iterator: Iterator<T>, options?: ConsumeOptions): Query<T> {
+        return from(fn.consume(iterator, options));
+    }
 
     /**
      * Creates a `Query` that iterates the elements from one of two sources based on the result of a
@@ -263,8 +287,9 @@ export declare namespace Query {
      * @param elseQueryable The source to use when the callback evaluates to `false`.
      * @category Query
      */
-    function _if<T>(condition: () => boolean, thenQueryable: Queryable<T>, elseQueryable?: Queryable<T>): Query<T>;
-    export { _if as if };
+    static if<T>(condition: () => boolean, thenQueryable: Queryable<T>, elseQueryable?: Queryable<T>): Query<T> {
+        return from(fn.if(condition, thenQueryable, elseQueryable));
+    }
 
     /**
      * Creates a `Query` that iterates the elements from sources picked from a list based on the
@@ -275,7 +300,9 @@ export declare namespace Query {
      * @param otherwise A default source to use when another choice could not be made.
      * @category Query
      */
-    export function choose<K, V>(chooser: () => K, choices: Queryable<Choice<K, V>>, otherwise?: Queryable<V>): Query<V>;
+    static choose<K, V>(chooser: () => K, choices: Queryable<Choice<K, V>>, otherwise?: Queryable<V>): Query<V> {
+        return from(fn.choose(chooser, choices, otherwise));
+    }
 
     /**
      * Creates a `Query` for the own property keys of an object.
@@ -283,7 +310,9 @@ export declare namespace Query {
      * @param source An object.
      * @category Query
      */
-    export function objectKeys<T extends object>(source: T): Query<Extract<keyof T, string>>;
+    static objectKeys<T extends object>(source: T): Query<Extract<keyof T, string>> {
+        return from(fn.objectKeys(source));
+    }
 
     /**
      * Creates a `Query` for the own property values of an object.
@@ -291,7 +320,9 @@ export declare namespace Query {
      * @param source An object.
      * @category Query
      */
-    export function objectValues<T extends object>(source: T): Query<T[Extract<keyof T, string>]>;
+    static objectValues<T extends object>(source: T): Query<T[Extract<keyof T, string>]> {
+        return from(fn.objectValues(source));
+    }
 
     /**
      * Creates a `Query` for the own property key-value pairs of an object.
@@ -299,21 +330,13 @@ export declare namespace Query {
      * @param source An object.
      * @category Query
      */
-    export function objectEntries<T extends object>(source: T): Query<KeyValuePair<T, Extract<keyof T, string>>>;
-}
+    static objectEntries<T extends object>(source: T): Query<KeyValuePair<T, Extract<keyof T, string>>> {
+        return from(fn.objectEntries(source));
+    }
 
-export interface Query<T> {
-    // #region Subqueries
-
-    /**
-     * Creates a subquery whose elements match the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @param predicate.element The element to test.
-     * @param predicate.offset The offset from the start of the source iterable.
-     * @category Subquery
-     */
-    filter<U extends T>(predicate: (element: T, offset: number) => element is U): Query<U>;
+    // #endregion Query
+    
+    // #region Subquery
 
     /**
      * Creates a subquery whose elements match the supplied predicate.
@@ -323,19 +346,20 @@ export interface Query<T> {
      * @param predicate.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    filter(predicate: (element: T, offset: number) => boolean): Query<T>;
+    filter<U extends T>(predicate: (element: T, offset: number) => element is U): UnorderedFlow<this, U>;
 
     /**
      * Creates a subquery whose elements match the supplied predicate.
-     *
-     * NOTE: This is an alias for `filter`.
      *
      * @param predicate A callback used to match each element.
      * @param predicate.element The element to test.
      * @param predicate.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    where<U extends T>(predicate: (element: T, offset: number) => element is U): Query<U>;
+    filter(predicate: (element: T, offset: number) => boolean): UnorderedFlow<this, T>;
+    filter(predicate: (element: T, offset: number) => boolean): UnorderedFlow<this, T> {
+        return from(fn.filter(GetSource(this), predicate)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery whose elements match the supplied predicate.
@@ -347,14 +371,31 @@ export interface Query<T> {
      * @param predicate.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    where(predicate: (element: T, offset: number) => boolean): Query<T>;
+    where<U extends T>(predicate: (element: T, offset: number) => element is U): UnorderedFlow<this, U>;
+
+    /**
+     * Creates a subquery whose elements match the supplied predicate.
+     *
+     * NOTE: This is an alias for `filter`.
+     *
+     * @param predicate A callback used to match each element.
+     * @param predicate.element The element to test.
+     * @param predicate.offset The offset from the start of the source iterable.
+     * @category Subquery
+     */
+    where(predicate: (element: T, offset: number) => boolean): UnorderedFlow<this, T>;
+    where(predicate: (element: T, offset: number) => boolean): UnorderedFlow<this, T> {
+        return from(fn.where(GetSource(this), predicate)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery whose elements are neither `null` nor `undefined`.
      *
      * @category Subquery
      */
-    filterDefined(): Query<NonNullable<T>>;
+    filterDefined(): UnorderedFlow<this, NonNullable<T>> {
+        return from(fn.filterDefined(GetSource(this))) as UnorderedFlow<this, NonNullable<T>>;
+    }
 
     /**
      * Creates a subquery whose elements are neither `null` nor `undefined`.
@@ -363,7 +404,9 @@ export interface Query<T> {
      *
      * @category Subquery
      */
-    whereDefined(): Query<NonNullable<T>>;
+    whereDefined(): UnorderedFlow<this, NonNullable<T>> {
+        return from(fn.whereDefined(GetSource(this))) as UnorderedFlow<this, NonNullable<T>>;
+    }
 
     /**
      * Creates a subquery by applying a callback to each element.
@@ -373,7 +416,9 @@ export interface Query<T> {
      * @param selector.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    map<U>(selector: (element: T, offset: number) => U): Query<U>;
+    map<U>(selector: (element: T, offset: number) => U): Query<U> {
+        return from(fn.map(GetSource(this), selector));
+    }
 
     /**
      * Creates a subquery by applying a callback to each element.
@@ -385,7 +430,9 @@ export interface Query<T> {
      * @param selector.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    select<U>(selector: (element: T, offset: number) => U): Query<U>;
+    select<U>(selector: (element: T, offset: number) => U): Query<U> {
+        return from(fn.select(GetSource(this), selector));
+    }
 
     /**
      * Creates a subquery that iterates the results of applying a callback to each element.
@@ -394,7 +441,9 @@ export interface Query<T> {
      * @param projection.element The element to flatMap.
      * @category Subquery
      */
-    flatMap<U>(projection: (element: T) => Queryable<U>): Query<U>;
+    flatMap<U>(projection: (element: T) => Queryable<U>): Query<U> {
+        return from(fn.flatMap(GetSource(this), projection));
+    }
 
     /**
      * Creates a subquery that iterates the results of applying a callback to each element.
@@ -405,7 +454,9 @@ export interface Query<T> {
      * @param projection.element The element to flatMap.
      * @category Subquery
      */
-    selectMany<U>(projection: (element: T) => Queryable<U>): Query<U>;
+    selectMany<U>(projection: (element: T) => Queryable<U>): Query<U> {
+        return from(fn.selectMany(GetSource(this), projection));
+    }
 
     /**
      * Creates a subquery that iterates the results of recursively expanding the
@@ -415,7 +466,9 @@ export interface Query<T> {
      * @param projection.element The element to expand.
      * @category Subquery
      */
-    expand(projection: (element: T) => Queryable<T>): Query<T>;
+    expand(projection: (element: T) => Queryable<T>): Query<T> {
+        return from(fn.expand(GetSource(this), projection));
+    }
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -425,7 +478,9 @@ export interface Query<T> {
      * @param callback.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    do(callback: (element: T, offset: number) => void): Query<T>;
+    do(callback: (element: T, offset: number) => void): UnorderedFlow<this, T> {
+        return from(fn.do(GetSource(this), callback)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -437,13 +492,17 @@ export interface Query<T> {
      * @param callback.offset The offset from the start of the source iterable.
      * @category Subquery
      */
-    tap(callback: (element: T, offset: number) => void): Query<T>;
+    tap(callback: (element: T, offset: number) => void): UnorderedFlow<this, T> {
+        return from(fn.tap(GetSource(this), callback)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery whose elements are in the reverse order.
      * @category Subquery
      */
-    reverse(): Query<T>;
+    reverse(): UnorderedFlow<this, T> {
+        return from(fn.reverse(GetSource(this))) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing all elements except the first elements up to the supplied
@@ -452,7 +511,9 @@ export interface Query<T> {
      * @param count The number of elements to skip.
      * @category Subquery
      */
-    skip(count: number): Query<T>;
+    skip(count: number): UnorderedFlow<this, T> {
+        return from(fn.skip(GetSource(this), count)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing all elements except the last elements up to the supplied
@@ -461,7 +522,9 @@ export interface Query<T> {
      * @param count The number of elements to skip.
      * @category Subquery
      */
-    skipRight(count: number): Query<T>;
+    skipRight(count: number): UnorderedFlow<this, T> {
+        return from(fn.skipRight(GetSource(this), count)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing all elements except the first elements that match
@@ -470,7 +533,9 @@ export interface Query<T> {
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    skipWhile(predicate: (element: T) => boolean): Query<T>;
+    skipWhile(predicate: (element: T) => boolean): UnorderedFlow<this, T> {
+        return from(fn.skipWhile(GetSource(this), predicate)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing all elements except the first elements that don't match
@@ -479,7 +544,9 @@ export interface Query<T> {
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    skipUntil(predicate: (element: T) => boolean): Query<T>;
+    skipUntil(predicate: (element: T) => boolean): UnorderedFlow<this, T> {
+        return from(fn.skipUntil(GetSource(this), predicate)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing the first elements up to the supplied
@@ -488,7 +555,9 @@ export interface Query<T> {
      * @param count The number of elements to take.
      * @category Subquery
      */
-    take(count: number): Query<T>;
+    take(count: number): UnorderedFlow<this, T> {
+        return from(fn.take(GetSource(this), count)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing the last elements up to the supplied
@@ -497,7 +566,9 @@ export interface Query<T> {
      * @param count The number of elements to take.
      * @category Subquery
      */
-    takeRight(count: number): Query<T>;
+    takeRight(count: number): UnorderedFlow<this, T> {
+        return from(fn.takeRight(GetSource(this), count)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing the first elements that match the supplied predicate.
@@ -505,14 +576,17 @@ export interface Query<T> {
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    takeWhile<U extends T>(predicate: (element: T) => element is U): Query<U>;
+    takeWhile<U extends T>(predicate: (element: T) => element is U): UnorderedFlow<this, U>;
 
     /**
      * Creates a subquery containing the first elements that match the supplied predicate.
      *
      * @param predicate A callback used to match each element.
      */
-    takeWhile(predicate: (element: T) => boolean): Query<T>;
+    takeWhile(predicate: (element: T) => boolean): UnorderedFlow<this, T>;
+    takeWhile(predicate: (element: T) => boolean): UnorderedFlow<this, T> {
+        return from(fn.takeWhile(GetSource(this), predicate)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery containing the first elements that do not match the supplied predicate.
@@ -520,7 +594,9 @@ export interface Query<T> {
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    takeUntil(predicate: (element: T) => boolean): Query<T>;
+    takeUntil(predicate: (element: T) => boolean): UnorderedFlow<this, T> {
+        return from(fn.takeUntil(GetSource(this), predicate)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
@@ -528,7 +604,15 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    intersect<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
+    intersect<UNode extends T, U extends UNode>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
+
+    /**
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<U extends T>(right: Queryable<U>): Query<U>;
 
     /**
      * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
@@ -537,6 +621,9 @@ export interface Query<T> {
      * @category Subquery
      */
     intersect(right: Queryable<T>): Query<T>;
+    intersect(right: Queryable<T>): Query<T> {
+        return from(fn.intersect(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the set union of this `Query` and another [[Queryable]].
@@ -544,15 +631,9 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    union<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery for the set union of this `Query` and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    union(right: Queryable<T>): Query<T>;
+    union(right: Queryable<T>): Query<T> {
+        return from(fn.union(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the set difference between this and another [[Queryable]].
@@ -560,7 +641,9 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    except(right: Queryable<T>): Query<T>;
+    except(right: Queryable<T>): Query<T> {
+        return from(fn.except(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the set difference between this and another [[Queryable]].
@@ -568,7 +651,9 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    relativeComplement(right: Queryable<T>): Query<T>;
+    relativeComplement(right: Queryable<T>): Query<T> {
+        return from(fn.relativeComplement(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the symmetric difference between this and another [[Queryable]].
@@ -576,15 +661,9 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    symmetricDifference<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    symmetricDifference(right: Queryable<T>): Query<T>;
+    symmetricDifference(right: Queryable<T>): Query<T> {
+        return from(fn.symmetricDifference(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the symmetric difference between this and another [[Queryable]].
@@ -594,17 +673,9 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    xor<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
-     *
-     * This is an alias for `symmetricDifference`.
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    xor(right: Queryable<T>): Query<T>;
+    xor(right: Queryable<T>): Query<T> {
+        return from(fn.xor(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery that concatenates this `Query` with another [[Queryable]].
@@ -612,21 +683,17 @@ export interface Query<T> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    concat<TNode, T extends TNode>(right: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    concat(right: Queryable<T>): Query<T>;
+    concat(right: Queryable<T>): Query<T> {
+        return from(fn.concat(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the distinct elements of this `Query`.
      * @category Subquery
      */
-    distinct(): Query<T>;
+    distinct(): UnorderedFlow<this, T> {
+        return from(fn.distinct(GetSource(this))) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery for the elements of this `Query` with the provided value appended to the end.
@@ -634,7 +701,9 @@ export interface Query<T> {
      * @param value The value to append.
      * @category Subquery
      */
-    append(value: T): Query<T>;
+    append(value: T): UnorderedFlow<this, T> {
+        return from(fn.append(GetSource(this), value)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery for the elements of this `Query` with the provided value prepended to the beginning.
@@ -642,7 +711,9 @@ export interface Query<T> {
      * @param value The value to prepend.
      * @category Subquery
      */
-    prepend(value: T): Query<T>;
+    prepend(value: T): UnorderedFlow<this, T> {
+        return from(fn.prepend(GetSource(this), value)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery for the elements of this `Query` with the provided range
@@ -653,7 +724,9 @@ export interface Query<T> {
      * @param range The range to patch into the result.
      * @category Subquery
      */
-    patch(start: number, skipCount?: number, range?: Queryable<T>): Query<T>;
+    patch(start: number, skipCount?: number, range?: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.patch(GetSource(this), start, skipCount, range && GetSource(range))) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery that contains the provided default value if this `Query`
@@ -662,7 +735,9 @@ export interface Query<T> {
      * @param defaultValue The default value.
      * @category Subquery
      */
-    defaultIfEmpty(defaultValue: T): Query<T>;
+    defaultIfEmpty(defaultValue: T): UnorderedFlow<this, T> {
+        return from(fn.defaultIfEmpty(GetSource(this), defaultValue)) as UnorderedFlow<this, T>;
+    }
 
     /**
      * Creates a subquery that splits this `Query` into one or more pages.
@@ -672,44 +747,9 @@ export interface Query<T> {
      * @param pageSize The number of elements per page.
      * @category Subquery
      */
-    pageBy(pageSize: number): Query<Page<T>>;
-
-    /**
-     * Creates a subquery that combines this `Query` with another [[Queryable]] by combining elements
-     * in tuples.
-     *
-     * @param right A [[Queryable]] object.
-     * @category Join
-     */
-    zip<U>(right: Queryable<U>): Query<[T, U]>;
-
-    /**
-     * Creates a subquery that combines this `Query` with another [[Queryable]] by combining elements
-     * using the supplied callback.
-     *
-     * @param right A [[Queryable]] object.
-     * @param selector A callback used to combine two elements.
-     * @category Join
-     */
-    zip<U, R>(right: Queryable<U>, selector: (left: T, right: U) => R): Query<R>;
-
-    /**
-     * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
-     *
-     * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
-     * @category Order
-     */
-    orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T>;
-
-    /**
-     * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
-     *
-     * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
-     * @category Order
-     */
-    orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T>;
+    pageBy(pageSize: number): Query<Page<T>> {
+        return from(fn.pageBy(GetSource(this), pageSize));
+    }
 
     /**
      * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
@@ -737,6 +777,9 @@ export interface Query<T> {
      * @category Subquery
      */
     spanMap<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Query<V>) => R): Query<R>;
+    spanMap<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => V, spanSelector?: (key: K, elements: Query<V>) => R): Query<R> {
+        return from(fn.spanMap(GetSource(this), keySelector, elementSelector!, wrapResultSelector(spanSelector!)));
+    }
 
     /**
      * Groups each element of this `Query` by its key.
@@ -764,39 +807,9 @@ export interface Query<T> {
      * @category Subquery
      */
     groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R): Query<R>;
-
-    /**
-     * Creates a grouped subquery for the correlated elements of this `Query` and another [[Queryable]] object.
-     *
-     * @param inner A [[Queryable]] object.
-     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
-     * @param innerKeySelector A callback used to select the key for an element in the other [[Queryable]] object.
-     * @param resultSelector A callback used to select the result for the correlated elements.
-     * @category Join
-     */
-    groupJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): Query<R>;
-
-    /**
-     * Creates a subquery for the correlated elements of this `Query` and another [[Queryable]].
-     *
-     * @param inner A [[Queryable]] object.
-     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
-     * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
-     * @param resultSelector A callback used to select the result for the correlated elements.
-     * @category Join
-     */
-    join<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): Query<R>
-
-    /**
-     * Creates a subquery for the correlated elements of this `Query` and another [[Queryable]].
-     *
-     * @param inner A [[Queryable]] object.
-     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
-     * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
-     * @param resultSelector A callback used to select the result for the correlated elements.
-     * @category Join
-     */
-    fullJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): Query<R>;
+    groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => V, resultSelector?: (key: K, elements: Query<V>) => R): Query<R> {
+        return from(fn.groupBy(GetSource(this), keySelector, elementSelector!, wrapResultSelector(resultSelector!)));
+    }
 
     /**
      * Creates a subquery containing the cumulative results of applying the provided callback to each element.
@@ -814,6 +827,11 @@ export interface Query<T> {
      * @category Subquery
      */
     scan<U>(accumulator: (current: U, element: T, offset: number) => U, seed: U): Query<U>;
+    scan(accumulator: (current: T, element: T, offset: number) => T, seed?: T): Query<T> {
+        return from(arguments.length > 1
+            ? fn.scan(GetSource(this), accumulator, seed as T)
+            : fn.scan(GetSource(this), accumulator));
+    }
 
     /**
      * Creates a subquery containing the cumulative results of applying the provided callback to each element in reverse.
@@ -831,6 +849,11 @@ export interface Query<T> {
      * @category Subquery
      */
     scanRight<U>(accumulator: (current: U, element: T, offset: number) => U, seed?: U): Query<U>;
+    scanRight(accumulator: (current: T, element: T, offset: number) => T, seed?: T): Query<T> {
+        return from(arguments.length > 1
+            ? fn.scanRight(GetSource(this), accumulator, seed as T)
+            : fn.scanRight(GetSource(this), accumulator));
+    }
 
     /**
      * Pass the entire query to the provided callback, creating a new query from the result.
@@ -838,31 +861,104 @@ export interface Query<T> {
      * @param callback A callback function.
      * @category Subquery
      */
-    through<UNode, U extends UNode>(callback: (source: this) => OrderedHierarchyIterable<UNode, U>): OrderedHierarchyQuery<UNode, U>;
+    through<U, R extends Queryable<U> = Queryable<U>>(callback: (source: this) => R): Flow<R, U> {
+        return from(fn.through(this, callback)) as Flow<R, U>;
+    }
+
+    // #endregion Subquery
+
+    // #region Join
 
     /**
-     * Pass the entire query to the provided callback, creating a new query from the result.
+     * Creates a grouped subquery for the correlated elements of this `Query` and another [[Queryable]] object.
      *
-     * @param callback A callback function.
-     * @category Subquery
+     * @param inner A [[Queryable]] object.
+     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
+     * @param innerKeySelector A callback used to select the key for an element in the other [[Queryable]] object.
+     * @param resultSelector A callback used to select the result for the correlated elements.
+     * @category Join
      */
-    through<UNode, U extends UNode>(callback: (source: this) => HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
+    groupJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): Query<R> {
+        return from(fn.groupJoin(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, wrapResultSelector(resultSelector)));
+    }
 
     /**
-     * Pass the entire query to the provided callback, creating a new query from the result.
+     * Creates a subquery for the correlated elements of this `Query` and another [[Queryable]].
      *
-     * @param callback A callback function.
-     * @category Subquery
+     * @param inner A [[Queryable]] object.
+     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
+     * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+     * @param resultSelector A callback used to select the result for the correlated elements.
+     * @category Join
      */
-    through<U>(callback: (source: this) => OrderedIterable<U>): OrderedQuery<U>;
+    join<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): Query<R> {
+        return from(fn.join(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, resultSelector));
+    }
 
     /**
-     * Pass the entire query to the provided callback, creating a new query from the result.
+     * Creates a subquery for the correlated elements of this `Query` and another [[Queryable]].
      *
-     * @param callback A callback function.
-     * @category Subquery
+     * @param inner A [[Queryable]] object.
+     * @param outerKeySelector A callback used to select the key for an element in this `Query`.
+     * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
+     * @param resultSelector A callback used to select the result for the correlated elements.
+     * @category Join
      */
-    through<U>(callback: (source: this) => Queryable<U>): Query<U>;
+    fullJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): Query<R> {
+        return from(fn.fullJoin(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, resultSelector));
+    }
+
+    /**
+     * Creates a subquery that combines this `Query` with another [[Queryable]] by combining elements
+     * in tuples.
+     *
+     * @param right A [[Queryable]] object.
+     * @category Join
+     */
+    zip<U>(right: Queryable<U>): Query<[T, U]>;
+
+    /**
+     * Creates a subquery that combines this `Query` with another [[Queryable]] by combining elements
+     * using the supplied callback.
+     *
+     * @param right A [[Queryable]] object.
+     * @param selector A callback used to combine two elements.
+     * @category Join
+     */
+    zip<U, R>(right: Queryable<U>, selector: (left: T, right: U) => R): Query<R>;
+    zip<U, R>(right: Queryable<U>, selector?: (left: T, right: U) => R): Query<R> {
+        return from(fn.zip(GetSource(this), GetSource(right), selector!));
+    }
+
+    // #endregion Join
+    
+    // #region Order
+
+    /**
+     * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
+     *
+     * @param keySelector A callback used to select the key for an element.
+     * @param comparison An optional callback used to compare two keys.
+     * @category Order
+     */
+    orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedFlow<this, T> {
+        return from(fn.orderBy(GetSource(this), keySelector, comparison)) as OrderedFlow<this, T>;
+    }
+
+    /**
+     * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
+     *
+     * @param keySelector A callback used to select the key for an element.
+     * @param comparison An optional callback used to compare two keys.
+     * @category Order
+     */
+    orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedFlow<this, T> {
+        return from(fn.orderByDescending(GetSource(this), keySelector, comparison)) as OrderedFlow<this, T>;
+    }
+
+    // #endregion Order
+
+    // #region Hierarchy
 
     /**
      * Creates a HierarchyQuery using the provided HierarchyProvider.
@@ -870,17 +966,21 @@ export interface Query<T> {
      * @param hierarchy A HierarchyProvider.
      * @category Hierarchy
      */
-    toHierarchy(hierarchy: HierarchyProvider<T>): HierarchyQuery<T>;
+    toHierarchy(hierarchy: HierarchyProvider<T>): HierarchyFlow<this, T> {
+        return from(fn.toHierarchy(GetSource(this), hierarchy)) as HierarchyFlow<this, T>;
+    }
 
-    // #endregion Subqueries
+    // #endregion Hierarchy
 
-    // #region Scalars
+    // #region Scalar
 
     /**
      * Eagerly evaluate the query, returning a new `Query`.
      * @category Scalar
      */
-    eval(): Query<T>;
+    eval(): Flow<this, T> {
+        return from(fn.eval(GetSource(this))) as Flow<this, T>;
+    }
 
     /**
      * Computes a scalar value by applying an accumulator callback over each element.
@@ -908,6 +1008,11 @@ export interface Query<T> {
      * @category Scalar
      */
     reduce<U, R>(accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): R;
+    reduce(accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector?: (result: T, count: number) => T): T {
+        return arguments.length > 1
+            ? fn.reduce(GetSource(this), accumulator, seed as T, resultSelector!)
+            : fn.reduce(GetSource(this), accumulator);
+    }
 
     /**
      * Computes a scalar value by applying an accumulator callback over each element in reverse.
@@ -935,6 +1040,11 @@ export interface Query<T> {
      * @category Scalar
      */
     reduceRight<U, R>(accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): R;
+    reduceRight(accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector?: (result: T, count: number) => T): T {
+        return arguments.length > 1
+            ? fn.reduceRight(GetSource(this), accumulator, seed as T, resultSelector!)
+            : fn.reduceRight(GetSource(this), accumulator);
+    }
 
     /**
      * Counts the number of elements in the Query, optionally filtering elements using the supplied
@@ -943,7 +1053,9 @@ export interface Query<T> {
      * @param predicate An optional callback used to match each element.
      * @category Scalar
      */
-    count(predicate?: (element: T) => boolean): number;
+    count(predicate?: (element: T) => boolean): number {
+        return fn.count(GetSource(this), predicate);
+    }
 
     /**
      * Gets the first element in the Query, optionally filtering elements using the supplied
@@ -962,6 +1074,9 @@ export interface Query<T> {
      * @category Scalar
      */
     first(predicate?: (element: T) => boolean): T | undefined;
+    first(predicate?: (element: T) => boolean): T | undefined {
+        return fn.first(GetSource(this), predicate);
+    }
 
     /**
      * Gets the last element in the Query, optionally filtering elements using the supplied
@@ -980,6 +1095,9 @@ export interface Query<T> {
      * @category Scalar
      */
     last(predicate?: (element: T) => boolean): T | undefined;
+    last(predicate?: (element: T) => boolean): T | undefined {
+        return fn.last(GetSource(this), predicate);
+    }
 
     /**
      * Gets the only element in the Query, or returns undefined.
@@ -996,6 +1114,9 @@ export interface Query<T> {
      * @category Scalar
      */
     single(predicate?: (element: T) => boolean): T | undefined;
+    single(predicate?: (element: T) => boolean): T | undefined {
+        return fn.single(GetSource(this), predicate);
+    }
 
     /**
      * Gets the minimum element in the query, optionally comparing elements using the supplied
@@ -1004,7 +1125,9 @@ export interface Query<T> {
      * @param comparison An optional callback used to compare two elements.
      * @category Scalar
      */
-    min(comparison?: (x: T, y: T) => number): T | undefined;
+    min(comparison?: (x: T, y: T) => number): T | undefined {
+        return fn.min(GetSource(this), comparison);
+    }
 
     /**
      * Gets the maximum element in the query, optionally comparing elements using the supplied
@@ -1013,25 +1136,43 @@ export interface Query<T> {
      * @param comparison An optional callback used to compare two elements.
      * @category Scalar
      */
-    max(comparison?: (x: T, y: T) => number): T | undefined;
+    max(comparison?: (x: T, y: T) => number): T | undefined {
+        return fn.max(GetSource(this), comparison);
+    }
 
     /**
+     * Computes the sum for a series of numbers.
+     *
      * @category Scalar
      */
-    sum(selector: (element: T) => number): number;
-    /**
-     * @category Scalar
-     */
-    sum(): T extends number ? number : never;
+    sum(this: Query<number>): number;
 
     /**
+     * Computes the sum for a series of numbers.
+     *
      * @category Scalar
      */
-    average(selector: (element: T) => number): number;
+    sum(elementSelector: (element: T) => number): number;
+    sum(elementSelector?: (element: T) => number): number {
+        return fn.sum(GetSource(this), elementSelector!);
+    }
+
     /**
+     * Computes the average for a series of numbers.
+     * 
      * @category Scalar
      */
-    average(): T extends number ? number : unknown; // no literal for NaN
+    average(this: Query<number>): number;
+
+    /**
+     * Computes the average for a series of numbers.
+     * 
+     * @category Scalar
+     */
+    average(elementSelector: (element: T) => number): number;
+    average(elementSelector?: (element: T) => number): number {
+        return fn.average(GetSource(this), elementSelector!);
+    }
 
     /**
      * Computes a scalar value indicating whether the Query contains any elements,
@@ -1040,7 +1181,9 @@ export interface Query<T> {
      * @param predicate An optional callback used to match each element.
      * @category Scalar
      */
-    some(predicate?: (element: T) => boolean): boolean;
+    some(predicate?: (element: T) => boolean): boolean {
+        return fn.some(GetSource(this), predicate);
+    }
 
     /**
      * Computes a scalar value indicating whether all elements of the Query
@@ -1049,7 +1192,7 @@ export interface Query<T> {
      * @param predicate A callback used to match each element.
      * @category Scalar
      */
-    every<U extends T>(predicate: (element: T) => element is U): this is Query<U>;
+    every<U extends T>(predicate: (element: T) => element is U): this is Flow<this, U>;
 
     /**
      * Computes a scalar value indicating whether all elements of the Query
@@ -1059,6 +1202,9 @@ export interface Query<T> {
      * @category Scalar
      */
     every(predicate: (element: T) => boolean): boolean;
+    every(predicate: (element: T) => boolean): boolean {
+        return fn.every(GetSource(this), predicate);
+    }
 
     /**
      * Computes a scalar value indicating whether every element in this `Query` corresponds to a matching element
@@ -1078,6 +1224,9 @@ export interface Query<T> {
      * @category Scalar
      */
     corresponds<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
+    corresponds<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
+        return fn.corresponds(GetSource(this), GetSource(right), equalityComparison!);
+    }
 
     /**
      * Computes a scalar value indicating whether the provided value is included in the query.
@@ -1086,6 +1235,18 @@ export interface Query<T> {
      * @category Scalar
      */
     includes(value: T): boolean;
+
+    /**
+     * Computes a scalar value indicating whether the provided value is included in the query.
+     *
+     * @param value A value.
+     * @param equalityComparison An optional callback used to compare the equality of two elements.
+     * @category Scalar
+     */
+    includes<U>(value: U, equalityComparison: (left: T, right: U) => boolean): boolean;
+    includes(value: T, equalityComparison?: (left: T, right: T) => boolean): boolean {
+        return fn.includes(GetSource(this), value, equalityComparison!);
+    }
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` include
@@ -1105,6 +1266,9 @@ export interface Query<T> {
      * @category Scalar
      */
     includesSequence<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
+    includesSequence<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
+        return fn.includesSequence(GetSource(this), GetSource(right), equalityComparison!);
+    }
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` start
@@ -1124,6 +1288,9 @@ export interface Query<T> {
      * @category Scalar
      */
     startsWith<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
+    startsWith<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
+        return fn.startsWith(GetSource(this), GetSource(right), equalityComparison!);
+    }
 
     /**
      * Computes a scalar value indicating whether the elements of this `Query` end
@@ -1143,6 +1310,9 @@ export interface Query<T> {
      * @category Scalar
      */
     endsWith<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
+    endsWith<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
+        return fn.endsWith(GetSource(this), GetSource(right), equalityComparison!);
+    }
 
     /**
      * Finds the value in the Query at the provided offset. A negative offset starts from the
@@ -1151,7 +1321,9 @@ export interface Query<T> {
      * @param offset An offset.
      * @category Scalar
      */
-    elementAt(offset: number): T | undefined;
+    elementAt(offset: number): T | undefined {
+        return fn.elementAt(GetSource(this), offset);
+    }
 
     /**
      * Finds the value in the Query at the provided offset. A negative offset starts from the
@@ -1162,7 +1334,9 @@ export interface Query<T> {
      * @param offset An offset.
      * @category Scalar
      */
-    nth(offset: number): T | undefined;
+    nth(offset: number): T | undefined {
+        return fn.nth(GetSource(this), offset);
+    }
 
     /**
      * Creates a tuple whose first element is a subquery containing the first span of
@@ -1189,6 +1363,10 @@ export interface Query<T> {
      * @category Scalar
      */
     span(predicate: (element: T) => boolean): [Query<T>, Query<T>];
+    span(predicate: (element: T) => boolean): [Query<T>, Query<T>] {
+        const [left, right] = fn.span(GetSource(this), predicate);
+        return [from(left), from(right)];
+    }
 
     /**
      * Creates a tuple whose first element is a subquery containing the first span of
@@ -1201,7 +1379,10 @@ export interface Query<T> {
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    break(predicate: (element: T) => boolean): [Query<T>, Query<T>];
+    break(predicate: (element: T) => boolean): [Query<T>, Query<T>] {
+        const [left, right] = fn.break(GetSource(this), predicate);
+        return [from(left), from(right)];
+    }
 
     /**
      * Invokes a callback for each element of the query.
@@ -1209,19 +1390,23 @@ export interface Query<T> {
      * @param callback The callback to invoke.
      * @category Scalar
      */
-    forEach(callback: (element: T, offset: number) => void): void;
+    forEach(callback: (element: T, offset: number) => void): void {
+        fn.forEach(GetSource(this), callback);
+    }
 
     /**
      * Iterates over all of the elements in the query, ignoring the results.
      * @category Scalar
      */
-    drain(): void;
+    drain(): void {
+        fn.drain(GetSource(this));
+    }
 
     /**
      * Creates an Array for the elements of the Query.
      * @category Scalar
      */
-    toArray(elementSelector?: (element: T) => T): T[];
+    toArray(): T[];
 
     /**
      * Creates an Array for the elements of the Query.
@@ -1230,12 +1415,15 @@ export interface Query<T> {
      * @category Scalar
      */
     toArray<V>(elementSelector: (element: T) => V): V[];
+    toArray<V>(elementSelector?: (element: T) => V): V[] {
+        return fn.toArray(GetSource(this), elementSelector!);
+    }
 
     /**
      * Creates a `Set` for the elements of the `Query`.
      * @category Scalar
      */
-    toSet(elementSelector?: (element: T) => T): Set<T>;
+    toSet(): Set<T>;
 
     /**
      * Creates a `Set` for the elements of the `Query`.
@@ -1244,6 +1432,9 @@ export interface Query<T> {
      * @category Scalar
      */
     toSet<V>(elementSelector: (element: T) => V): Set<V>;
+    toSet<V>(elementSelector?: (element: T) => V): Set<V> {
+        return fn.toSet(GetSource(this), elementSelector!);
+    }
 
     /**
      * Creates a `Map` for the elements of the `Query`.
@@ -1261,6 +1452,9 @@ export interface Query<T> {
      * @category Scalar
      */
     toMap<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V>;
+    toMap<K, V>(keySelector: (element: T) => K, elementSelector?: (element: T) => V): Map<K, V> {
+        return fn.toMap(GetSource(this), keySelector, elementSelector!);
+    }
 
     /**
      * Creates a `Lookup` for the elements of the `Query`.
@@ -1278,6 +1472,9 @@ export interface Query<T> {
      * @category Scalar
      */
     toLookup<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Lookup<K, V>;
+    toLookup<K, V>(keySelector: (element: T) => K, elementSelector?: (element: T) => V): Lookup<K, V> {
+        return fn.toLookup(GetSource(this), keySelector, elementSelector!);
+    }
 
     /**
      * Creates an `object` for the elements of the `Query`.
@@ -1297,16 +1494,28 @@ export interface Query<T> {
      * @category Scalar
      */
     toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): object;
+    toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => V): object {
+        return fn.toObject(GetSource(this), prototype, keySelector, elementSelector!);
+    }
 
-    toJSON(): T[];
+    toJSON() {
+        return this.toArray();
+    }
 
-    // #endregion Scalars
+    // #endregion Scalar
+
+    [Symbol.iterator](): Iterator<T> {
+        return GetIterator(ToIterable(GetSource(this)));
+    }
+
+    /** @internal */ [QuerySource.source]() {
+        return this._source;
+    }
 }
 
 /**
  * Represents a sequence of hierarchically organized values.
  */
-@Registry.QueryConstructor("HierarchyQuery")
 export class HierarchyQuery<TNode, T extends TNode = TNode> extends Query<T> implements HierarchyIterable<TNode, T> {
     constructor(source: HierarchyIterable<TNode, T>);
     constructor(source: Queryable<T>, hierarchy: HierarchyProvider<TNode>);
@@ -1318,152 +1527,23 @@ export class HierarchyQuery<TNode, T extends TNode = TNode> extends Query<T> imp
         super(source);
     }
 
-    [Hierarchical.hierarchy](): HierarchyProvider<TNode> {
-        return GetHierarchy(GetSource(this));
-    }
-}
+    // #region Subquery
 
-export declare namespace HierarchyQuery {
-}
-
-export interface HierarchyQuery<TNode, T extends TNode = TNode> {
     /**
-     * Creates a subquery whose elements match the supplied predicate.
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
-     * @param predicate A callback used to match each element.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    filter<U extends T>(predicate: (element: T, offset: number) => element is U): HierarchyQuery<TNode, U>;
+    intersect<UNode extends TNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
 
     /**
-     * Creates a subquery whose elements match the supplied predicate.
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
-     * @param predicate A callback used to match each element.
+     * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    filter(predicate: (element: T, offset: number) => boolean): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery whose elements match the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Subquery
-     */
-    where<U extends T>(predicate: (element: T, offset: number) => element is U): HierarchyQuery<TNode, U>;
-
-    /**
-     * Creates a subquery whose elements match the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Subquery
-     */
-    where(predicate: (element: T, offset: number) => boolean): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery whose elements are neither `null` nor `undefined`.
-     *
-     * @category Subquery
-     */
-    filterDefined(): HierarchyQuery<TNode, NonNullable<T>>;
-
-    /**
-     * Creates a subquery whose elements are neither `null` nor `undefined`.
-     *
-     * @category Subquery
-     */
-    whereDefined(): HierarchyQuery<TNode, NonNullable<T>>;
-
-    /**
-     * Lazily invokes a callback as each element of the query is iterated.
-     *
-     * @param callback The callback to invoke.
-     * @category Subquery
-     */
-    do(callback: (element: T, offset: number) => void): HierarchyQuery<TNode, T>;
-
-    /**
-     * Lazily invokes a callback as each element of the query is iterated.
-     * This is an alias for `do`.
-     *
-     * @param callback The callback to invoke.
-     * @category Subquery
-     */
-    tap(callback: (element: T, offset: number) => void): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery whose elements are in the reverse order.
-     * @category Subquery
-     */
-    reverse(): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery containing all elements except the first elements up to the supplied
-     * count.
-     *
-     * @param count The number of elements to skip.
-     * @category Subquery
-     */
-    skip(count: number): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery containing all elements except the last elements up to the supplied
-     * count.
-     *
-     * @param count The number of elements to skip.
-     * @category Subquery
-     */
-    skipRight(count: number): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery containing all elements except the first elements that match
-     * the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Subquery
-     */
-    skipWhile(predicate: (element: T) => boolean): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery containing the first elements up to the supplied
-     * count.
-     *
-     * @param count The number of elements to take.
-     * @category Subquery
-     */
-    take(count: number): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery containing the last elements up to the supplied
-     * count.
-     *
-     * @param count The number of elements to take.
-     * @category Subquery
-     */
-    takeRight(count: number): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery containing the first elements that match the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Subquery
-     */
-    takeWhile<U extends T>(predicate: (element: T) => element is U): HierarchyQuery<TNode, U>;
-
-    /**
-     * Creates a subquery containing the first elements that match the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Subquery
-     */
-    takeWhile<U extends TNode>(predicate: (element: TNode) => element is U): HierarchyQuery<TNode, U>;
-
-    /**
-     * Creates a subquery containing the first elements that match the supplied predicate.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Subquery
-     */
-    takeWhile(predicate: (element: T) => boolean): HierarchyQuery<TNode, T>;
+    intersect<U extends T>(right: Queryable<U>): HierarchyQuery<TNode, U>;
 
     /**
      * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
@@ -1472,6 +1552,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Subquery
      */
     intersect(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    intersect(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.intersect(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the set union of this `Query` and another [[Queryable]].
@@ -1479,25 +1562,29 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    union(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    union(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.union(GetSource(this), GetSource(right)));
+    }
 
     /**
-     * Creates a subquery for the set difference between this `Query` and another [[Queryable]].
+     * Creates a subquery for the set difference between this and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    except(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    except(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.except(GetSource(this), GetSource(right)));
+    }
 
     /**
-     * Creates a subquery for the set difference between this `Query` and another [[Queryable]].
-     *
-     * This is an alias for `except`.
+     * Creates a subquery for the set difference between this and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    relativeComplement(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    relativeComplement(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.relativeComplement(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the symmetric difference between this and another [[Queryable]].
@@ -1505,7 +1592,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    symmetricDifference(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    symmetricDifference(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.symmetricDifference(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery for the symmetric difference between this and another [[Queryable]].
@@ -1515,7 +1604,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    xor(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    xor(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.xor(GetSource(this), GetSource(right)));
+    }
 
     /**
      * Creates a subquery that concatenates this `Query` with another [[Queryable]].
@@ -1523,73 +1614,13 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    concat(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    concat(right: Queryable<T>): HierarchyQuery<TNode, T> {
+        return from(fn.concat(GetSource(this), GetSource(right)));
+    }
 
-    /**
-     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
-     * @category Subquery
-     */
-    distinct(): HierarchyQuery<TNode, T>;
+    // #endregion Subquery
 
-    /**
-     * Creates a subquery for the elements of this `Query` with the provided value appended to the end.
-     *
-     * @param value The value to append.
-     * @category Subquery
-     */
-    append(value: T): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery for the elements of this `Query` with the provided value prepended to the beginning.
-     *
-     * @param value The value to prepend.
-     * @category Subquery
-     */
-    prepend(value: T): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery for the elements of this `Query` with the provided range
-     * patched into the results.
-     *
-     * @param start The offset at which to patch the range.
-     * @param skipCount The number of elements to skip from start.
-     * @param range The range to patch into the result.
-     * @category Subquery
-     */
-    patch(start: number, skipCount?: number, range?: Queryable<T>): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates a subquery that contains the provided default value if this `Query`
-     * contains no elements.
-     *
-     * @param defaultValue The default value.
-     * @category Subquery
-     */
-    defaultIfEmpty(defaultValue: T): HierarchyQuery<TNode, T>;
-
-    /**
-     * Eagerly evaluate the query, returning a new `Query`.
-     * @category Scalar
-     */
-    eval(): HierarchyQuery<TNode, T>;
-
-    /**
-     * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
-     *
-     * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
-     * @category Order
-     */
-    orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T>;
-
-    /**
-     * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
-     *
-     * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
-     * @category Order
-     */
-    orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T>;
+    // #region Hierarchy
 
     /**
      * Creates a subquery for the roots of each element in the hierarchy.
@@ -1606,6 +1637,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     root(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    root(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.root(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the ancestors of each element in the hierarchy.
@@ -1622,6 +1656,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     ancestors(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    ancestors(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.ancestors(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the ancestors of each element as well as each element in the hierarchy.
@@ -1638,6 +1675,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     ancestorsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    ancestorsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.ancestorsAndSelf(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the descendants of each element in the hierarchy.
@@ -1654,6 +1694,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     descendants(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    descendants(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.descendants(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the descendants of each element as well as each element in the hierarchy.
@@ -1670,6 +1713,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     descendantsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    descendantsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.descendantsAndSelf(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for this `query`.
@@ -1677,7 +1723,7 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param predicate A callback used to filter the results.
      * @category Hierarchy
      */
-    self<U extends T>(predicate: (element: T) => element is U): HierarchyQuery<TNode, U>;
+    self<U extends T>(predicate: (element: TNode) => element is U): HierarchyQuery<TNode, U>;
 
     /**
      * Creates a subquery for this `query`.
@@ -1694,6 +1740,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     self(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    self(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.self(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the parents of each element in the hierarchy.
@@ -1710,6 +1759,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     parents(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    parents(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.parents(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the children of each element in the hierarchy.
@@ -1726,6 +1778,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     children(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    children(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.children(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the siblings of each element in the hierarchy.
@@ -1742,6 +1797,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     siblings(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    siblings(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.siblings(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the siblings of each element as well as each element in the hierarchy.
@@ -1758,6 +1816,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     siblingsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    siblingsAndSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.siblingsAndSelf(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the siblings before each element in the hierarchy.
@@ -1774,6 +1835,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     siblingsBeforeSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    siblingsBeforeSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.siblingsBeforeSelf(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the siblings after each element in the hierarchy.
@@ -1790,6 +1854,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     siblingsAfterSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode>;
+    siblingsAfterSelf(predicate?: (element: TNode) => boolean): HierarchyQuery<TNode> {
+        return from(fn.siblingsAfterSelf(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the child of each element at the specified offset. A negative offset
@@ -1798,7 +1865,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param offset The offset for the child.
      * @category Hierarchy
      */
-    nthChild(offset: number): HierarchyQuery<TNode>;
+    nthChild(offset: number): HierarchyQuery<TNode> {
+        return from(fn.nthChild(GetSource(this), offset));
+    }
 
     /**
      * Creates a subquery for the top-most elements. Elements that are a descendant of any other
@@ -1813,6 +1882,9 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     topMost(predicate?: (element: T) => boolean): HierarchyQuery<TNode, T>;
+    topMost(predicate?: (element: T) => boolean): HierarchyQuery<TNode, T> {
+        return from(fn.topMost(GetSource(this), predicate));
+    }
 
     /**
      * Creates a subquery for the bottom-most elements. Elements that are an ancestor of any other
@@ -1827,45 +1899,28 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Hierarchy
      */
     bottomMost(predicate?: (element: T) => boolean): HierarchyQuery<TNode, T>;
+    bottomMost(predicate?: (element: T) => boolean): HierarchyQuery<TNode, T> {
+        return from(fn.bottomMost(GetSource(this), predicate));
+    }
 
-    /**
-     * Computes a scalar value indicating whether all elements of the Query
-     * match the supplied callback.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Scalar
-     */
-    every<U extends T>(predicate: (element: T) => element is U): this is HierarchyQuery<TNode, U>;
+    // #endregion Hierarchy
 
-    /**
-     * Computes a scalar value indicating whether all elements of the Query
-     * match the supplied callback.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Scalar
-     */
-    every(predicate: (element: T) => boolean): boolean;
+    [Hierarchical.hierarchy](): HierarchyProvider<TNode> {
+        return GetHierarchy(GetSource(this));
+    }
 }
 
 /**
  * Represents an ordered sequence of elements.
  */
-@Registry.QueryConstructor("OrderedQuery")
 export class OrderedQuery<T> extends Query<T> implements OrderedIterable<T> {
     constructor(source: OrderedIterable<T>) {
         assert.mustBeOrderedIterable(source, "source");
         super(source);
     }
 
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T> {
-        return ThenBy(GetSource(this), keySelector, comparison, descending);
-    }
-}
+    // #region Order
 
-export declare namespace OrderedQuery {
-}
-
-export interface OrderedQuery<T> {
     /**
      * Creates a subsequent ordered subquery whose elements are sorted in ascending order by the provided key.
      *
@@ -1873,7 +1928,9 @@ export interface OrderedQuery<T> {
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T>;
+    thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T> {
+        return from(fn.thenBy(GetSource(this), keySelector, comparison));
+    }
 
     /**
      * Creates a subsequent ordered subquery whose elements are sorted in descending order by the provided key.
@@ -1882,31 +1939,20 @@ export interface OrderedQuery<T> {
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T>;
+    thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T> {
+        return from(fn.thenByDescending(GetSource(this), keySelector, comparison));
+    }
 
-    /**
-     * Computes a scalar value indicating whether all elements of the Query
-     * match the supplied callback.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Scalar
-     */
-    every<U extends T>(predicate: (element: T) => element is U): this is OrderedQuery<U>;
+    // #endregion Order
 
-    /**
-     * Computes a scalar value indicating whether all elements of the Query
-     * match the supplied callback.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Scalar
-     */
-    every(predicate: (element: T) => boolean): boolean;
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T> {
+        return ThenBy(GetSource(this), keySelector, comparison, descending);
+    }
 }
 
 /**
  * Represents an ordered sequence of hierarchically organized values.
  */
-@Registry.QueryConstructor("OrderedHierarchyQuery")
 export class OrderedHierarchyQuery<TNode, T extends TNode = TNode> extends HierarchyQuery<TNode, T> implements OrderedHierarchyIterable<TNode, T> {
     constructor(source: OrderedHierarchyIterable<TNode, T>);
     constructor(source: OrderedIterable<T>, hierarchy: HierarchyProvider<TNode>);
@@ -1920,15 +1966,8 @@ export class OrderedHierarchyQuery<TNode, T extends TNode = TNode> extends Hiera
         }
     }
 
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedHierarchyIterable<TNode, T> {
-        return ThenBy(GetSource(this), keySelector, comparison, descending);
-    }
-}
+    // #region Order
 
-export declare namespace OrderedHierarchyQuery {
-}
-
-export interface OrderedHierarchyQuery<TNode, T extends TNode = TNode> {
     /**
      * Creates a subsequent ordered subquery whose elements are sorted in ascending order by the provided key.
      *
@@ -1936,7 +1975,9 @@ export interface OrderedHierarchyQuery<TNode, T extends TNode = TNode> {
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T>;
+    thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T> {
+        return from(fn.thenBy(GetSource(this), keySelector, comparison));
+    }
 
     /**
      * Creates a subsequent ordered subquery whose elements are sorted in descending order by the provided key.
@@ -1945,23 +1986,22 @@ export interface OrderedHierarchyQuery<TNode, T extends TNode = TNode> {
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T>;
+    thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T> {
+        return from(fn.thenByDescending(GetSource(this), keySelector, comparison));
+    }
 
-    /**
-     * Computes a scalar value indicating whether all elements of the Query
-     * match the supplied callback.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Scalar
-     */
-    every<U extends T>(predicate: (element: T) => element is U): this is OrderedHierarchyQuery<TNode, U>;
+    // #endregion Order
 
-    /**
-     * Computes a scalar value indicating whether all elements of the Query
-     * match the supplied callback.
-     *
-     * @param predicate A callback used to match each element.
-     * @category Scalar
-     */
-    every(predicate: (element: T) => boolean): boolean;
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedHierarchyIterable<TNode, T> {
+        return ThenBy(GetSource(this), keySelector, comparison, descending);
+    }
+}
+
+function wrapResultSelector<I, O, R>(selector: ((inner: I, outer: Query<O>) => R)): ((inner: I, outer: Queryable<O>) => R);
+function wrapResultSelector<I, O, R>(selector: ((inner: I, outer: Query<O>) => R) | undefined): ((inner: I, outer: Queryable<O>) => R) | undefined;
+function wrapResultSelector<I, O, R>(selector: ((inner: I, outer: Query<O>) => R) | undefined) {
+    if (typeof selector === "function") {
+        return (inner: I, outer: Queryable<O>) => selector(inner, from(outer));
+    }
+    return selector;
 }

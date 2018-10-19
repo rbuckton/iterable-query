@@ -14,12 +14,10 @@
   limitations under the License.
  */
 
-import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
+import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
-import { IsAsyncIterable, IsIterable, IsAsyncQuerySource } from "./guards";
+import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
-import { Query, HierarchyQuery, OrderedHierarchyQuery, OrderedQuery } from "../query";
-import { AsyncQuery, AsyncOrderedQuery, AsyncOrderedHierarchyQuery, AsyncHierarchyQuery } from "../asyncQuery";
 import { QuerySource, AsyncQuerySource } from "./types";
 
 /** @internal */
@@ -87,54 +85,28 @@ export function GetHierarchy<TNode>(value: Hierarchical<TNode>): HierarchyProvid
     throw new TypeError();
 }
 
-/** @internal */ export function GetSource<TNode, T extends TNode>(query: OrderedHierarchyQuery<TNode, T>): OrderedHierarchyIterable<TNode, T>;
-/** @internal */ export function GetSource<TNode, T extends TNode>(query: HierarchyQuery<TNode, T>): HierarchyIterable<TNode, T>;
-/** @internal */ export function GetSource<T>(query: OrderedQuery<T>): OrderedIterable<T>;
-/** @internal */ export function GetSource<T>(query: QuerySource<T>): Queryable<T>;
-/** @internal */ export function GetSource<T>(query: QuerySource<T>): Queryable<T> {
-    const sourceMethod = query[QuerySource.source];
+/** @internal */ export function GetSource<TNode, T extends TNode>(query: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyIterable<TNode, T>;
+/** @internal */ export function GetSource<TNode, T extends TNode>(query: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
+/** @internal */ export function GetSource<T>(query: OrderedIterable<T>): OrderedIterable<T>;
+/** @internal */ export function GetSource<T>(query: Queryable<T>): Queryable<T>;
+/** @internal */ export function GetSource<T>(query: Queryable<T>): Queryable<T> {
+    const sourceMethod = IsQuerySource(query) ? query[QuerySource.source] : undefined;
     if (typeof sourceMethod === "function") {
         return sourceMethod.call(query);
     }
-    throw new TypeError();
+    return query;
 }
 
-/** @internal */ export function CreateSubquery<TNode, T extends TNode>(query: Query<unknown> | AsyncQuery<unknown>, subquery: OrderedHierarchyIterable<TNode, T>): OrderedHierarchyQuery<TNode, T>;
-/** @internal */ export function CreateSubquery<TNode, T extends TNode>(query: Query<unknown> | AsyncQuery<unknown>, subquery: HierarchyIterable<TNode, T>): HierarchyQuery<TNode, T>;
-/** @internal */ export function CreateSubquery<T>(query: Query<unknown> | AsyncQuery<unknown>, subquery: OrderedIterable<T>): OrderedQuery<T>;
-/** @internal */ export function CreateSubquery<T>(query: Query<unknown> | AsyncQuery<unknown>, subquery: Queryable<T>): Query<T>;
-/** @internal */ export function CreateSubquery<T>(query: QuerySource<unknown> | AsyncQuerySource<unknown>, subquery: Queryable<T>): QuerySource<T>;
-/** @internal */ export function CreateSubquery<T>(query: QuerySource<unknown> | AsyncQuerySource<unknown>, subquery: Queryable<T>): QuerySource<T> {
-    const subqueryMethod = IsAsyncQuerySource(query) ? query[AsyncQuerySource.createSync] : query[QuerySource.create];
-    if (typeof subqueryMethod === "function") {
-        return subqueryMethod.call(query, subquery) as QuerySource<T>;
-    }
-    throw new TypeError();
-}
-
-/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncOrderedHierarchyQuery<TNode, T>): AsyncOrderedHierarchyIterable<TNode, T>;
-/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncHierarchyQuery<TNode, T>): AsyncHierarchyIterable<TNode, T>;
-/** @internal */ export function GetAsyncSource<T>(query: AsyncOrderedQuery<T>): AsyncOrderedIterable<T>;
-/** @internal */ export function GetAsyncSource<T>(query: AsyncQuerySource<T>): AsyncQueryable<T>;
-/** @internal */ export function GetAsyncSource<T>(query: AsyncQuerySource<T>): AsyncQueryable<T> {
-    const sourceMethod = query[AsyncQuerySource.source];
+/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyIterable<TNode, T>;
+/** @internal */ export function GetAsyncSource<TNode, T extends TNode>(query: AsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
+/** @internal */ export function GetAsyncSource<T>(query: AsyncOrderedIterable<T>): AsyncOrderedIterable<T>;
+/** @internal */ export function GetAsyncSource<T>(query: AsyncQueryable<T>): AsyncQueryable<T>;
+/** @internal */ export function GetAsyncSource<T>(query: AsyncQueryable<T>): AsyncQueryable<T> {
+    const sourceMethod = IsAsyncQuerySource(query) ? query[AsyncQuerySource.source] : undefined;
     if (typeof sourceMethod === "function") {
         return sourceMethod.call(query);
     }
-    throw new TypeError();
-}
-
-/** @internal */ export function CreateAsyncSubquery<TNode, T extends TNode>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncOrderedHierarchyIterable<TNode, T>): AsyncOrderedHierarchyQuery<TNode, T>;
-/** @internal */ export function CreateAsyncSubquery<TNode, T extends TNode>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyQuery<TNode, T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuery<unknown>, subquery: PossiblyAsyncOrderedIterable<T>): AsyncOrderedQuery<T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuery<unknown>, subquery: AsyncQueryable<T>): AsyncQuery<T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: AsyncQueryable<T>): AsyncQuerySource<T>;
-/** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: AsyncQueryable<T>): AsyncQuerySource<T> {
-    const subqueryMethod = query[AsyncQuerySource.create];
-    if (typeof subqueryMethod === "function") {
-        return subqueryMethod.call(query, subquery) as AsyncQuerySource<T>;
-    }
-    throw new TypeError();
+    return query;
 }
 
 /** @internal */
@@ -224,13 +196,11 @@ export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (ele
     return map;
 }
 
-/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>>;
-/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>>;
-/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Promise<Map<K, V[]>> {
+/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Map<K, V[]>> {
     const map = new Map<K, V[]>();
     for await (const item of ToPossiblyAsyncIterable(source)) {
         let key = keySelector(item);
-        let element = elementSelector(item);
+        let element = await elementSelector(item);
         let grouping = map.get(key);
         if (grouping == null) {
             grouping = [];

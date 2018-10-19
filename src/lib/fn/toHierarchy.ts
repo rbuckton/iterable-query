@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, MakeHierarchyIterable, Registry } from "../internal";
+import { assert, MakeHierarchyIterable} from "../internal";
 import { Queryable, HierarchyIterable, HierarchyProvider, OrderedIterable, OrderedHierarchyIterable } from "../types";
 
 /**
@@ -39,5 +39,3 @@ export function toHierarchy<TNode, T extends TNode>(source: Queryable<T>, hierar
     assert.mustBeHierarchyProvider(hierarchy, "hierarchy");
     return MakeHierarchyIterable(source, hierarchy);
 }
-
-Registry.Query.registerSubquery("toHierarchy", toHierarchy);

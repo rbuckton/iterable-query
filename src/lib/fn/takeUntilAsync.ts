@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -33,7 +33,7 @@ export function takeUntilAsync<TNode, T extends TNode, U extends T>(source: Poss
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
-export function takeUntilAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): AsyncHierarchyIterable<TNode, T>;
+export function takeUntilAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery containing the first elements that do not match the supplied predicate.
  *
@@ -49,8 +49,8 @@ export function takeUntilAsync<T, U extends T>(source: AsyncQueryable<T>, predic
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
-export function takeUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T>;
-export function takeUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): AsyncIterable<T> {
+export function takeUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncIterable<T>;
+export function takeUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     return FlowHierarchy(new AsyncTakeUntilIterable(ToPossiblyAsyncIterable(source), predicate), source);
@@ -59,9 +59,9 @@ export function takeUntilAsync<T>(source: AsyncQueryable<T>, predicate: (element
 @ToStringTag("AsyncTakeUntilIterable")
 class AsyncTakeUntilIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _predicate: (element: T) => boolean;
+    private _predicate: (element: T) => boolean | PromiseLike<boolean>;
 
-    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T) => boolean) {
+    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>) {
         this._source = source;
         this._predicate = predicate;
     }
@@ -69,12 +69,11 @@ class AsyncTakeUntilIterable<T> implements AsyncIterable<T> {
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
         const predicate = this._predicate;
         for await (const element of this._source) {
-            if (predicate(element)) {
+            const result = predicate(element);
+            if (typeof result === "boolean" ? result : await result) {
                 break;
             }
             yield element;
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("takeUntil", takeUntilAsync);

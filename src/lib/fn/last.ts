@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToIterable, Registry } from "../internal";
+import { assert, True, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -37,5 +37,3 @@ export function last<T>(source: Queryable<T>, predicate: (element: T) => boolean
     }
     return result;
 }
-
-Registry.Query.registerScalar("last", last);

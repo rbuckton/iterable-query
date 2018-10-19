@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { elementAt } from "./elementAt";
-export { elementAt as nth };
-
-Registry.Query.registerAlias("nth", elementAt);
+export { elementAt as nth } from "./elementAt";

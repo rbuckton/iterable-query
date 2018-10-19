@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetAsyncIterator, FlowHierarchy, Registry, GetAsyncSource, CreateAsyncSubquery, CreateSubquery, MakeTuple, ToPossiblyAsyncIterable } from "../internal";
+import { assert, GetAsyncIterator, FlowHierarchy, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncHierarchyIterable, HierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { prependAsync } from "./prependAsync";
 import { consumeAsync, ConsumeAsyncOptions } from "./consumeAsync";
@@ -36,7 +36,7 @@ const cacheAndClose: ConsumeAsyncOptions = { cacheElements: true, leaveOpen: fal
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
+export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an [[Iterable]] containing the first span of
  * elements that do not match the supplied predicate, and whose second element is an [[AsyncIterable]]
@@ -49,14 +49,15 @@ export async function breakAsync<TNode, T extends TNode>(source: PossiblyAsyncHi
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]>;
-export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean): Promise<[Iterable<T>, AsyncIterable<T>]> {
+export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]>;
+export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     const prefix: T[] = [];
     const iterator = GetAsyncIterator(ToPossiblyAsyncIterable(source));
     for await (const value of consumeAsync(iterator, noCacheAndLeaveOpen)) {
-        if (predicate(value)) {
+        const result = predicate(value);
+        if (typeof result === "boolean" ? result : await result) {
             const remaining = prependAsync(consumeAsync(iterator, cacheAndClose), value);
             return [
                 FlowHierarchy(prefix, source),
@@ -70,8 +71,3 @@ export async function breakAsync<T>(source: AsyncQueryable<T>, predicate: (eleme
         FlowHierarchy(emptyAsync<T>(), source)
     ];
 }
-
-Registry.AsyncQuery.registerCustom("break", breakAsync, async function (predicate) {
-    const [first, rest] = await breakAsync(GetAsyncSource(this), predicate);
-    return MakeTuple(CreateSubquery(this, first), CreateAsyncSubquery(this, rest));
-});

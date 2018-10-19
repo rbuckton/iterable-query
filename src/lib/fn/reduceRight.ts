@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, Registry } from "../internal";
+import { assert, Identity} from "../internal";
 import { Queryable } from "../types";
 import { toArray } from "./toArray";
 
@@ -67,5 +67,3 @@ export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, e
     }
     return resultSelector(current!, count);
 }
-
-Registry.Query.registerScalar("reduceRight", reduceRight);

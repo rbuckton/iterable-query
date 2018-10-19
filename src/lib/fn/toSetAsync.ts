@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Set } from "../collections";
 
@@ -33,16 +33,14 @@ export function toSetAsync<T>(source: AsyncQueryable<T>): Promise<Set<T>>;
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
-export function toSetAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V): Promise<Set<V>>;
-export async function toSetAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T = Identity): Promise<Set<T>> {
+export function toSetAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Set<V>>;
+export async function toSetAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<Set<T>> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const set = new Set<T>();
     for await (const item of ToPossiblyAsyncIterable(source)) {
-        const element = elementSelector(item);
+        const element = await elementSelector(item);
         set.add(element);
     }
     return set;
 }
-
-Registry.AsyncQuery.registerScalar("toSet", toSetAsync);

@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { filterDefined } from "./filterDefined";
-export { filterDefined as whereDefined };
-
-Registry.Query.registerAlias("whereDefined", filterDefined);
+export { filterDefined as whereDefined } from "./filterDefined";

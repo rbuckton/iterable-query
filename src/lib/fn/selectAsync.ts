@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { mapAsync } from "./mapAsync";
-export { mapAsync as selectAsync };
-
-Registry.AsyncQuery.registerAlias("select", mapAsync);
+export { mapAsync as selectAsync } from "./mapAsync";

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry, IsDefined } from "../internal";
+import { IsDefined } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { filterAsync } from "./filterAsync";
 
@@ -36,5 +36,3 @@ export function filterDefinedAsync<T>(source: AsyncQueryable<T>): AsyncIterable<
 export function filterDefinedAsync<T>(source: AsyncQueryable<T>): AsyncIterable<NonNullable<T>> {
     return filterAsync(source, IsDefined);
 }
-
-Registry.AsyncQuery.registerSubquery("filterDefined", filterDefinedAsync);

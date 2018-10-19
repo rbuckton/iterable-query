@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, ToStringTag } from "../internal";
+import { assert, ToStringTag } from "../internal";
 
 /**
  * Creates an [[AsyncIterable]] for the own property keys of an `object`.
@@ -41,5 +41,3 @@ class AsyncObjectKeysIterable<T extends object> implements AsyncIterable<Extract
         yield* Object.keys(source) as Extract<keyof T, string>[];
     }
 }
-
-Registry.AsyncQuery.registerStatic("objectKeys", objectKeysAsync);

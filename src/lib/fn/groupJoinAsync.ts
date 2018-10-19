@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, Registry, GetAsyncSource, CreateSubquery, CreateAsyncSubquery } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "../fn/empty";
 
@@ -29,7 +29,7 @@ import { empty } from "../fn/empty";
  * @param resultSelector A callback used to select the result for the correlated elements.
  * @category Join
  */
-export function groupJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Iterable<I>) => R): AsyncIterable<R> {
+export function groupJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Iterable<I>) => R | PromiseLike<R>): AsyncIterable<R> {
     assert.mustBeAsyncQueryable<O>(outer, "outer");
     assert.mustBeAsyncQueryable<I>(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
@@ -44,9 +44,9 @@ class AsyncGroupJoinIterable<O, I, K, R> implements AsyncIterable<R> {
     private _inner: PossiblyAsyncIterable<I>;
     private _outerKeySelector: (element: O) => K;
     private _innerKeySelector: (element: I) => K;
-    private _resultSelector: (outer: O, inner: Iterable<I>) => R;
+    private _resultSelector: (outer: O, inner: Iterable<I>) => R | PromiseLike<R>;
 
-    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Iterable<I>) => R) {
+    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O, inner: Iterable<I>) => R | PromiseLike<R>) {
         this._outer = outer;
         this._inner = inner;
         this._outerKeySelector = outerKeySelector;
@@ -65,12 +65,3 @@ class AsyncGroupJoinIterable<O, I, K, R> implements AsyncIterable<R> {
         }
     }
 }
-
-Registry.AsyncQuery.registerCustom("groupJoin", groupJoinAsync, function (inner, outerKeySelector, innerKeySelector, resultSelector) {
-    assert.mustBeAsyncQuerySource(this, "this");
-    assert.mustBeAsyncQueryable(inner, "inner");
-    assert.mustBeFunction(outerKeySelector, "outerKeySelector");
-    assert.mustBeFunction(innerKeySelector, "innerKeySelector");
-    assert.mustBeFunction(resultSelector, "resultSelector");
-    return CreateAsyncSubquery(this, new AsyncGroupJoinIterable(ToPossiblyAsyncIterable(GetAsyncSource(this)), ToPossiblyAsyncIterable(inner), outerKeySelector, innerKeySelector, (outer, inner) => resultSelector(outer, CreateSubquery(this, inner))));
-});

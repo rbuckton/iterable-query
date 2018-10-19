@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Registry } from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -33,5 +33,3 @@ export function forEach<T>(source: Queryable<T>, callback: (element: T, offset: 
         callback(element, offset++);
     }
 }
-
-Registry.Query.registerScalar("forEach", forEach);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, GetHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, True, GetHierarchy, ToStringTag} from "../internal";
 import { HierarchyProvider, HierarchyIterable, Hierarchical } from "../types";
 import { Axis } from "./axis";
 
@@ -185,16 +185,3 @@ const SiblingsAndSelfTraversalIterable = CreateTraversalIterable("SiblingsAndSel
 const SiblingsBeforeSelfTraversalIterable = CreateTraversalIterable("SiblingsBeforeSelfTraversalIterable", Axis.siblingsBeforeSelf);
 const SiblingsAfterSelfTraversalIterable = CreateTraversalIterable("SiblingsAfterSelfTraversalIterable", Axis.siblingsAfterSelf);
 const ChildrenTraversalIterable = CreateTraversalIterable("ChildrenTraversalIterable", Axis.children);
-
-Registry.HierarchyQuery.registerSubquery("root", root);
-Registry.HierarchyQuery.registerSubquery("ancestors", ancestors);
-Registry.HierarchyQuery.registerSubquery("ancestorsAndSelf", ancestorsAndSelf);
-Registry.HierarchyQuery.registerSubquery("descendants", descendants);
-Registry.HierarchyQuery.registerSubquery("descendantsAndSelf", descendantsAndSelf);
-Registry.HierarchyQuery.registerSubquery("parents", parents);
-Registry.HierarchyQuery.registerSubquery("self", self);
-Registry.HierarchyQuery.registerSubquery("siblings", siblings);
-Registry.HierarchyQuery.registerSubquery("siblingsAndSelf", siblingsAndSelf);
-Registry.HierarchyQuery.registerSubquery("siblingsBeforeSelf", siblingsBeforeSelf);
-Registry.HierarchyQuery.registerSubquery("siblingsAfterSelf", siblingsAfterSelf);
-Registry.HierarchyQuery.registerSubquery("children", children);

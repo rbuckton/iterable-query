@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 
 /**
@@ -56,5 +56,3 @@ class AppendIterable<T> implements Iterable<T> {
         yield this._value;
     }
 }
-
-Registry.Query.registerSubquery("append", append);

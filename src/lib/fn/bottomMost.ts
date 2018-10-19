@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, Registry, True} from "../internal";
+import { assert, GetHierarchy, ToStringTag, True} from "../internal";
 import { HierarchyIterable, Hierarchical } from "../types";
 import { Map, Set } from "../collections";
 import { Axis } from "./axis";
@@ -97,5 +97,3 @@ class BottomMostIterable<TNode, T extends TNode> implements HierarchyIterable<TN
         return GetHierarchy(this._source);
     }
 }
-
-Registry.HierarchyQuery.registerSubquery("bottomMost", bottomMost);

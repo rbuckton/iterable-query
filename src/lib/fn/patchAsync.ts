@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -88,5 +88,3 @@ class AsyncPatchIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("patch", patchAsync);

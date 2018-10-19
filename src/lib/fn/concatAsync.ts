@@ -15,11 +15,11 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToStringTag, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { assert, FlowHierarchy, ToStringTag, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 
 /**
- * Creates an [[AsyncHierarchyIterable]] that concatenates a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] 
+ * Creates an [[AsyncHierarchyIterable]] that concatenates a [[HierarchyIterable]] or [[AsyncHierarchyIterable]]
  * object with an [[AsyncQueryable]] object.
  *
  * @param left A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
@@ -28,7 +28,7 @@ import { AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncHierarchyIterable,
  */
 export function concatAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
 /**
- * Creates an [[AsyncHierarchyIterable]] that concatenates an [[AsyncQueryable]] object with 
+ * Creates an [[AsyncHierarchyIterable]] that concatenates an [[AsyncQueryable]] object with
  * a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  *
  * @param left An [[AsyncQueryable]] object.
@@ -65,5 +65,3 @@ class AsyncConcatIterable<T> implements AsyncIterable<T> {
         yield* this._right;
     }
 }
-
-Registry.AsyncQuery.registerSubquery("concat", concatAsync);

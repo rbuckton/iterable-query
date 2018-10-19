@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry, IsDefined } from "../internal";
+import { IsDefined } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { filter } from "./filter";
 
@@ -36,5 +36,3 @@ export function filterDefined<T>(source: Queryable<T>): Iterable<NonNullable<T>>
 export function filterDefined<T>(source: Queryable<T>): Iterable<NonNullable<T>> {
     return filter(source, IsDefined);
 }
-
-Registry.Query.registerSubquery("filterDefined", filterDefined);

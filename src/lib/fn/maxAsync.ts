@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CompareValues, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, CompareValues, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -41,5 +41,3 @@ export async function maxAsync<T>(source: AsyncQueryable<T>, comparison: (x: T, 
     }
     return result;
 }
-
-Registry.AsyncQuery.registerScalar("max", maxAsync);

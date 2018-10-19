@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -73,5 +73,3 @@ class ScanIterable<T, U> implements Iterable<T | U> {
         }
     }
 }
-
-Registry.Query.registerSubquery("scan", scan);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -25,13 +25,12 @@ import { AsyncQueryable } from "../types";
  * @param callback The callback to invoke.
  * @category Scalar
  */
-export async function forEachAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => void): Promise<void> {
+export async function forEachAsync<T>(source: AsyncQueryable<T>, callback: (element: T, offset: number) => void | PromiseLike<void>): Promise<void> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(callback, "callback");
     let offset = 0;
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        callback(element, offset++);
+        const result = callback(element, offset++);
+        if (typeof result !== "undefined") await result;
     }
 }
-
-Registry.AsyncQuery.registerScalar("forEach", forEachAsync);

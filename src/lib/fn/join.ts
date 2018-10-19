@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, ToStringTag, Registry } from "../internal";
+import { assert, ToIterable, CreateGroupings, Identity, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -68,5 +68,3 @@ class JoinIterable<O, I, K, R> implements Iterable<R> {
         }
     }
 }
-
-Registry.Query.registerSubquery("join", join);

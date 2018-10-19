@@ -15,8 +15,6 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { tap } from "./tap";
-export { tap as do };
-
-Registry.Query.registerAlias("do", tap);
+// TODO: remove comment once auto-import is fixed
+/** @internal */
+export { tap as do } from "./tap";

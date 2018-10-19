@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToIterable, Registry } from "../internal";
+import { assert, Identity, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -44,5 +44,3 @@ export function sum(source: Queryable<number>, elementSelector: (element: number
     }
     return sum;
 }
-
-Registry.Query.registerScalar("sum", sum);

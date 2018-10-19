@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, True, Registry } from "../internal";
+import { assert, ToIterable, True} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -41,5 +41,3 @@ export function single<T>(source: Queryable<T>, predicate: (element: T) => boole
     }
     return hasResult ? result : undefined;
 }
-
-Registry.Query.registerScalar("single", single);

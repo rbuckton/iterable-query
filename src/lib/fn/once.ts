@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { ToStringTag, Registry } from "../internal";
+import { ToStringTag} from "../internal";
 
 /**
  * Creates an [[Iterable]] over a single element.
@@ -39,5 +39,3 @@ class OnceIterable<T> implements Iterable<T> {
         yield this._value;
     }
 }
-
-Registry.Query.registerStatic("once", once);

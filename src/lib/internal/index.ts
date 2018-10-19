@@ -25,8 +25,6 @@ export * from "./guards";
 /** @internal */
 export * from "./utils";
 /** @internal */
-export * from "./registry";
-/** @internal */
 export * from "./types";
 /** @internal */
 import * as assert from "./assert";

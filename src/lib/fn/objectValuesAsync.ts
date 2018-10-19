@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, ToStringTag } from "../internal";
+import { assert, ToStringTag } from "../internal";
 
 /**
  * Creates an [[AsyncIterable]] for the own property values of an `object`.
@@ -43,5 +43,3 @@ class AsyncObjectValuesIterable<T extends object> implements AsyncIterable<T[Ext
         }
     }
 }
-
-Registry.AsyncQuery.registerStatic("objectValues", objectValuesAsync);

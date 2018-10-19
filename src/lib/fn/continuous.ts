@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { ToStringTag, Registry } from "../internal";
+import { ToStringTag} from "../internal";
 
 /**
  * Creates an [[Iterable]] that repeats the provided value forever.
@@ -42,5 +42,3 @@ class ContinuousIterable<T> implements Iterable<T> {
         }
     }
 }
-
-Registry.Query.registerStatic("continuous", continuous);

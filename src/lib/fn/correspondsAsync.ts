@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetAsyncIterator, AsyncIteratorClose, Registry, ToPossiblyAsyncIterable } from "../internal";
+import { assert, SameValue, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -64,5 +64,3 @@ export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQ
         if (!leftDone) await AsyncIteratorClose(leftIterator);
     }
 }
-
-Registry.AsyncQuery.registerScalar("corresponds", correspondsAsync);

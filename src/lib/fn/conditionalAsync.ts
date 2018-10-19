@@ -15,5 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { ifAsync } from "./ifAsync";
-export { ifAsync as conditionalAsync };
+export { ifAsync as conditionalAsync } from "./ifAsync";

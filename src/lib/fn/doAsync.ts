@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { tapAsync } from "./tapAsync";
-export { tapAsync as doAsync };
-
-Registry.AsyncQuery.registerAlias("do", tapAsync);
+export { tapAsync as doAsync } from "./tapAsync";

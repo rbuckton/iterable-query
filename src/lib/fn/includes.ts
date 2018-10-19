@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, SameValue, Registry } from "../internal";
+import { assert, ToIterable, SameValue} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -25,14 +25,22 @@ import { Queryable } from "../types";
  * @param value A value.
  * @category Scalar
  */
-export function includes<T>(source: Queryable<T>, value: T): boolean {
+export function includes<T>(source: Queryable<T>, value: T): boolean;
+/**
+ * Computes a scalar value indicating whether the provided value is included in a [[Queryable]].
+ *
+ * @param source A [[Queryable]] object.
+ * @param value A value.
+ * @param equalityComparison An optional callback used to compare the equality of two elements.
+ * @category Scalar
+ */
+export function includes<T, U>(source: Queryable<T>, value: U, equalityComparison: (left: T, right: U) => boolean): boolean;
+export function includes<T>(source: Queryable<T>, value: T, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
     assert.mustBeQueryable(source, "source");
     for (const element of ToIterable(source)) {
-        if (SameValue(value, element)) {
+        if (equalityComparison(value, element)) {
             return true;
         }
     }
     return false;
 }
-
-Registry.Query.registerScalar("includes", includes);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CompareValues, FlowHierarchy, ThenByAsync, ToAsyncOrderedIterable, ToPossiblyAsyncIterable, ToStringTag, Registry } from "../internal";
+import { assert, CompareValues, FlowHierarchy, ThenByAsync, ToAsyncOrderedIterable, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncQueryable, AsyncOrderedIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
 
@@ -173,10 +173,3 @@ class AsyncOrderByIterable<T, K> implements AsyncOrderedIterable<T> {
         return parent ? parent._getSorter(elements, sorter) : sorter;
     }
 }
-
-Registry.AsyncQuery.registerSubquery("orderBy", orderByAsync);
-Registry.AsyncQuery.registerSubquery("orderByDescending", orderByDescendingAsync);
-Registry.AsyncOrderedQuery.registerSubquery("thenBy", thenByAsync);
-Registry.AsyncOrderedQuery.registerSubquery("thenByDescending", thenByDescendingAsync);
-Registry.AsyncOrderedHierarchyQuery.registerSubquery("thenBy", thenByAsync);
-Registry.AsyncOrderedHierarchyQuery.registerSubquery("thenByDescending", thenByDescendingAsync);

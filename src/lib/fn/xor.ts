@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { symmetricDifference } from "./symmetricDifference";
-export { symmetricDifference as xor };
-
-Registry.Query.registerAlias("xor", symmetricDifference);
+export { symmetricDifference as xor } from "./symmetricDifference";

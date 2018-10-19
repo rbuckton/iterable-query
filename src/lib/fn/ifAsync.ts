@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToStringTag, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, ToStringTag, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "./empty";
 
@@ -49,9 +49,10 @@ class AsyncIfIterable<T> implements AsyncIterable<T> {
 
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
         const condition = this._condition;
-        const iterable = await condition() ? this._thenQueryable : (this._elseQueryable || empty());
+        const result = condition();
+        const iterable = (typeof result === "boolean" ? result : await result)
+            ? this._thenQueryable
+            : this._elseQueryable || empty();
         yield* iterable;
     }
 }
-
-Registry.AsyncQuery.registerStatic("if", ifAsync);

@@ -15,8 +15,4 @@
  */
 /** @module "iterable-query/fn" */
 
-import { Registry } from "../internal";
-import { except } from "./except";
-export { except as relativeComplement };
-
-Registry.Query.registerAlias("relativeComplement", except);
+export { except as relativeComplement } from "./except";

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity, Registry } from "../internal";
+import { assert, ToIterable, Identity} from "../internal";
 import { Queryable } from "../types";
 import { Map } from "../collections";
 
@@ -48,5 +48,3 @@ export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K
     }
     return map;
 }
-
-Registry.Query.registerScalar("toMap", toMap);

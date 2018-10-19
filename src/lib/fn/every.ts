@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Registry } from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -46,5 +46,3 @@ export function every<T>(source: Queryable<T>, predicate: (element: T) => boolea
     }
     return hasMatchingElements;
 }
-
-Registry.Query.registerScalar("every", every);

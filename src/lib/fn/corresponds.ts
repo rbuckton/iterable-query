@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetIterator, ToIterable, IteratorClose, Registry } from "../internal";
+import { assert, SameValue, GetIterator, ToIterable, IteratorClose} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -64,5 +64,3 @@ export function corresponds<T>(left: Queryable<T>, right: Queryable<T>, equality
         if (!leftDone) IteratorClose(leftIterator);
     }
 }
-
-Registry.Query.registerScalar("corresponds", corresponds);

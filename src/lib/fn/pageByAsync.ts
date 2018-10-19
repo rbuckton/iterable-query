@@ -15,12 +15,12 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, ToStringTag, Registry, CreatePage } from "../internal";
+import { assert, ToPossiblyAsyncIterable, ToStringTag, CreatePage } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable, Page, PossiblyAsyncHierarchyIterable, HierarchyPage } from "../types";
 
 /**
- * Creates an [[AsyncHierarchyIterable]] that splits a [[HierarchyIterable]] or 
- * [[AsyncHierarchyIterable]] into one or more pages. While advancing from page 
+ * Creates an [[AsyncHierarchyIterable]] that splits a [[HierarchyIterable]] or
+ * [[AsyncHierarchyIterable]] into one or more pages. While advancing from page
  * to page is evaluated lazily, the elements of the page are evaluated eagerly.
  *
  * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
@@ -71,5 +71,3 @@ class AsyncPageByIterable<T> implements AsyncIterable<Page<T>> {
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("pageBy", pageByAsync);

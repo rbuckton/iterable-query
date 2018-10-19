@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 
 /**
@@ -41,7 +41,7 @@ export function filterAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarc
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
-export function filterAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean): AsyncHierarchyIterable<TNode, T>;
+export function filterAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates an [[AsyncIterable]] whose elements match the supplied predicate.
  *
@@ -57,8 +57,8 @@ export function filterAsync<T, U extends T>(source: AsyncQueryable<T>, predicate
  * @param predicate A callback used to match each element.
  * @category Subquery
  */
-export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean): AsyncIterable<T>;
-export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean): AsyncIterable<T> {
+export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncIterable<T>;
+export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     return FlowHierarchy(new AsyncFilterIterable(ToPossiblyAsyncIterable(source), predicate), source);
@@ -67,9 +67,9 @@ export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T
 @ToStringTag("AsyncFilterIterable")
 class AsyncFilterIterable<T> implements AsyncIterable<T> {
     private _source: PossiblyAsyncIterable<T>;
-    private _predicate: (element: T, offset: number) => boolean;
+    private _predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>;
 
-    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T, offset: number) => boolean) {
+    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>) {
         this._source = source;
         this._predicate = predicate;
     }
@@ -78,11 +78,10 @@ class AsyncFilterIterable<T> implements AsyncIterable<T> {
         const predicate = this._predicate;
         let offset = 0;
         for await (const element of this._source) {
-            if (predicate(element, offset++)) {
+            const result = predicate(element, offset++);
+            if (typeof result === "boolean" ? result : await result) {
                 yield element;
             }
         }
     }
 }
-
-Registry.AsyncQuery.registerSubquery("filter", filterAsync);

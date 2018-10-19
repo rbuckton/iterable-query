@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToStringTag, Registry, AsyncIteratorClose } from "../internal";
+import { assert, ToStringTag, AsyncIteratorClose } from "../internal";
 
 export interface ConsumeAsyncOptions {
     /** Indicates whether iterated elements should be cached for subsequent iterations. */
@@ -76,5 +76,3 @@ class AsyncConsumeIterable<T> implements AsyncIterable<T> {
         }
     }
 }
-
-Registry.AsyncQuery.registerStatic("consume", consumeAsync);

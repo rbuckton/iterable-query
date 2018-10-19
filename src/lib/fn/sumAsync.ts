@@ -15,34 +15,34 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
  * Computes the sum for a series of numbers.
- * 
+ * NOTE: If any element is not a `number`, this overload will throw.
+ *
  * @param source An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function sumAsync(source: AsyncQueryable<number>): Promise<number>;
 /**
  * Computes the sum for a series of numbers.
- * 
+ *
  * @param source An [[AsyncQueryable]] object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
  * @category Scalar
  */
-export async function sumAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number): Promise<number>;
-export async function sumAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number = Identity): Promise<number> {
+export async function sumAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number | PromiseLike<number>): Promise<number>;
+export async function sumAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number | PromiseLike<number> = Identity): Promise<number> {
     assert.mustBeAsyncQueryable<number>(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     let sum = 0;
-    for await (const value of ToPossiblyAsyncIterable(source)) {
-        const result = elementSelector(value);
-        if (typeof result !== "number") throw new TypeError();
+    for await (const element of ToPossiblyAsyncIterable(source)) {
+        const value = elementSelector(element);
+        const result = typeof value === "number" ? value : await value;
+        assert.mustBeNumber(result);
         sum += result;
     }
     return sum;
 }
-
-Registry.AsyncQuery.registerScalar("sum", sumAsync);

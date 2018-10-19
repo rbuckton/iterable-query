@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, Registry } from "../internal";
+import { assert, GetHierarchy, ToStringTag} from "../internal";
 import { HierarchyProvider, HierarchyIterable, Hierarchical } from "../types";
 import { elementAt } from "./elementAt";
 import { Axis } from "./axis";
@@ -68,5 +68,3 @@ class NthChildIterable<TNode, T extends TNode> implements Iterable<TNode> {
         return GetHierarchy(this._source);
     }
 }
-
-Registry.HierarchyQuery.registerSubquery("nthChild", nthChild);

@@ -150,15 +150,10 @@ export function IsQueryable<T>(value: Queryable<T> | Other): value is Queryable<
 
 /** @internal */
 export function IsQuerySource<T>(value: QuerySource<T> | Other): value is QuerySource<T> {
-    return IsObject(value)
-        && QuerySource.source in value
-        && QuerySource.create in value;
+    return IsObject(value) && QuerySource.source in value;
 }
 
 /** @internal */
 export function IsAsyncQuerySource<T>(value: AsyncQuerySource<T> | Other): value is AsyncQuerySource<T> {
-    return IsObject(value)
-        && AsyncQuerySource.source in value
-        && AsyncQuerySource.create in value
-        && AsyncQuerySource.createSync in value;
+    return IsObject(value) && AsyncQuerySource.source in value;
 }

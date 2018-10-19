@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity, Registry } from "../internal";
+import { assert, ToIterable, Identity} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -50,5 +50,3 @@ export function toObject<T>(source: Queryable<T>, prototype: object | null, keyS
     }
     return obj;
 }
-
-Registry.Query.registerScalar("toObject", toObject);

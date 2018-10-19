@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, MakeAsyncHierarchyIterable } from "../internal";
+import { assert, MakeAsyncHierarchyIterable } from "../internal";
 import { HierarchyProvider, AsyncHierarchyIterable } from "../types";
 import { onceAsync } from "./onceAsync";
 
@@ -30,5 +30,3 @@ export function hierarchyAsync<TNode, T extends TNode>(root: PromiseLike<T> | T,
     assert.mustBeHierarchyProvider(hierarchy, "hierarchy");
     return MakeAsyncHierarchyIterable(onceAsync(root), hierarchy);
 }
-
-Registry.AsyncQuery.registerStatic("hierarchy", hierarchyAsync);

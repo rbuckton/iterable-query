@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToIterable, Registry } from "../internal";
+import { assert, True, ToIterable} from "../internal";
 import { Queryable } from "../types";
 
 /**
@@ -35,5 +35,3 @@ export function first<T>(source: Queryable<T>, predicate: (element: T) => boolea
     }
     return undefined;
 }
-
-Registry.Query.registerScalar("first", first);

@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToPossiblyAsyncIterable, Registry } from "../internal";
+import { assert, True, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -25,21 +25,29 @@ import { AsyncQueryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export async function singleAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean = True) {
+export async function singleAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T) => element is U): Promise<U | undefined>;
+/**
+ * Gets the only element, or returns `undefined`.
+ *
+ * @param source An [[AsyncQueryable]] object.
+ * @param predicate An optional callback used to match each element.
+ * @category Scalar
+ */
+export async function singleAsync<T>(source: AsyncQueryable<T>, predicate?: (element: T) => boolean | PromiseLike<boolean>): Promise<T | undefined>;
+export async function singleAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True) {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     let hasResult = false;
-    let result: T | undefined;
+    let single: T | undefined;
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        if (predicate(element)) {
+        const result = predicate(element);
+        if (typeof result === "boolean" ? result : await result) {
             if (hasResult) {
                 return undefined;
             }
             hasResult = true;
-            result = element;
+            single = element;
         }
     }
-    return hasResult ? result : undefined;
+    return hasResult ? single : undefined;
 }
-
-Registry.AsyncQuery.registerScalar("single", singleAsync);
