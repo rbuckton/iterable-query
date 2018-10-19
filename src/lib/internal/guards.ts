@@ -21,6 +21,11 @@ type Primitive = string | number | boolean | symbol;
 type Other = Primitive | object | null | undefined;
 
 /** @internal */
+export function IsDefined<T>(value: T): value is NonNullable<T> {
+    return value !== undefined && value !== null;
+}
+
+/** @internal */
 export function IsObject<T>(value: T): value is T & object {
     return typeof value === "object" && value !== null
         || typeof value === "function";
@@ -46,40 +51,40 @@ export function IsHierarchyProvider<TNode>(value: HierarchyProvider<TNode> | Oth
 
 /** @internal */
 export function IsGrouping<K, V>(value: Grouping<K, V> | Other): value is Grouping<K, V> {
-    return IsObject(value) 
+    return IsObject(value)
         && Symbol.iterator in value
         && "key" in value;
 }
 
 /** @internal */
 export function IsArrayLike<T>(value: ArrayLike<T> | Other): value is ArrayLike<T> {
-    return IsObject(value) && typeof value !== "function" 
+    return IsObject(value) && typeof value !== "function"
         && "length" in value;
 }
 
 /** @internal */
 export function IsIterable<T>(value: Iterable<T> | Other): value is Iterable<T> {
-    return IsObject(value) 
+    return IsObject(value)
         && Symbol.iterator in value;
 }
 
 /** @internal */
 export function IsOrderedIterable<T>(value: Iterable<T> | Other): value is OrderedIterable<T> {
-    return IsObject(value) 
+    return IsObject(value)
         && Symbol.iterator in value
         && OrderedIterable.thenBy in value;
 }
 
 /** @internal */
 export function IsHierarchyIterable<T>(value: Iterable<T> | Other): value is HierarchyIterable<T> {
-    return IsObject(value) 
+    return IsObject(value)
         && Symbol.iterator in value
         && Hierarchical.hierarchy in value;
 }
 
 /** @internal */
 export function IsOrderedHierarchyIterable<T>(value: Iterable<T> | Other): value is OrderedHierarchyIterable<T> {
-    return IsObject(value) 
+    return IsObject(value)
         && Symbol.iterator in value
         && OrderedIterable.thenBy in value
         && Hierarchical.hierarchy in value;

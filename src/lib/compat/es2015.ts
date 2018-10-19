@@ -217,19 +217,19 @@ function installShims(global: any) {
             return primArray.filter(primObject.keys(o), isVisibleKey);
         };
 
-        Object.freeze = function(o: any) {
-            if (primObject.isExtensible(o)) getOrCreateWeakTable(o, /*create*/ true);
-            return primObject.freeze(o);
+        Object.freeze = function<T>(o: T) {
+            if (primObject.isExtensible(o) && typeof o === "object" && o !== null) getOrCreateWeakTable(o, /*create*/ true);
+            return primObject.freeze(o) as T;
         };
 
-        Object.seal = function(o: any) {
-            if (primObject.isExtensible(o)) getOrCreateWeakTable(o, /*create*/ true);
-            return primObject.seal(o);
+        Object.seal = function<T>(o: T) {
+            if (primObject.isExtensible(o) && typeof o === "object" && o !== null) getOrCreateWeakTable(o, /*create*/ true);
+            return primObject.seal(o) as T;
         };
 
-        Object.preventExtensions = function(o: any) {
-            if (primObject.isExtensible(o)) getOrCreateWeakTable(o, /*create*/ true);
-            return primObject.preventExtensions(o);
+        Object.preventExtensions = function<T>(o: T) {
+            if (primObject.isExtensible(o) && typeof o === "object" && o !== null) getOrCreateWeakTable(o, /*create*/ true);
+            return primObject.preventExtensions(o) as T;
         };
 
         if (primReflect) {
@@ -237,7 +237,7 @@ function installShims(global: any) {
                 return primArray.filter(primReflect.ownKeys(o), isVisibleKey);
             };
             Reflect.preventExtensions = function(o: any) {
-                if (primReflect.isExtensible(o)) getOrCreateWeakTable(o, true);
+                if (primReflect.isExtensible(o) && typeof o === "object" && o !== null) getOrCreateWeakTable(o, true);
                 return primReflect.preventExtensions(o);
             };
         }

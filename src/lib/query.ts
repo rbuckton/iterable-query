@@ -350,6 +350,22 @@ export interface Query<T> {
     where(predicate: (element: T, offset: number) => boolean): Query<T>;
 
     /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * @category Subquery
+     */
+    filterDefined(): Query<NonNullable<T>>;
+
+    /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * NOTE: This is an alias for `filterDefined`.
+     *
+     * @category Subquery
+     */
+    whereDefined(): Query<NonNullable<T>>;
+
+    /**
      * Creates a subquery by applying a callback to each element.
      *
      * @param selector A callback used to map each element.
@@ -361,7 +377,7 @@ export interface Query<T> {
 
     /**
      * Creates a subquery by applying a callback to each element.
-     * 
+     *
      * NOTE: This is an alias for `map`.
      *
      * @param selector A callback used to map each element.
@@ -413,7 +429,7 @@ export interface Query<T> {
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
-     * 
+     *
      * NOTE: This is an alias for `do`.
      *
      * @param callback The callback to invoke.
@@ -1007,7 +1023,7 @@ export interface Query<T> {
      * @category Scalar
      */
     sum(): T extends number ? number : never;
-    
+
     /**
      * @category Scalar
      */
@@ -1310,7 +1326,7 @@ export class HierarchyQuery<TNode, T extends TNode = TNode> extends Query<T> imp
 export declare namespace HierarchyQuery {
 }
 
-export interface HierarchyQuery<TNode, T extends TNode = TNode>{
+export interface HierarchyQuery<TNode, T extends TNode = TNode> {
     /**
      * Creates a subquery whose elements match the supplied predicate.
      *
@@ -1342,6 +1358,20 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode>{
      * @category Subquery
      */
     where(predicate: (element: T, offset: number) => boolean): HierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * @category Subquery
+     */
+    filterDefined(): HierarchyQuery<TNode, NonNullable<T>>;
+
+    /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * @category Subquery
+     */
+    whereDefined(): HierarchyQuery<TNode, NonNullable<T>>;
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.

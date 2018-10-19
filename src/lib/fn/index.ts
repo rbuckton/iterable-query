@@ -14,11 +14,11 @@
   limitations under the License.
  */
 /**
- * @module "iterable-query/fn" 
+ * @module "iterable-query/fn"
  * @preferred
  */
 
-// statics
+// queries
 export * from "./choose";
 export * from "./chooseAsync";
 export * from "./consume";
@@ -101,7 +101,7 @@ export * from "./toObject";
 export * from "./toObjectAsync";
 export * from "./toSet";
 export * from "./toSetAsync";
-// queries
+// subqueries
 export * from "./append";
 export * from "./appendAsync";
 export * from "./concat";
@@ -124,8 +124,12 @@ export * from "./eval";
 export * from "./evalAsync";
 export * from "./filter";
 export * from "./filterAsync";
+export * from "./filterDefined";
+export * from "./filterDefinedAsync";
 export * from "./where";
 export * from "./whereAsync";
+export * from "./whereDefined";
+export * from "./whereDefinedAsync";
 export * from "./intersect";
 export * from "./intersectAsync";
 export * from "./map";

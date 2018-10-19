@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Registry, GetAsyncSource, CreateAsyncSubquery } from "../internal";
+import { assert, Registry, CreateAsyncSubquery } from "../internal";
 import { AsyncQueryable } from "../types";
 
 /**
@@ -34,5 +34,5 @@ export function throughAsync<T, U, S extends AsyncQueryable<T> = AsyncQueryable<
 }
 
 Registry.AsyncQuery.registerCustom("through", throughAsync, function (callback) {
-    return CreateAsyncSubquery(this, throughAsync(GetAsyncSource(this), callback as <S, R>(source: S) => R));
+    return CreateAsyncSubquery(this, throughAsync(this, callback as <S, R>(source: S) => R));
 });

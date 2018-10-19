@@ -53,12 +53,12 @@ class AsyncFromSyncIterator<T> implements AsyncIterator<T> {
     constructor(iterator: Iterator<PromiseLike<T> | T>) {
         this._iterator = iterator;
     }
-    
+
     async next(value?: any): Promise<IteratorResult<T>> {
         const { done, value: resultValue } = this._iterator.next(value);
         return { done, value: await resultValue };
     }
-    
+
     async return(value?: T): Promise<IteratorResult<T>> {
         const returnMethod = this._iterator.return;
         if (returnMethod === undefined) {
@@ -107,7 +107,7 @@ export function GetHierarchy<TNode>(value: Hierarchical<TNode>): HierarchyProvid
 /** @internal */ export function CreateSubquery<T>(query: QuerySource<unknown> | AsyncQuerySource<unknown>, subquery: Queryable<T>): QuerySource<T> {
     const subqueryMethod = IsAsyncQuerySource(query) ? query[AsyncQuerySource.createSync] : query[QuerySource.create];
     if (typeof subqueryMethod === "function") {
-        return subqueryMethod.call(query, subquery);
+        return subqueryMethod.call(query, subquery) as QuerySource<T>;
     }
     throw new TypeError();
 }
@@ -132,7 +132,7 @@ export function GetHierarchy<TNode>(value: Hierarchical<TNode>): HierarchyProvid
 /** @internal */ export function CreateAsyncSubquery<T>(query: AsyncQuerySource<unknown>, subquery: AsyncQueryable<T>): AsyncQuerySource<T> {
     const subqueryMethod = query[AsyncQuerySource.create];
     if (typeof subqueryMethod === "function") {
-        return subqueryMethod.call(query, subquery);
+        return subqueryMethod.call(query, subquery) as AsyncQuerySource<T>;
     }
     throw new TypeError();
 }
@@ -162,7 +162,7 @@ export function AsyncIteratorClose<T>(iterator: AsyncIterator<T> | undefined | n
 /** @internal */ export function ThenBy<T, K>(value: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T> {
     const thenBy = value[OrderedIterable.thenBy];
     if (typeof thenBy === "function") {
-        return thenBy.call(value, keySelector, comparison, descending);
+        return thenBy.call(value, keySelector, comparison as (x: {}, y: {}) => number, descending);
     }
     throw new TypeError();
 }
@@ -172,7 +172,7 @@ export function AsyncIteratorClose<T>(iterator: AsyncIterator<T> | undefined | n
 /** @internal */ export function ThenByAsync<T, K>(value: AsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T> {
     const thenBy = value[AsyncOrderedIterable.thenByAsync];
     if (typeof thenBy === "function") {
-        return thenBy.call(value, keySelector, comparison, descending);
+        return thenBy.call(value, keySelector, comparison as (x: {}, y: {}) => number, descending);
     }
     throw new TypeError();
 }

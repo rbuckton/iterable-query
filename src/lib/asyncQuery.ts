@@ -334,6 +334,22 @@ export interface AsyncQuery<T> {
     where(predicate: (element: T, offset: number) => boolean): AsyncQuery<T>;
 
     /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * @category Subquery
+     */
+    filterDefined(): AsyncQuery<NonNullable<T>>;
+
+    /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * NOTE: This is an alias for `filterDefined`.
+     *
+     * @category Subquery
+     */
+    whereDefined(): AsyncQuery<NonNullable<T>>;
+
+    /**
      * Creates a subquery by applying a callback to each element.
      *
      * @param selector A callback used to map each element.
@@ -980,7 +996,7 @@ export interface AsyncQuery<T> {
     sum(selector: (element: T) => number): Promise<number>;
     /** @category Scalar */
     sum(): Promise<T extends number ? number : never>;
-    
+
     /** @category Scalar */
     average(selector: (element: T) => number): Promise<number>;
     /** @category Scalar */
@@ -1314,6 +1330,20 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
     where(predicate: (element: T, offset: number) => boolean): AsyncHierarchyQuery<TNode, T>;
 
     /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * @category Subquery
+     */
+    filterDefined(): AsyncHierarchyQuery<TNode, NonNullable<T>>;
+
+    /**
+     * Creates a subquery whose elements are neither `null` nor `undefined`.
+     *
+     * @category Subquery
+     */
+    whereDefined(): AsyncHierarchyQuery<TNode, NonNullable<T>>;
+
+    /**
      * Lazily invokes a callback as each element of the query is iterated.
      *
      * @param callback The callback to invoke.
@@ -1470,7 +1500,7 @@ export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
      * @category Subquery
      */
     union<U extends TNode>(right: PossiblyAsyncHierarchyIterable<TNode, U>): AsyncHierarchyQuery<TNode, T | U>;
-    
+
     /**
      * Creates a subquery for the set union of this `AsyncQuery` and another [[AsyncQueryable]].
      *
