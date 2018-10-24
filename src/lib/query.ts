@@ -24,15 +24,15 @@ import { ConsumeOptions } from "./fn";
 /**
  * Flows the base type of a [[Query]] as an unordered query with a new iterated type.
  */
-export type UnorderedFlow<S extends Queryable<any>, T> = 
-    S extends Hierarchical<infer TNode> ? HierarchyQuery<TNode, TNode & T> : 
+export type UnorderedFlow<S extends Queryable<any>, T> =
+    S extends Hierarchical<infer TNode> ? HierarchyQuery<TNode, TNode & T> :
     Query<T>;
 
 /**
  * Flows the base type of a [[Query]] as an ordered query with a new iterated type.
  */
-export type OrderedFlow<S extends Queryable<any>, T> = 
-    S extends Hierarchical<infer TNode> ? OrderedHierarchyQuery<TNode, TNode & T> : 
+export type OrderedFlow<S extends Queryable<any>, T> =
+    S extends Hierarchical<infer TNode> ? OrderedHierarchyQuery<TNode, TNode & T> :
     OrderedQuery<T>;
 
 /**
@@ -335,7 +335,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     }
 
     // #endregion Query
-    
+
     // #region Subquery
 
     /**
@@ -691,8 +691,16 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * Creates a subquery for the distinct elements of this `Query`.
      * @category Subquery
      */
-    distinct(): UnorderedFlow<this, T> {
-        return from(fn.distinct(GetSource(this))) as UnorderedFlow<this, T>;
+    distinct(): UnorderedFlow<this, T>;
+    /**
+     * Creates a subquery for the distinct elements of this `Query`.
+     *
+     * @param keySelector A callback used to select the key to determine uniqueness.
+     * @category Subquery
+     */
+    distinct<K>(keySelector: (value: T) => K): UnorderedFlow<this, T>;
+    distinct(keySelector?: (value: T) => T): UnorderedFlow<this, T> {
+        return from(fn.distinct(GetSource(this), keySelector!)) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -931,7 +939,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     }
 
     // #endregion Join
-    
+
     // #region Order
 
     /**
@@ -1159,14 +1167,14 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
 
     /**
      * Computes the average for a series of numbers.
-     * 
+     *
      * @category Scalar
      */
     average(this: Query<number>): number;
 
     /**
      * Computes the average for a series of numbers.
-     * 
+     *
      * @category Scalar
      */
     average(elementSelector: (element: T) => number): number;

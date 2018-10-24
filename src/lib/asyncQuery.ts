@@ -709,8 +709,16 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * Creates a subquery for the distinct elements of this Query.
      * @category Subquery
      */
-    distinct(): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.distinctAsync(GetAsyncSource(this))) as AsyncUnorderedFlow<this, T>;
+    distinct(): AsyncUnorderedFlow<this, T>;
+    /**
+     * Creates a subquery for the distinct elements of this Query.
+     *
+     * @param keySelector A callback used to select the key to determine uniqueness.
+     * @category Subquery
+     */
+    distinct<K>(keySelector: (value: T) => K): AsyncUnorderedFlow<this, T>;
+    distinct(keySelector?: (value: T) => T): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.distinctAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedFlow<this, T>;
     }
 
     /**

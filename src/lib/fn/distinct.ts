@@ -15,42 +15,63 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag, Identity} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
 
 /**
  * Creates a [[HierarchyIterable]] for the distinct elements of `source`.
  * @category Subquery
- * 
+ *
  * @param source A [[HierarchyIterable]] object.
  */
 export function distinct<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
 /**
+ * Creates a [[HierarchyIterable]] for the distinct elements of `source`.
+ * @category Subquery
+ *
+ * @param source A [[HierarchyIterable]] object.
+ * @param keySelector A callback used to select the key to determine uniqueness.
+ */
+export function distinct<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (value: T) => K): HierarchyIterable<TNode, T>;
+/**
  * Creates an [[Iterable]] for the distinct elements of `source`.
  * @category Subquery
- * 
+ *
  * @param source A [[Queryable]] object.
  */
 export function distinct<T>(source: Queryable<T>): Iterable<T>;
-export function distinct<T>(source: Queryable<T>): Iterable<T> {
+/**
+ * Creates an [[Iterable]] for the distinct elements of `source`.
+ * @category Subquery
+ *
+ * @param source A [[Queryable]] object.
+ * @param keySelector A callback used to select the key to determine uniqueness.
+ */
+export function distinct<T, K>(source: Queryable<T>, keySelector: (value: T) => K): Iterable<T>;
+export function distinct<T>(source: Queryable<T>, keySelector: (value: T) => T = Identity): Iterable<T> {
     assert.mustBeQueryable(source, "source");
-    return FlowHierarchy(new DistinctIterable(ToIterable(source)), source);
+    assert.mustBeFunction(keySelector, "keySelector");
+    return FlowHierarchy(new DistinctIterable(ToIterable(source), keySelector), source);
 }
 
 @ToStringTag("DistinctIterable")
-class DistinctIterable<T> implements Iterable<T> {
+class DistinctIterable<T, K> implements Iterable<T> {
     private _source: Iterable<T>;
+    private _keySelector: (value: T) => K;
 
-    constructor(source: Iterable<T>) {
+    constructor(source: Iterable<T>, keySelector: (value: T) => K) {
         this._source = source;
+        this._keySelector = keySelector;
     }
 
     *[Symbol.iterator](): Iterator<T> {
-        const set = new Set<T>();
+        const set = new Set<K>();
+        const keySelector = this._keySelector;
         for (const element of this._source) {
-            if (!set.has(element)) {
-                set.add(element);
+            const key = keySelector(element);
+            if (!set.has(key)) {
+                set.add(key);
                 yield element;
             }
         }
