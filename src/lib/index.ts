@@ -14,7 +14,7 @@
   limitations under the License.
  */
 /**
- * @module "iterable-query" 
+ * @module "iterable-query"
  * @preferred
  */
 

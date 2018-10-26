@@ -30,7 +30,7 @@ gulp.task("cover", setCoverage());
 gulp.task("test:pre-test", ["build"], preTest());
 gulp.task("test", ["test:pre-test"], test({ main: "dist/tests/index.js", coverage: { thresholds: { global: 80 } } }));
 gulp.task("watch", watch(["src/**/*"], ["test"]));
-gulp.task("default", ["test"]);
+gulp.task("default", ["docs", "test"]);
 gulp.task("docs", ["typedoc"], () => gulp.src("src/lib/**/*.ts", { read: false })
     .pipe(typedoc({
         tsconfig: "src/lib/tsconfig.typedoc.json",

@@ -177,3 +177,5 @@ export type PossiblyAsyncIterable<T> = AsyncIterable<T> | Iterable<PromiseLike<T
 export type PossiblyAsyncHierarchyIterable<TNode, T extends TNode = TNode> = AsyncHierarchyIterable<TNode, T> | HierarchyIterable<TNode, T>;
 export type PossiblyAsyncOrderedIterable<T> = AsyncOrderedIterable<T> | OrderedIterable<T>;
 export type PossiblyAsyncOrderedHierarchyIterable<TNode, T extends TNode = TNode> = AsyncOrderedHierarchyIterable<TNode, T> | OrderedHierarchyIterable<TNode, T>;
+
+export type QueriedType<T> = T extends Queryable<infer U> ? U : never;

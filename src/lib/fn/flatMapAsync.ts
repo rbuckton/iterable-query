@@ -25,26 +25,44 @@ import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
  * @param projection A callback used to map each element into an iterable.
  * @category Subquery
  */
-export function flatMapAsync<T, U>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<U>): AsyncIterable<U> {
+export function flatMapAsync<T, U>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<U>): AsyncIterable<U>;
+/**
+ * Creates an [[AsyncIterable]] that iterates the results of applying a callback to each element of `source`.
+ *
+ * @param source A [[Queryable]] object.
+ * @param projection A callback used to map each element into an iterable.
+ * @category Subquery
+ */
+export function flatMapAsync<T, U, R>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<U>, resultSelector: (element: T, results: AsyncQueryable<U>) => R | PromiseLike<R>): AsyncIterable<R>;
+export function flatMapAsync<T, U, R>(source: AsyncQueryable<T>, projection: (element: T) => AsyncQueryable<U>, resultSelector?: (element: T, results: AsyncQueryable<U>) => R | PromiseLike<R>): AsyncIterable<U | R> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(projection, "projection");
-    return new AsyncFlatMapIterable(ToPossiblyAsyncIterable(source), projection);
+    return new AsyncFlatMapIterable(ToPossiblyAsyncIterable(source), projection, resultSelector);
 }
 
 @ToStringTag("AsyncFlatMapIterable")
-class AsyncFlatMapIterable<T, U> implements AsyncIterable<U> {
+class AsyncFlatMapIterable<T, U, R> implements AsyncIterable<U | R> {
     private _source: PossiblyAsyncIterable<T>;
     private _projection: (element: T) => AsyncQueryable<U>;
+    private _resultSelector?: (element: T, results: AsyncQueryable<U>) => R | PromiseLike<R>;
 
-    constructor(source: PossiblyAsyncIterable<T>, projection: (element: T) => AsyncQueryable<U>) {
+    constructor(source: PossiblyAsyncIterable<T>, projection: (element: T) => AsyncQueryable<U>, resultSelector?: (element: T, results: AsyncQueryable<U>) => R | PromiseLike<R>) {
         this._source = source;
         this._projection = projection;
+        this._resultSelector = resultSelector;
     }
 
-    async *[Symbol.asyncIterator](): AsyncIterator<U> {
+    async *[Symbol.asyncIterator](): AsyncIterator<U | R> {
         const projection = this._projection;
+        const resultSelector = this._resultSelector;
         for await (const element of this._source) {
-            yield* ToPossiblyAsyncIterable(projection(element));
+            const results = projection(element);
+            if (resultSelector) {
+                yield resultSelector(element, results);
+            }
+            else {
+                yield* ToPossiblyAsyncIterable(results);
+            }
         }
     }
 }

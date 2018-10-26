@@ -25,26 +25,45 @@ import { Queryable } from "../types";
  * @param projection A callback used to map each element into an iterable.
  * @category Subquery
  */
-export function flatMap<T, U>(source: Queryable<T>, projection: (element: T) => Queryable<U>): Iterable<U> {
+export function flatMap<T, U>(source: Queryable<T>, projection: (element: T) => Queryable<U>): Iterable<U>;
+/**
+ * Creates an [[Iterable]] that iterates the results of applying a callback to each element of `source`.
+ *
+ * @param source A [[Queryable]] object.
+ * @param projection A callback used to map each element into an iterable.
+ * @category Subquery
+ */
+export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) => Queryable<U>, resultSelector: (element: T, results: Queryable<U>) => R): Iterable<R>;
+export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) => Queryable<U>, resultSelector?: (element: T, elements: Queryable<U>) => R): Iterable<U | R> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(projection, "projection");
-    return new FlatMapIterable(ToIterable(source), projection);
+    assert.mustBeFunctionOrUndefined(resultSelector, "resultSelector");
+    return new FlatMapIterable(ToIterable(source), projection, resultSelector);
 }
 
 @ToStringTag("FlatMapIterable")
-class FlatMapIterable<T, U> implements Iterable<U> {
+class FlatMapIterable<T, U, R> implements Iterable<U | R> {
     private _source: Iterable<T>;
     private _projection: (element: T) => Queryable<U>;
+    private _resultSelector?: (element: T, results: Queryable<U>) => R;
 
-    constructor(source: Iterable<T>, projection: (element: T) => Queryable<U>) {
+    constructor(source: Iterable<T>, projection: (element: T) => Queryable<U>, resultSelector?: (element: T, results: Queryable<U>) => R) {
         this._source = source;
         this._projection = projection;
+        this._resultSelector = resultSelector;
     }
 
-    *[Symbol.iterator](): Iterator<U> {
+    *[Symbol.iterator](): Iterator<U | R> {
         const projection = this._projection;
+        const resultSelector = this._resultSelector;
         for (const element of this._source) {
-            yield* ToIterable(projection(element));
+            const results = projection(element);
+            if (resultSelector) {
+                yield resultSelector(element, results);
+            }
+            else {
+                yield* ToIterable(results);
+            }
         }
     }
 }

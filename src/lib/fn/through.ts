@@ -25,7 +25,7 @@ import { Queryable } from "../types";
  * @param callback A callback function.
  * @category Subquery
  */
-export function through<T, U, S extends Queryable<T> = Queryable<T>, R extends Queryable<U> = Queryable<U>>(source: S, callback: (source: S) => R): R {
+export function through<T, S extends Queryable<T> = Queryable<T>, R extends Queryable<any> = Queryable<any>>(source: S, callback: (source: S) => R): R {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(callback, "callback");
     const result = callback(source);

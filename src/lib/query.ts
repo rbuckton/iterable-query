@@ -17,7 +17,7 @@
 
 import * as fn from "./fn";
 import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, GetIterator, QuerySource } from "./internal";
-import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, KeyValuePair, Page, Choice } from "./types";
+import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, KeyValuePair, Page, Choice, QueriedType } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeOptions } from "./fn";
 
@@ -441,8 +441,17 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param projection.element The element to flatMap.
      * @category Subquery
      */
-    flatMap<U>(projection: (element: T) => Queryable<U>): Query<U> {
-        return from(fn.flatMap(GetSource(this), projection));
+    flatMap<U>(projection: (element: T) => Queryable<U>): Query<U>;
+    /**
+     * Creates a subquery that iterates the results of applying a callback to each element.
+     *
+     * @param projection A callback used to map each element into an iterable.
+     * @param projection.element The element to flatMap.
+     * @category Subquery
+     */
+    flatMap<U, R>(projection: (element: T) => Queryable<U>, resultSelector: (element: T, results: Query<U>) => R): Query<R>;
+    flatMap<U, R>(projection: (element: T) => Queryable<U>, resultSelector?: (element: T, results: Query<U>) => R): Query<U | R> {
+        return from(fn.flatMap(GetSource(this), projection, wrapResultSelector(resultSelector)!));
     }
 
     /**
@@ -454,8 +463,19 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param projection.element The element to flatMap.
      * @category Subquery
      */
-    selectMany<U>(projection: (element: T) => Queryable<U>): Query<U> {
-        return from(fn.selectMany(GetSource(this), projection));
+    selectMany<U>(projection: (element: T) => Queryable<U>): Query<U>;
+    /**
+     * Creates a subquery that iterates the results of applying a callback to each element.
+     *
+     * NOTE: This is an alias for `flatMap`.
+     *
+     * @param projection A callback used to map each element into an iterable.
+     * @param projection.element The element to flatMap.
+     * @category Subquery
+     */
+    selectMany<U, R>(projection: (element: T) => Queryable<U>, resultSelector: (element: T, results: Query<U>) => R): Query<R>;
+    selectMany<U, R>(projection: (element: T) => Queryable<U>, resultSelector?: (element: T, results: Query<U>) => R): Query<U | R> {
+        return from(fn.selectMany(GetSource(this), projection, wrapResultSelector(resultSelector)!));
     }
 
     /**
@@ -869,8 +889,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param callback A callback function.
      * @category Subquery
      */
-    through<U, R extends Queryable<U> = Queryable<U>>(callback: (source: this) => R): Flow<R, U> {
-        return from(fn.through(this, callback)) as Flow<R, U>;
+    through<R extends Queryable<any> = Queryable<any>>(callback: (source: this) => R): Flow<R, QueriedType<R>> {
+        return from(fn.through(this, callback)) as Flow<R, QueriedType<R>>;
     }
 
     // #endregion Subquery

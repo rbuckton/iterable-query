@@ -25,7 +25,7 @@ import { AsyncQueryable } from "../types";
  * @param callback A callback function.
  * @category Subquery
  */
-export function throughAsync<T, U, S extends AsyncQueryable<T> = AsyncQueryable<T>, R extends AsyncQueryable<U> = AsyncQueryable<U>>(source: S, callback: (source: S) => R): R {
+export function throughAsync<T, S extends AsyncQueryable<T> = AsyncQueryable<T>, R extends AsyncQueryable<any> = AsyncQueryable<any>>(source: S, callback: (source: S) => R): R {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(callback, "callback");
     const result = callback(source);

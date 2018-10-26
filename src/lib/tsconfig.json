@@ -15,6 +15,7 @@
         "strict": true,
         "composite": true,
         "noUnusedLocals": true,
+        "preserveConstEnums": true,
         // "noUnusedParameters": true
     },
     "include": [
