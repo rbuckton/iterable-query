@@ -69,8 +69,19 @@ export namespace Hierarchical {
 export interface Grouping<K, V> extends Iterable<V> {
     /**
      * The key associated with this group.
+     * 
+     * NOTE: This is a convenience alias for [Grouping.key] and should return the same value.
      */
     readonly key: K;
+
+    /**
+     * The key associated with this group.
+     */
+    readonly [Grouping.key]: K;
+}
+
+export namespace Grouping {
+    export const key = Symbol("Grouping.key");
 }
 
 /**
@@ -87,13 +98,32 @@ export interface HierarchyGrouping<K, VNode, V extends VNode = VNode> extends Gr
 export interface Page<T> extends Iterable<T> {
     /**
      * The page offset from the start of the source iterable.
+     * 
+     * NOTE: This is a convenience alias for [Page.page] and should return the same value.
      */
     readonly page: number;
 
     /**
      * The element offset from the start of the source iterable.
+     * 
+     * NOTE: This is a convenience alias for [Page.offset] and should return the same value.
      */
     readonly offset: number;
+
+    /**
+     * The page offset from the start of the source iterable.
+     */
+    readonly [Page.page]: number;
+
+    /**
+     * The element offset from the start of the source iterable.
+     */
+    readonly [Page.offset]: number;
+}
+
+export namespace Page {
+    export const page = Symbol("Page.page");
+    export const offset = Symbol("Page.offset");
 }
 
 /**
@@ -177,5 +207,4 @@ export type PossiblyAsyncIterable<T> = AsyncIterable<T> | Iterable<PromiseLike<T
 export type PossiblyAsyncHierarchyIterable<TNode, T extends TNode = TNode> = AsyncHierarchyIterable<TNode, T> | HierarchyIterable<TNode, T>;
 export type PossiblyAsyncOrderedIterable<T> = AsyncOrderedIterable<T> | OrderedIterable<T>;
 export type PossiblyAsyncOrderedHierarchyIterable<TNode, T extends TNode = TNode> = AsyncOrderedHierarchyIterable<TNode, T> | OrderedHierarchyIterable<TNode, T>;
-
 export type QueriedType<T> = T extends Queryable<infer U> ? U : never;

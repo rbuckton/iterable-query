@@ -113,6 +113,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_iterable_query_.page.html#_page_offset_" class="tsd-kind-icon">[<wbr>Page.offset]</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_iterable_query_.page.html#_page_page_" class="tsd-kind-icon">[<wbr>Page.page]</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_iterable_query_.page.html#offset" class="tsd-kind-icon">offset</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_iterable_query_.page.html#page" class="tsd-kind-icon">page</a></li>
 							</ul>
@@ -129,12 +131,12 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="offset" class="tsd-anchor"></a>
-					<h3>offset</h3>
-					<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="_page_offset_" class="tsd-anchor"></a>
+					<h3>[<wbr>Page.offset]</h3>
+					<div class="tsd-signature tsd-kind-icon">[<wbr>Page.offset]<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L96">types.ts:96</a></li>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L121">types.ts:121</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -144,18 +146,52 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="page" class="tsd-anchor"></a>
-					<h3>page</h3>
-					<div class="tsd-signature tsd-kind-icon">page<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="_page_page_" class="tsd-anchor"></a>
+					<h3>[<wbr>Page.page]</h3>
+					<div class="tsd-signature tsd-kind-icon">[<wbr>Page.page]<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L91">types.ts:91</a></li>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L116">types.ts:116</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The page offset from the start of the source iterable.</p>
 						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="offset" class="tsd-anchor"></a>
+					<h3>offset</h3>
+					<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol(&quot;Page.offset&quot;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L111">types.ts:111</a></li>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L126">types.ts:126</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The element offset from the start of the source iterable.</p>
+						</div>
+						<p>NOTE: This is a convenience alias for [Page.offset] and should return the same value.</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="page" class="tsd-anchor"></a>
+					<h3>page</h3>
+					<div class="tsd-signature tsd-kind-icon">page<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol(&quot;Page.page&quot;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L104">types.ts:104</a></li>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L125">types.ts:125</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The page offset from the start of the source iterable.</p>
+						</div>
+						<p>NOTE: This is a convenience alias for [Page.page] and should return the same value.</p>
 					</div>
 				</section>
 			</section>
@@ -202,6 +238,12 @@
 					<li class="current tsd-kind-interface tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="_iterable_query_.page.html" class="tsd-kind-icon">Page</a>
 						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_iterable_query_.page.html#_page_offset_" class="tsd-kind-icon">[<wbr>Page.offset]</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_iterable_query_.page.html#_page_page_" class="tsd-kind-icon">[<wbr>Page.page]</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_iterable_query_.page.html#offset" class="tsd-kind-icon">offset</a>
 							</li>

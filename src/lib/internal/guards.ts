@@ -52,8 +52,9 @@ export function IsHierarchyProvider<TNode>(value: HierarchyProvider<TNode> | Oth
 /** @internal */
 export function IsGrouping<K, V>(value: Grouping<K, V> | Other): value is Grouping<K, V> {
     return IsObject(value)
-        && Symbol.iterator in value
-        && "key" in value;
+        && "key" in value
+        && Grouping.key in value
+        && Symbol.iterator in value;
 }
 
 /** @internal */

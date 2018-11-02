@@ -244,7 +244,7 @@ class AsyncOrderedHierarchyIterableImpl<TNode, T extends TNode> extends AsyncHie
 // /** @internal */ export function CreateGrouping<K, VNode, V extends VNode>(key: K, elements: HierarchyIterable<VNode, V>): HierarchyGrouping<K, VNode, V>;
 // /** @internal */ export function CreateGrouping<K, V>(key: K, elements: Queryable<V>): Grouping<K, V>;
 /** @internal */ export function CreateGrouping<K, V>(key: K, elements: Queryable<V>): Grouping<K, V> {
-    return IsHierarchyIterable(elements) ? new HierarchyGroupingImpl(key, elements) : new GroupingImpl(key, elements);
+    return IsHierarchyIterable(elements) ? new HierarchyGroupingImpl(key, elements) : new GroupingImpl(key, ToIterable(elements));
 }
 
 /** @internal */ export function CreateHierarchyGrouping<K, VNode, V extends VNode>(key: K, elements: HierarchyIterable<VNode, V>): HierarchyGrouping<K, VNode, V> {
@@ -252,7 +252,7 @@ class AsyncOrderedHierarchyIterableImpl<TNode, T extends TNode> extends AsyncHie
 }
 
 @ToStringTag("Grouping")
-class GroupingImpl<K, V> implements Grouping<K, V> {
+class GroupingImpl<K, V, VSource extends Iterable<V> = Iterable<V>> implements Grouping<K, V> {
     /**
      * The key for the group.
      */
@@ -261,7 +261,7 @@ class GroupingImpl<K, V> implements Grouping<K, V> {
     /**
      * Gets the items in the group.
      */
-    private _items: Iterable<V>;
+    protected _items: VSource;
 
     /**
      * Creates a new Grouping for the specified key.
@@ -269,11 +269,13 @@ class GroupingImpl<K, V> implements Grouping<K, V> {
      * @param key The key for the group.
      * @param items The elements in the group.
      */
-    constructor(key: K, items: Queryable<V>) {
+    constructor(key: K, items: VSource) {
         assert.mustBeQueryable(items, "items");
         this.key = key;
-        this._items = ToIterable(items);
+        this._items = items;
     }
+
+    get [Grouping.key]() { return this.key; }
 
     [Symbol.iterator]() {
         return GetIterator(this._items);
@@ -281,22 +283,19 @@ class GroupingImpl<K, V> implements Grouping<K, V> {
 }
 
 @ToStringTag("HierarchyGrouping")
-class HierarchyGroupingImpl<K, VNode, V extends VNode> extends GroupingImpl<K, V> implements HierarchyGrouping<K, VNode, V> {
-    private _hierarchy: HierarchyProvider<VNode>;
-
+class HierarchyGroupingImpl<K, VNode, V extends VNode> extends GroupingImpl<K, V, HierarchyIterable<VNode, V>> implements HierarchyGrouping<K, VNode, V> {
     constructor(key: K, items: HierarchyIterable<VNode, V>) {
         assert.mustBeHierarchyIterable(items, "items");
         super(key, items);
-        this._hierarchy = GetHierarchy(items);
     }
 
     [Hierarchical.hierarchy]() {
-        return this._hierarchy;
+        return GetHierarchy(this._items);
     }
 }
 
-/** @internal */ export function CreatePage<T>(page: number, offset: number, items: Iterable<T>): Page<T> {
-    return IsHierarchyIterable(items) ? new HierarchyPageImpl(page, offset, items) : new PageImpl(page, offset, items);
+/** @internal */ export function CreatePage<T>(page: number, offset: number, items: Queryable<T>): Page<T> {
+    return IsHierarchyIterable(items) ? new HierarchyPageImpl(page, offset, items) : new PageImpl(page, offset, ToIterable(items));
 }
 
 /** @internal */ export function CreateHierarchyPage<TNode, T extends TNode>(page: number, offset: number, items: HierarchyIterable<TNode, T>): HierarchyPage<TNode, T> {
@@ -337,6 +336,9 @@ class PageImpl<T, TSource extends Iterable<T>> implements Page<T> {
         this.offset = offset;
         this._items = items;
     }
+
+    get [Page.page]() { return this.page; }
+    get [Page.offset]() { return this.offset; }
 
     [Symbol.iterator]() {
         return GetIterator(this._items);
