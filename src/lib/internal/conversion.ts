@@ -261,24 +261,24 @@ class GroupingImpl<K, V, VSource extends Iterable<V> = Iterable<V>> implements G
     /**
      * Gets the items in the group.
      */
-    protected _items: VSource;
+    readonly values: VSource;
 
     /**
      * Creates a new Grouping for the specified key.
      *
      * @param key The key for the group.
-     * @param items The elements in the group.
+     * @param values The elements in the group.
      */
-    constructor(key: K, items: VSource) {
-        assert.mustBeQueryable(items, "items");
+    constructor(key: K, values: VSource) {
+        assert.mustBeQueryable(values, "items");
         this.key = key;
-        this._items = items;
+        this.values = values;
     }
 
     get [Grouping.key]() { return this.key; }
 
     [Symbol.iterator]() {
-        return GetIterator(this._items);
+        return GetIterator(this.values);
     }
 }
 
@@ -290,7 +290,7 @@ class HierarchyGroupingImpl<K, VNode, V extends VNode> extends GroupingImpl<K, V
     }
 
     [Hierarchical.hierarchy]() {
-        return GetHierarchy(this._items);
+        return GetHierarchy(this.values);
     }
 }
 

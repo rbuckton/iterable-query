@@ -76,6 +76,13 @@ export interface Grouping<K, V> extends Iterable<V> {
 
     /**
      * The key associated with this group.
+     * 
+     * NOTE: This is a convenience alias for the values in the grouping and should return the same values.
+     */
+    readonly values: Iterable<V>;
+
+    /**
+     * The key associated with this group.
      */
     readonly [Grouping.key]: K;
 }
