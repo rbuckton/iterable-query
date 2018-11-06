@@ -36,7 +36,7 @@ const cacheAndClose: ConsumeOptions = { cacheElements: true, leaveOpen: false };
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-function _break<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
+function _break<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean): [HierarchyIterable<TNode, T>, HierarchyIterable<TNode, T>];
 /**
  * Creates a tuple whose first element is an [[Iterable]] containing the first span of
  * elements that do not match the supplied predicate, and whose second element is an [[Iterable]]
@@ -49,14 +49,15 @@ function _break<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, pre
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-function _break<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>];
-function _break<T>(source: Queryable<T>, predicate: (element: T) => boolean): [Iterable<T>, Iterable<T>] {
+function _break<T>(source: Queryable<T>, predicate: (element: T, offset: number) => boolean): [Iterable<T>, Iterable<T>];
+function _break<T>(source: Queryable<T>, predicate: (element: T, offset: number) => boolean): [Iterable<T>, Iterable<T>] {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     const prefix: T[] = [];
     const iterator = GetIterator(ToIterable(source));
+    let offset = 0;
     for (const value of consume(iterator, noCacheAndLeaveOpen)) {
-        if (predicate(value)) {
+        if (predicate(value, offset++)) {
             const remaining = prepend(consume(iterator, cacheAndClose), value);
             return [
                 FlowHierarchy(prefix, source),

@@ -1367,7 +1367,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    span<U extends T>(predicate: (element: T) => element is U): Promise<[Query<U>, AsyncQuery<T>]>;
+    span<U extends T>(predicate: (element: T, offset: number) => element is U): Promise<[Query<U>, AsyncQuery<T>]>;
 
     /**
      * Creates a tuple whose first element is a subquery containing the first span of
@@ -1380,8 +1380,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    span(predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Query<T>, AsyncQuery<T>]>;
-    async span(predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Query<T>, AsyncQuery<T>]> {
+    span(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): Promise<[Query<T>, AsyncQuery<T>]>;
+    async span(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): Promise<[Query<T>, AsyncQuery<T>]> {
         const [first, rest] = await fn.spanAsync(GetAsyncSource(this), predicate);
         return [from(first), fromAsync(rest)];
     }
@@ -1397,7 +1397,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    async break(predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Query<T>, AsyncQuery<T>]> {
+    async break(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): Promise<[Query<T>, AsyncQuery<T>]> {
         const [first, rest] = await fn.breakAsync(GetAsyncSource(this), predicate);
         return [from(first), fromAsync(rest)];
     }

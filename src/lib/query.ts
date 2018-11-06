@@ -1377,7 +1377,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    span<U extends T>(predicate: (element: T) => element is U): [Query<U>, Query<T>];
+    span<U extends T>(predicate: (element: T, offset: number) => element is U): [Query<U>, Query<T>];
 
     /**
      * Creates a tuple whose first element is a subquery containing the first span of
@@ -1390,8 +1390,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    span(predicate: (element: T) => boolean): [Query<T>, Query<T>];
-    span(predicate: (element: T) => boolean): [Query<T>, Query<T>] {
+    span(predicate: (element: T, offset: number) => boolean): [Query<T>, Query<T>];
+    span(predicate: (element: T, offset: number) => boolean): [Query<T>, Query<T>] {
         const [left, right] = fn.span(GetSource(this), predicate);
         return [from(left), from(right)];
     }
@@ -1407,7 +1407,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param predicate The predicate used to match elements.
      * @category Scalar
      */
-    break(predicate: (element: T) => boolean): [Query<T>, Query<T>] {
+    break(predicate: (element: T, offset: number) => boolean): [Query<T>, Query<T>] {
         const [left, right] = fn.break(GetSource(this), predicate);
         return [from(left), from(right)];
     }

@@ -36,7 +36,7 @@ const cacheAndClose: ConsumeAsyncOptions = { cacheElements: true, leaveOpen: fal
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function spanAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): Promise<[HierarchyIterable<TNode, U>, AsyncHierarchyIterable<TNode, T>]>;
+export async function spanAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => element is U): Promise<[HierarchyIterable<TNode, U>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an [[Iterable]] containing the first span of
  * elements that match the supplied predicate, and whose second element is an [[AsyncIterable]]
@@ -49,7 +49,7 @@ export async function spanAsync<TNode, T extends TNode, U extends T>(source: Pos
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function spanAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
+export async function spanAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): Promise<[HierarchyIterable<TNode, T>, AsyncHierarchyIterable<TNode, T>]>;
 /**
  * Creates a tuple whose first element is an [[Iterable]] containing the first span of
  * elements that match the supplied predicate, and whose second element is an [[AsyncIterable]]
@@ -62,7 +62,7 @@ export async function spanAsync<TNode, T extends TNode>(source: PossiblyAsyncHie
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function spanAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T) => element is U): Promise<[Iterable<U>, AsyncIterable<T>]>;
+export async function spanAsync<T, U extends T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => element is U): Promise<[Iterable<U>, AsyncIterable<T>]>;
 /**
  * Creates a tuple whose first element is an [[Iterable]] containing the first span of
  * elements that match the supplied predicate, and whose second element is an [[AsyncIterable]]
@@ -75,14 +75,15 @@ export async function spanAsync<T, U extends T>(source: AsyncQueryable<T>, predi
  * @param predicate The predicate used to match elements.
  * @category Scalar
  */
-export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]>;
-export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]> {
+export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]>;
+export async function spanAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): Promise<[Iterable<T>, AsyncIterable<T>]> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     const prefix: T[] = [];
     const iterator = GetAsyncIterator(ToAsyncIterable(source));
+    let offset = 0;
     for await (const value of consumeAsync(iterator, noCacheAndLeaveOpen)) {
-        const result = predicate(value);
+        const result = predicate(value, offset++);
         if (!(typeof result === "boolean" ? result : await result)) {
             const remaining = prependAsync(consumeAsync(iterator, cacheAndClose), value);
             return [
