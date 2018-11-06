@@ -33,8 +33,8 @@ export function flatMap<T, U>(source: Queryable<T>, projection: (element: T) => 
  * @param projection A callback used to map each element into an iterable.
  * @category Subquery
  */
-export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) => Queryable<U>, resultSelector: (element: T, results: Queryable<U>) => R): Iterable<R>;
-export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) => Queryable<U>, resultSelector?: (element: T, elements: Queryable<U>) => R): Iterable<U | R> {
+export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) => Queryable<U>, resultSelector: (element: T, innerElement: U) => R): Iterable<R>;
+export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) => Queryable<U>, resultSelector?: (element: T, innerElement: U) => R): Iterable<U | R> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(projection, "projection");
     assert.mustBeFunctionOrUndefined(resultSelector, "resultSelector");
@@ -45,9 +45,9 @@ export function flatMap<T, U, R>(source: Queryable<T>, projection: (element: T) 
 class FlatMapIterable<T, U, R> implements Iterable<U | R> {
     private _source: Iterable<T>;
     private _projection: (element: T) => Queryable<U>;
-    private _resultSelector?: (element: T, results: Queryable<U>) => R;
+    private _resultSelector?: (element: T, innerElement: U) => R;
 
-    constructor(source: Iterable<T>, projection: (element: T) => Queryable<U>, resultSelector?: (element: T, results: Queryable<U>) => R) {
+    constructor(source: Iterable<T>, projection: (element: T) => Queryable<U>, resultSelector?: (element: T, innerElement: U) => R) {
         this._source = source;
         this._projection = projection;
         this._resultSelector = resultSelector;
@@ -57,12 +57,14 @@ class FlatMapIterable<T, U, R> implements Iterable<U | R> {
         const projection = this._projection;
         const resultSelector = this._resultSelector;
         for (const element of this._source) {
-            const results = projection(element);
+            const inner = projection(element);
             if (resultSelector) {
-                yield resultSelector(element, results);
+                for (const innerElement of ToIterable(inner)) {
+                    yield resultSelector(element, innerElement);
+                }
             }
             else {
-                yield* ToIterable(results);
+                yield* ToIterable(inner);
             }
         }
     }

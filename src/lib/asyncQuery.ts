@@ -425,9 +425,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param projection A callback used to map each element into an iterable.
      * @category Subquery
      */
-    flatMap<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector: (element: T, results: AsyncQuery<U>) => R | PromiseLike<R>): AsyncQuery<R>;
-    flatMap<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector?: (element: T, results: AsyncQuery<U>) => R | PromiseLike<R>): AsyncQuery<U | R> {
-        return fromAsync(fn.flatMapAsync(GetAsyncSource(this), projection, wrapAsyncResultSelector(resultSelector)!));
+    flatMap<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector: (element: T, innerElement: U) => R | PromiseLike<R>): AsyncQuery<R>;
+    flatMap<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector?: (element: T, innerElement: U) => R | PromiseLike<R>): AsyncQuery<U | R> {
+        return fromAsync(fn.flatMapAsync(GetAsyncSource(this), projection, resultSelector!));
     }
 
     /**
@@ -445,9 +445,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param projection A callback used to map each element into an iterable.
      * @category Subquery
      */
-    selectMany<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector: (element: T, results: AsyncQuery<U>) => R | PromiseLike<R>): AsyncQuery<R>;
-    selectMany<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector?: (element: T, results: AsyncQuery<U>) => R | PromiseLike<R>): AsyncQuery<U | R> {
-        return fromAsync(fn.selectManyAsync(GetAsyncSource(this), projection, wrapAsyncResultSelector(resultSelector)!));
+    selectMany<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector: (element: T, innerElement: U) => R | PromiseLike<R>): AsyncQuery<R>;
+    selectMany<U, R>(projection: (element: T) => AsyncQueryable<U>, resultSelector?: (element: T, innerElement: U) => R | PromiseLike<R>): AsyncQuery<U | R> {
+        return fromAsync(fn.selectManyAsync(GetAsyncSource(this), projection, resultSelector!));
     }
 
     /**
@@ -2034,15 +2034,6 @@ function wrapResultSelector<I, O, R>(selector: ((inner: I, outer: Query<O>) => R
 function wrapResultSelector<I, O, R>(selector: ((inner: I, outer: Query<O>) => R) | undefined) {
     if (typeof selector === "function") {
         return (inner: I, outer: Queryable<O>) => selector(inner, from(outer));
-    }
-    return selector;
-}
-
-function wrapAsyncResultSelector<I, O, R>(selector: ((inner: I, outer: AsyncQuery<O>) => R | PromiseLike<R>)): ((inner: I, outer: AsyncQueryable<O>) => R | PromiseLike<R>);
-function wrapAsyncResultSelector<I, O, R>(selector: ((inner: I, outer: AsyncQuery<O>) => R | PromiseLike<R>) | undefined): ((inner: I, outer: AsyncQueryable<O>) => R | PromiseLike<R>) | undefined;
-function wrapAsyncResultSelector<I, O, R>(selector: ((inner: I, outer: AsyncQuery<O>) => R | PromiseLike<R>) | undefined) {
-    if (typeof selector === "function") {
-        return (inner: I, outer: AsyncQueryable<O>) => selector(inner, fromAsync(outer));
     }
     return selector;
 }

@@ -449,9 +449,9 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param projection.element The element to flatMap.
      * @category Subquery
      */
-    flatMap<U, R>(projection: (element: T) => Queryable<U>, resultSelector: (element: T, results: Query<U>) => R): Query<R>;
-    flatMap<U, R>(projection: (element: T) => Queryable<U>, resultSelector?: (element: T, results: Query<U>) => R): Query<U | R> {
-        return from(fn.flatMap(GetSource(this), projection, wrapResultSelector(resultSelector)!));
+    flatMap<U, R>(projection: (element: T) => Queryable<U>, resultSelector: (element: T, innerElement: U) => R): Query<R>;
+    flatMap<U, R>(projection: (element: T) => Queryable<U>, resultSelector?: (element: T, innerElement: U) => R): Query<U | R> {
+        return from(fn.flatMap(GetSource(this), projection, resultSelector!));
     }
 
     /**
@@ -473,9 +473,9 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param projection.element The element to flatMap.
      * @category Subquery
      */
-    selectMany<U, R>(projection: (element: T) => Queryable<U>, resultSelector: (element: T, results: Query<U>) => R): Query<R>;
-    selectMany<U, R>(projection: (element: T) => Queryable<U>, resultSelector?: (element: T, results: Query<U>) => R): Query<U | R> {
-        return from(fn.selectMany(GetSource(this), projection, wrapResultSelector(resultSelector)!));
+    selectMany<U, R>(projection: (element: T) => Queryable<U>, resultSelector: (element: T, innerElement: U) => R): Query<R>;
+    selectMany<U, R>(projection: (element: T) => Queryable<U>, resultSelector?: (element: T, innerElement: U) => R): Query<U | R> {
+        return from(fn.selectMany(GetSource(this), projection, resultSelector!));
     }
 
     /**
