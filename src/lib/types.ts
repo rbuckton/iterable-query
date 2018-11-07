@@ -61,6 +61,23 @@ export namespace Hierarchical {
     export const hierarchy = Symbol("Hierarchical.hierarchy");
 }
 
+// Comparables
+
+/** Describes an object that is comparable to another object. */
+export interface Comparable<T> {
+    /**
+     * Compares this object with another object:
+     * - A negative value indicates this value is lesser.
+     * - A positive value indicates this value is greater.
+     * - A zero value indicates this value is the same.
+     */
+    [Comparable.compareTo](other: T): number;
+}
+
+export namespace Comparable {
+    export const compareTo = Symbol("Comparable.compareTo");
+}
+
 // Grouping
 
 /**
@@ -69,14 +86,14 @@ export namespace Hierarchical {
 export interface Grouping<K, V> extends Iterable<V> {
     /**
      * The key associated with this group.
-     * 
+     *
      * NOTE: This is a convenience alias for [Grouping.key] and should return the same value.
      */
     readonly key: K;
 
     /**
      * The key associated with this group.
-     * 
+     *
      * NOTE: This is a convenience alias for the values in the grouping and should return the same values.
      */
     readonly values: Iterable<V>;
@@ -105,14 +122,14 @@ export interface HierarchyGrouping<K, VNode, V extends VNode = VNode> extends Gr
 export interface Page<T> extends Iterable<T> {
     /**
      * The page offset from the start of the source iterable.
-     * 
+     *
      * NOTE: This is a convenience alias for [Page.page] and should return the same value.
      */
     readonly page: number;
 
     /**
      * The element offset from the start of the source iterable.
-     * 
+     *
      * NOTE: This is a convenience alias for [Page.offset] and should return the same value.
      */
     readonly offset: number;

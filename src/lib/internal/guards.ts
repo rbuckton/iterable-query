@@ -14,7 +14,7 @@
   limitations under the License.
  */
 
-import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncOrderedHierarchyIterable } from "../types";
+import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncOrderedHierarchyIterable, Comparable } from "../types";
 import { QuerySource, AsyncQuerySource } from "./types";
 
 type Primitive = string | number | boolean | symbol;
@@ -157,4 +157,10 @@ export function IsQuerySource<T>(value: QuerySource<T> | Other): value is QueryS
 /** @internal */
 export function IsAsyncQuerySource<T>(value: AsyncQuerySource<T> | Other): value is AsyncQuerySource<T> {
     return IsObject(value) && AsyncQuerySource.source in value;
+}
+
+/** @internal */
+export function IsComparable(x: any): x is Comparable<any> {
+    return IsObject(x)
+        && Comparable.compareTo in x;
 }

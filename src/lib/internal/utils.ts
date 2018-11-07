@@ -14,9 +14,9 @@
   limitations under the License.
  */
 
-import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
+import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, Comparable } from "../types";
 import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
-import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
+import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource, IsComparable } from "./guards";
 import { ToStringTag } from "./decorators";
 import { QuerySource, AsyncQuerySource } from "./types";
 
@@ -166,6 +166,9 @@ export function SameValue(x: any, y: any): boolean {
 
 /** @internal */
 export function CompareValues<T>(x: T, y: T): number {
+    if (IsComparable(x) && IsComparable(y)) {
+        return x[Comparable.compareTo](y);
+    }
     if (x < y) {
         return -1;
     }
