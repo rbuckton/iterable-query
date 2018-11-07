@@ -15,12 +15,13 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToIterable} from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Creates an Array for the elements of the [[Queryable]].
- * 
+ *
  * @param source A [[Queryable]] object.
  * @category Scalar
  */
@@ -33,7 +34,7 @@ export function toArray<T>(source: Queryable<T>): T[];
  * @category Scalar
  */
 export function toArray<T, V>(source: Queryable<T>, elementSelector: (element: T) => V): V[];
-export function toArray<T>(source: Queryable<T>, elementSelector: (element: T) => T = Identity): T[] {
+export function toArray<T>(source: Queryable<T>, elementSelector: (element: T) => T = identity): T[] {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const result: T[] = [];

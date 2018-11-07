@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, Identity} from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
+import { identity } from "./common";
 
 /**
  * Creates a [[HierarchyIterable]] for the distinct elements of `source`.
@@ -49,7 +50,7 @@ export function distinct<T>(source: Queryable<T>): Iterable<T>;
  * @param keySelector A callback used to select the key to determine uniqueness.
  */
 export function distinct<T, K>(source: Queryable<T>, keySelector: (value: T) => K): Iterable<T>;
-export function distinct<T>(source: Queryable<T>, keySelector: (value: T) => T = Identity): Iterable<T> {
+export function distinct<T>(source: Queryable<T>, keySelector: (value: T) => T = identity): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     return FlowHierarchy(new DistinctIterable(ToIterable(source), keySelector), source);

@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CompareValues} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
+import { compare } from "./common";
 
 /**
  * Gets the minimum element of a [[Queryable]], optionally comparing elements using the supplied callback.
@@ -25,7 +26,7 @@ import { Queryable } from "../types";
  * @param comparison An optional callback used to compare two elements.
  * @category Scalar
  */
-export function min<T>(source: Queryable<T>, comparison: (x: T, y: T) => number = CompareValues): T | undefined {
+export function min<T>(source: Queryable<T>, comparison: (x: T, y: T) => number = compare): T | undefined {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(comparison, "comparison");
     let hasResult = false;

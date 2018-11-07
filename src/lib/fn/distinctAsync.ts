@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag, Identity } from "../internal";
+import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 import { Set } from "../collections";
+import { identity } from "./common";
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the distinct elements of `source`.
@@ -49,7 +50,7 @@ export function distinctAsync<T>(source: AsyncQueryable<T>): AsyncIterable<T>;
  * @param keySelector A callback used to select the key to determine uniqueness.
  */
 export function distinctAsync<T, K>(source: AsyncQueryable<T>, keySelector: (value: T) => K): AsyncIterable<T>;
-export function distinctAsync<T>(source: AsyncQueryable<T>, keySelector: (value: T) => T = Identity): AsyncIterable<T> {
+export function distinctAsync<T>(source: AsyncQueryable<T>, keySelector: (value: T) => T = identity): AsyncIterable<T> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     return FlowHierarchy(new AsyncDistinctIterable(ToPossiblyAsyncIterable(source), keySelector), source);

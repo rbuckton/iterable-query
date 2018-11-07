@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, SameValue, Identity, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
+import { assert, ToIterable, SameValue, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
+import { identity } from "./common";
 
 /**
  * Creates a subquery whose elements are the contiguous ranges of elements that share the same key.
@@ -53,7 +54,7 @@ export function spanMap<T, K, V>(source: Queryable<T>, keySelector: (element: T)
  * @category Subquery
  */
 export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, spanSelector: (key: K, elements: Iterable<V>) => R): Iterable<R>;
-export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = Identity, spanSelector: (key: K, span: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
+export function spanMap<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = identity, spanSelector: (key: K, span: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
@@ -89,14 +90,14 @@ class SpanMapIterable<T, K, V, R> implements Iterable<R> {
                 span = [];
             }
             else if (!SameValue(previousKey, key)) {
-                yield spanSelector(previousKey, elementSelector === Identity ? FlowHierarchy(span, this._source) : span);
+                yield spanSelector(previousKey, elementSelector === identity ? FlowHierarchy(span, this._source) : span);
                 span = [];
                 previousKey = key;
             }
             span.push(elementSelector(element));
         }
         if (span) {
-            yield spanSelector(previousKey, elementSelector === Identity ? FlowHierarchy(span, this._source) : span);
+            yield spanSelector(previousKey, elementSelector === identity ? FlowHierarchy(span, this._source) : span);
         }
     }
 }

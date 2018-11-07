@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity} from "../internal";
+import { assert } from "../internal";
 import { Queryable } from "../types";
 import { toArray } from "./toArray";
+import { identity } from "./common";
 
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
@@ -46,7 +47,7 @@ export function reduceRight<T, U>(source: Queryable<T>, accumulator: (current: U
  * @category Scalar
  */
 export function reduceRight<T, U, R>(source: Queryable<T>, accumulator: (current: U, element: T, offset: number) => U, seed: U, resultSelector: (result: U, count: number) => R): R;
-export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = Identity): T {
+export function reduceRight<T>(source: Queryable<T>, accumulator: (current: T, element: T, offset: number) => T, seed?: T, resultSelector: (result: T, count: number) => T = identity): T {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(accumulator, "accumulator");
     assert.mustBeFunction(resultSelector, "resultSelector");

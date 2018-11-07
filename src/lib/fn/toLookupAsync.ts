@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, CreateGroupingsAsync } from "../internal";
+import { assert, CreateGroupingsAsync } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Lookup } from "../lookup";
+import { identity } from "./common";
 
 /**
  * Creates a Lookup for the elements of the source.
@@ -36,7 +37,7 @@ export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector
  * @category Scalar
  */
 export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Lookup<K, V>>;
-export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<Lookup<K, T>> {
+export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = identity): Promise<Lookup<K, T>> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");

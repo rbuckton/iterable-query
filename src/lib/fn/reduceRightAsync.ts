@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity } from "../internal";
+import { assert } from "../internal";
 import { AsyncQueryable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
+import { identity } from "./common";
 
 /**
  * Computes a scalar value by applying an accumulator callback over each element in reverse.
@@ -46,7 +47,7 @@ export function reduceRightAsync<T, U>(source: AsyncQueryable<T>, accumulator: (
  * @category Scalar
  */
 export function reduceRightAsync<T, U, R>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U | PromiseLike<U>, seed: U, resultSelector: (result: U, count: number) => R | PromiseLike<R>): Promise<R>;
-export function reduceRightAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>, seed?: T, resultSelector: (result: T, count: number) => T | PromiseLike<T> = Identity): Promise<T> {
+export function reduceRightAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>, seed?: T, resultSelector: (result: T, count: number) => T | PromiseLike<T> = identity): Promise<T> {
     return reduceRightAsyncCore(source, accumulator, seed, arguments.length > 2, resultSelector);
 }
 

@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToPossiblyAsyncIterable, GetAsyncSource } from "../internal";
+import { assert, ToPossiblyAsyncIterable, GetAsyncSource } from "../internal";
 import { Map, Set } from "../collections";
 import { AsyncQueryable } from "../types";
+import { T } from "./common";
 
 /**
  * Counts the number of elements, optionally filtering elements using the supplied callback.
@@ -26,11 +27,11 @@ import { AsyncQueryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export async function countAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): Promise<number> {
+export async function countAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = T): Promise<number> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
 
-    if (predicate === True) {
+    if (predicate === T) {
         const realSource = GetAsyncSource(source);
         if (Array.isArray(realSource)) return realSource.length;
         if (realSource instanceof Set || realSource instanceof Map) return realSource.size;
@@ -38,7 +39,7 @@ export async function countAsync<T>(source: AsyncQueryable<T>, predicate: (eleme
 
     let count = 0;
     for await (const element of ToPossiblyAsyncIterable(source)) {
-        if (predicate === True || await predicate(element)) {
+        if (predicate === T || await predicate(element)) {
             count++;
         }
     }

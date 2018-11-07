@@ -15,25 +15,26 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToIterable } from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Computes the average for a series of numbers.
- * 
+ *
  * @param source A [[Queryable]] object.
  * @category Scalar
  */
 export function average(source: Queryable<number>): number;
 /**
  * Computes the average for a series of numbers.
- * 
+ *
  * @param source A [[Queryable]] object.
  * @param elementSelector A callback used to convert a value in `source` to a number.
  * @category Scalar
  */
 export function average<T>(source: Queryable<T>, elementSelector: (element: T) => number): number;
-export function average(source: Queryable<number>, elementSelector: (element: number) => number = Identity): number {
+export function average(source: Queryable<number>, elementSelector: (element: number) => number = identity): number {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunctionOrUndefined(elementSelector, "elementSelector");
     let sum = 0;

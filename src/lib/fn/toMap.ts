@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
 import { Map } from "../collections";
+import { identity } from "./common";
 
 /**
  * Creates a Map for the elements of the Query.
@@ -36,7 +37,7 @@ export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K
  * @category Scalar
  */
 export function toMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V>;
-export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Map<K, T> {
+export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = identity): Map<K, T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");

@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, True} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
+import { T } from "./common";
 
 /**
  * Computes a scalar value indicating whether `source` contains any elements,
@@ -26,7 +27,7 @@ import { Queryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export function some<T>(source: Queryable<T>, predicate: (element: T) => boolean = True): boolean {
+export function some<T>(source: Queryable<T>, predicate: (element: T) => boolean = T): boolean {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     for (const element of ToIterable(source)) {

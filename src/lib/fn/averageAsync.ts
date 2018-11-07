@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, Identity } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Computes the average for a series of numbers.
@@ -34,7 +35,7 @@ export async function averageAsync(source: AsyncQueryable<number>): Promise<numb
  * @category Scalar
  */
 export async function averageAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number | PromiseLike<number>): Promise<number>;
-export async function averageAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number | PromiseLike<number> = Identity): Promise<number> {
+export async function averageAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number | PromiseLike<number> = identity): Promise<number> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     let sum = 0;

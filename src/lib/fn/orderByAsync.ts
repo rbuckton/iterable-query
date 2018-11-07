@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CompareValues, FlowHierarchy, ThenByAsync, ToAsyncOrderedIterable, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
+import { assert, FlowHierarchy, ThenByAsync, ToAsyncOrderedIterable, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncQueryable, AsyncOrderedIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
+import { compare } from "./common";
 
 /**
  * Creates an [[AsyncOrderedHierarchyIterable]] whose elements are sorted in ascending order by the provided key.
@@ -37,7 +38,7 @@ export function orderByAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHie
  * @category Order
  */
 export function orderByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-export function orderByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
+export function orderByAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): AsyncOrderedIterable<T> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(comparison, "comparison");
@@ -62,7 +63,7 @@ export function orderByDescendingAsync<TNode, T extends TNode, K>(source: Possib
  * @category Order
  */
 export function orderByDescendingAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-export function orderByDescendingAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
+export function orderByDescendingAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): AsyncOrderedIterable<T> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(comparison, "comparison");
@@ -87,7 +88,7 @@ export function thenByAsync<TNode, T extends TNode, K>(source: PossiblyAsyncOrde
  * @category Order
  */
 export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
+export function thenByAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): AsyncOrderedIterable<T> {
     assert.mustBePossiblyAsyncOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(comparison, "comparison");
@@ -112,7 +113,7 @@ export function thenByDescendingAsync<TNode, T extends TNode, K>(source: Possibl
  * @category Order
  */
 export function thenByDescendingAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedIterable<T>;
-export function thenByDescendingAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = CompareValues): AsyncOrderedIterable<T> {
+export function thenByDescendingAsync<T, K>(source: PossiblyAsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): AsyncOrderedIterable<T> {
     assert.mustBePossiblyAsyncOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(comparison, "comparison");

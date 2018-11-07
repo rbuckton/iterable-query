@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CompareValues, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { compare } from "./common";
 
 /**
  * Gets the minimum element of an [[AsyncQueryable]], optionally comparing elements using the supplied callback.
@@ -25,7 +26,7 @@ import { AsyncQueryable } from "../types";
  * @param comparison An optional callback used to compare two elements.
  * @category Scalar
  */
-export async function minAsync<T>(source: AsyncQueryable<T>, comparison: (x: T, y: T) => number = CompareValues): Promise<T | undefined> {
+export async function minAsync<T>(source: AsyncQueryable<T>, comparison: (x: T, y: T) => number = compare): Promise<T | undefined> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(comparison, "comparison");
     let hasResult = false;

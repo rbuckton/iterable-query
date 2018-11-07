@@ -15,16 +15,17 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, True } from "../internal";
+import { assert, GetHierarchy, ToStringTag } from "../internal";
 import { AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Axis } from "./axis";
 import { Map, Set } from "../collections";
 import { toArrayAsync } from "./toArrayAsync";
+import { T } from "./common";
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the top-most elements. Elements of `source` that are a descendant of any other
  * element of `source` are removed.
- * 
+ *
  * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
@@ -33,13 +34,13 @@ export function topMostAsync<TNode, T extends TNode, U extends T>(source: Possib
 /**
  * Creates an [[AsyncHierarchyIterable]] for the top-most elements. Elements of `source` that are a descendant of any other
  * element of `source` are removed.
- * 
+ *
  * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
  */
 export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate?: (element: T) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode, T>;
-export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode, T> {
+export function topMostAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode, T> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     return new AsyncTopMostIterable(source, predicate);
 }
@@ -88,7 +89,7 @@ class AsyncTopMostIterable<TNode, T extends TNode> implements AsyncHierarchyIter
             }
         }
 
-        if (predicate === True) {
+        if (predicate === T) {
             yield* topMostNodes;
         }
         else {

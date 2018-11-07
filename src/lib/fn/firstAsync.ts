@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { T } from "./common";
 
 /**
  * Gets the first element, optionally filtering elements using the supplied callback.
@@ -34,7 +35,7 @@ export async function firstAsync<T, U extends T>(source: AsyncQueryable<T>, pred
  * @category Scalar
  */
 export async function firstAsync<T>(source: AsyncQueryable<T>, predicate?: (element: T) => boolean | PromiseLike<boolean>): Promise<T | undefined>;
-export async function firstAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = True): Promise<T | undefined> {
+export async function firstAsync<T>(source: AsyncQueryable<T>, predicate: (element: T) => boolean | PromiseLike<boolean> = T): Promise<T | undefined> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     for await (const element of ToPossiblyAsyncIterable(source)) {

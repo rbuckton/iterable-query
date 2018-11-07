@@ -15,13 +15,14 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
 import { Set } from "../collections";
+import { identity } from "./common";
 
 /**
  * Creates a Set for the elements of the Query.
- * 
+ *
  * @param source A [[Queryable]] object.
  * @category Scalar
  */
@@ -34,7 +35,7 @@ export function toSet<T>(source: Queryable<T>): Set<T>;
  * @category Scalar
  */
 export function toSet<T, V>(source: Queryable<T>, elementSelector: (element: T) => V): Set<V>;
-export function toSet<T>(source: Queryable<T>, elementSelector: (element: T) => T = Identity): Set<T> {
+export function toSet<T>(source: Queryable<T>, elementSelector: (element: T) => T = identity): Set<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const set = new Set<T>();

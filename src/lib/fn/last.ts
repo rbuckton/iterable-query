@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToIterable} from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
+import { T } from "./common";
 
 /**
  * Gets the last element of a [[Queryable]], optionally filtering elements using the supplied
@@ -26,7 +27,7 @@ import { Queryable } from "../types";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export function last<T>(source: Queryable<T>, predicate: (element: T) => boolean = True): T | undefined {
+export function last<T>(source: Queryable<T>, predicate: (element: T) => boolean = T): T | undefined {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
     let result: T | undefined;

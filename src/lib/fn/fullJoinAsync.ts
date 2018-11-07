@@ -15,12 +15,13 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, SelectGroupingKey, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
+import { assert, SelectGroupingKey, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { Lookup } from "../lookup";
 import { union } from "../fn/union";
 import { map } from "../fn/map";
 import { defaultIfEmpty } from "../fn/defaultIfEmpty";
+import { identity } from "./common";
 
 /**
  * Creates an [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner
@@ -60,8 +61,8 @@ class AsyncFullJoinIterable<O, I, K, R> implements AsyncIterable<R> {
 
     async *[Symbol.asyncIterator](): AsyncIterator<R> {
         const resultSelector = this._resultSelector;
-        const outerLookup = new Lookup(await CreateGroupingsAsync(this._outer, this._outerKeySelector, Identity));
-        const innerLookup = new Lookup(await CreateGroupingsAsync(this._inner, this._innerKeySelector, Identity));
+        const outerLookup = new Lookup(await CreateGroupingsAsync(this._outer, this._outerKeySelector, identity));
+        const innerLookup = new Lookup(await CreateGroupingsAsync(this._inner, this._innerKeySelector, identity));
         const keys = union(map(outerLookup, SelectGroupingKey), map(innerLookup, SelectGroupingKey));
         for (const key of keys) {
             const outer = defaultIfEmpty<O | undefined>(outerLookup.get(key), undefined);

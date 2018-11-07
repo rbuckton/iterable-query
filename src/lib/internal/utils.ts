@@ -14,9 +14,9 @@
   limitations under the License.
  */
 
-import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, Comparable } from "../types";
+import { Hierarchical, HierarchyProvider, Queryable, OrderedIterable, AsyncOrderedIterable, HierarchyIterable, PossiblyAsyncIterable, Grouping, OrderedHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
-import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource, IsComparable } from "./guards";
+import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
 import { QuerySource, AsyncQuerySource } from "./types";
 
@@ -165,25 +165,6 @@ export function SameValue(x: any, y: any): boolean {
 }
 
 /** @internal */
-export function CompareValues<T>(x: T, y: T): number {
-    if (IsComparable(x) && IsComparable(y)) {
-        return x[Comparable.compareTo](y);
-    }
-    if (x < y) {
-        return -1;
-    }
-    else if (x > y) {
-        return +1;
-    }
-    return 0;
-}
-
-/** @internal */
-export function Identity<T>(x: T): T {
-    return x;
-}
-
-/** @internal */
 export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V[]> {
     const map = new Map<K, V[]>();
     for (const item of ToIterable(source)) {
@@ -232,9 +213,4 @@ export function SelectValue<T extends object, K extends keyof T>(this: T, key: K
 /** @internal */
 export function SelectEntry<T extends object, K extends keyof T>(this: T, key: K) {
     return MakeTuple(key, this[key]);
-}
-
-/** @internal */
-export function True(_unused: any) {
-    return true;
 }

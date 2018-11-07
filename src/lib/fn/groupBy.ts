@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
+import { assert, ToIterable, CreateGroupings, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
+import { identity } from "./common";
 
 /**
  * Groups each element of a [[HierarchyIterable]] by its key.
@@ -53,7 +54,7 @@ export function groupBy<T, K, V>(source: Queryable<T>, keySelector: (element: T)
  * @category Subquery
  */
 export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Iterable<V>) => R): Iterable<R>;
-export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = Identity, resultSelector: (key: K, elements: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
+export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = identity, resultSelector: (key: K, elements: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
@@ -81,7 +82,7 @@ class GroupByIterable<T, K, V, R> implements Iterable<R> {
         const resultSelector = this._resultSelector;
         const map = CreateGroupings(source, this._keySelector, this._elementSelector);
         for (const [key, values] of map) {
-            yield resultSelector(key, elementSelector === Identity ? FlowHierarchy(values, source) : values);
+            yield resultSelector(key, elementSelector === identity ? FlowHierarchy(values, source) : values);
         }
     }
 }

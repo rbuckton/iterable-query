@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, Identity} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Creates an Object for the elements of `source`.
@@ -37,7 +38,7 @@ export function toObject<T>(source: Queryable<T>, prototype: object | null, keyS
  * @category Scalar
  */
 export function toObject<T, V>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): object;
-export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T = Identity): object {
+export function toObject<T>(source: Queryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T = identity): object {
     assert.mustBeQueryable(source, "source");
     assert.mustBeObjectOrNull(prototype, "prototype");
     assert.mustBeFunction(keySelector, "keySelector");

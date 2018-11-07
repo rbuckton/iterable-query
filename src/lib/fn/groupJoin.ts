@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, ToStringTag } from "../internal";
+import { assert, ToIterable, CreateGroupings, ToStringTag } from "../internal";
 import { Queryable } from "../types";
 import { empty } from "./empty";
+import { identity } from "./common";
 
 /**
  * Creates a grouped [[Iterable]] for the correlated elements between an outer [[Queryable]] object and an inner [[Queryable]] object.
@@ -57,7 +58,7 @@ class GroupJoinIterable<O, I, K, R> implements Iterable<R> {
     *[Symbol.iterator](): Iterator<R> {
         const outerKeySelector = this._outerKeySelector;
         const resultSelector = this._resultSelector;
-        const map = CreateGroupings(this._inner, this._innerKeySelector, Identity);
+        const map = CreateGroupings(this._inner, this._innerKeySelector, identity);
         for (const outerElement of this._outer) {
             const outerKey = outerKeySelector(outerElement);
             const innerElements = map.get(outerKey) || empty<I>();

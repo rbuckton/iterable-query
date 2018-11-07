@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, CreateGroupings} from "../internal";
+import { assert, CreateGroupings} from "../internal";
 import { Queryable } from "../types";
 import { Lookup } from "../lookup";
+import { identity } from "./common";
 
 /**
  * Creates a Lookup for the elements of the Query.
@@ -36,7 +37,7 @@ export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) =
  * @category Scalar
  */
 export function toLookup<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Lookup<K, V>;
-export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = Identity): Lookup<K, T> {
+export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = identity): Lookup<K, T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");

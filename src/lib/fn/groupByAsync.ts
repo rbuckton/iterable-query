@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, CreateGrouping, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, FlowHierarchy } from "../internal";
+import { assert, CreateGrouping, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, FlowHierarchy } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable, Grouping, PossiblyAsyncHierarchyIterable, HierarchyGrouping } from "../types";
+import { identity } from "./common";
 
 /**
  * Groups each element of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] by its key.
@@ -53,7 +54,7 @@ export function groupByAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (e
  * @category Subquery
  */
 export function groupByAsync<T, K, V, R>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>, resultSelector: (key: K, elements: Iterable<V>) => PromiseLike<R> | R): AsyncIterable<R>;
-export function groupByAsync<T, K, V, R>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V | PromiseLike<T | V> = Identity, resultSelector: (key: K, elements: Iterable<T | V>) => PromiseLike<Grouping<K, T | V> | R> | Grouping<K, T | V> | R = CreateGrouping): AsyncIterable<Grouping<K, T | V> | R> {
+export function groupByAsync<T, K, V, R>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V | PromiseLike<T | V> = identity, resultSelector: (key: K, elements: Iterable<T | V>) => PromiseLike<Grouping<K, T | V> | R> | Grouping<K, T | V> | R = CreateGrouping): AsyncIterable<Grouping<K, T | V> | R> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
@@ -81,7 +82,7 @@ class AsyncGroupByIterable<T, K, V, R> implements AsyncIterable<R> {
         const resultSelector = this._resultSelector;
         const map = await CreateGroupingsAsync(source, this._keySelector, this._elementSelector);
         for (const [key, values] of map) {
-            yield resultSelector(key, elementSelector === Identity ? FlowHierarchy(values, source) : values);
+            yield resultSelector(key, elementSelector === identity ? FlowHierarchy(values, source) : values);
         }
     }
 }

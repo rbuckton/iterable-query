@@ -15,30 +15,31 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Creates an Array for the elements of the [[AsyncIterable]].
- * 
+ *
  * @param source An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export async function toArrayAsync<T>(source: AsyncQueryable<T>): Promise<T[]>;
 /**
  * Creates an Array for the elements of the [[AsyncIterable]].
- * 
+ *
  * @param source An [[AsyncQueryable]] object.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
 export async function toArrayAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V | PromiseLike<V>): Promise<V[]>;
-export async function toArrayAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<T[]> {
+export async function toArrayAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T | PromiseLike<T> = identity): Promise<T[]> {
     assert.mustBeAsyncQueryable(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const result: T[] = [];
     for await (const item of ToPossiblyAsyncIterable(source)) {
-        result.push(elementSelector === Identity ? item : await elementSelector(item));
+        result.push(elementSelector === identity ? item : await elementSelector(item));
     }
     return result;
 }

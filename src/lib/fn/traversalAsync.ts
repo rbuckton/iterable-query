@@ -15,15 +15,16 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, GetHierarchy, ToStringTag, ClassName } from "../internal";
+import { assert, GetHierarchy, ToStringTag, ClassName } from "../internal";
 import { HierarchyProvider, AsyncHierarchyIterable, Hierarchical, PossiblyAsyncHierarchyIterable } from "../types";
 import { Axis } from "./axis";
+import { T } from "./common";
 
 /** @category Hierarchy */
 export function rootAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function rootAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function rootAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function rootAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncRootTraversalIterable(source, predicate);
@@ -33,7 +34,7 @@ export function rootAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, 
 export function ancestorsAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function ancestorsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function ancestorsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function ancestorsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncAncestorsTraversalIterable(source, predicate);
@@ -43,7 +44,7 @@ export function ancestorsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNo
 export function ancestorsAndSelfAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function ancestorsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function ancestorsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function ancestorsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncAncestorsAndSelfTraversalIterable(source, predicate);
@@ -53,7 +54,7 @@ export function ancestorsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyItera
 export function descendantsAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function descendantsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function descendantsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function descendantsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncDescendantsTraversalIterable(source, predicate);
@@ -63,7 +64,7 @@ export function descendantsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<T
 export function descendantsAndSelfAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function descendantsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function descendantsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function descendantsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncDescendantsAndSelfTraversalIterable(source, predicate);
@@ -73,7 +74,7 @@ export function descendantsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIte
 export function parentsAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function parentsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function parentsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function parentsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncParentsTraversalIterable(source, predicate);
@@ -83,7 +84,7 @@ export function parentsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode
 export function selfAsync<TNode, T extends TNode, U extends T>(source: PossiblyAsyncHierarchyIterable<TNode, T>, predicate: (element: T) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function selfAsync<TNode, T extends TNode>(source: AsyncHierarchyIterable<T>, predicate?: (element: T) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode, T>;
-export function selfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function selfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncSelfTraversalIterable(source, predicate);
@@ -93,7 +94,7 @@ export function selfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, 
 export function siblingsAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function siblingsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function siblingsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function siblingsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncSiblingsTraversalIterable(source, predicate);
@@ -103,7 +104,7 @@ export function siblingsAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNod
 export function siblingsAndSelfAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function siblingsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function siblingsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function siblingsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncSiblingsAndSelfTraversalIterable(source, predicate);
@@ -113,7 +114,7 @@ export function siblingsAndSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterab
 export function siblingsBeforeSelfAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function siblingsBeforeSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function siblingsBeforeSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function siblingsBeforeSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncSiblingsBeforeSelfTraversalIterable(source, predicate);
@@ -123,7 +124,7 @@ export function siblingsBeforeSelfAsync<TNode>(source: PossiblyAsyncHierarchyIte
 export function siblingsAfterSelfAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function siblingsAfterSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function siblingsAfterSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function siblingsAfterSelfAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncSiblingsAfterSelfTraversalIterable(source, predicate);
@@ -133,7 +134,7 @@ export function siblingsAfterSelfAsync<TNode>(source: PossiblyAsyncHierarchyIter
 export function childrenAsync<TNode, U extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => element is U): AsyncHierarchyIterable<TNode, U>;
 /** @category Hierarchy */
 export function childrenAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate?: (element: TNode) => boolean | PromiseLike<boolean>): AsyncHierarchyIterable<TNode>;
-export function childrenAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = True): AsyncHierarchyIterable<TNode> {
+export function childrenAsync<TNode>(source: PossiblyAsyncHierarchyIterable<TNode>, predicate: (element: TNode) => boolean | PromiseLike<boolean> = T): AsyncHierarchyIterable<TNode> {
     assert.mustBePossiblyAsyncHierarchyIterable(source, "source");
     assert.mustBeFunctionOrUndefined(predicate, "predicate");
     return new AsyncChildrenTraversalIterable(source, predicate);

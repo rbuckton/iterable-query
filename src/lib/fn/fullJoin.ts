@@ -15,15 +15,16 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, Identity, SelectGroupingKey, ToStringTag} from "../internal";
+import { assert, ToIterable, CreateGroupings, SelectGroupingKey, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 import { union } from "./union";
 import { map } from "./map";
 import { Lookup } from "../lookup";
 import { defaultIfEmpty } from "./defaultIfEmpty";
+import { identity } from "./common";
 
 /**
- * Creates an [[Iterable]] for the correlated elements between an outer [[Queryable]] object and an inner 
+ * Creates an [[Iterable]] for the correlated elements between an outer [[Queryable]] object and an inner
  * [[Queryable]] object.
  *
  * @param outer A [[Queryable]] object.
@@ -60,8 +61,8 @@ class FullJoinIterable<O, I, K, R> implements Iterable<R> {
 
     *[Symbol.iterator](): Iterator<R> {
         const resultSelector = this._resultSelector;
-        const outerLookup = new Lookup(CreateGroupings(this._outer, this._outerKeySelector, Identity));
-        const innerLookup = new Lookup(CreateGroupings(this._inner, this._innerKeySelector, Identity));
+        const outerLookup = new Lookup(CreateGroupings(this._outer, this._outerKeySelector, identity));
+        const innerLookup = new Lookup(CreateGroupings(this._inner, this._innerKeySelector, identity));
         const keys = union(map(outerLookup, SelectGroupingKey), map(innerLookup, SelectGroupingKey));
         for (const key of keys) {
             const outer = defaultIfEmpty<O | undefined>(outerLookup.get(key), undefined);

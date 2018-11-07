@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Computes the sum for a series of numbers.
@@ -34,7 +35,7 @@ export async function sumAsync(source: AsyncQueryable<number>): Promise<number>;
  * @category Scalar
  */
 export async function sumAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => number | PromiseLike<number>): Promise<number>;
-export async function sumAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number | PromiseLike<number> = Identity): Promise<number> {
+export async function sumAsync(source: AsyncQueryable<number>, elementSelector: (element: number) => number | PromiseLike<number> = identity): Promise<number> {
     assert.mustBeAsyncQueryable<number>(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     let sum = 0;

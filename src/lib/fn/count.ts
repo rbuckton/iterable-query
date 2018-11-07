@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, True, ToIterable} from "../internal";
+import { assert, ToIterable} from "../internal";
 import { Queryable } from "../types";
 import { Map, Set } from "../collections";
+import { T } from "./common";
 
 /**
  * Counts the number of elements, optionally filtering elements using the supplied callback.
@@ -26,11 +27,11 @@ import { Map, Set } from "../collections";
  * @param predicate An optional callback used to match each element.
  * @category Scalar
  */
-export function count<T>(source: Queryable<T>, predicate: (element: T) => boolean = True): number {
+export function count<T>(source: Queryable<T>, predicate: (element: T) => boolean = T): number {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
 
-    if (predicate === True) {
+    if (predicate === T) {
         if (Array.isArray(source)) return source.length;
         if (source instanceof Set || source instanceof Map) return source.size;
     }

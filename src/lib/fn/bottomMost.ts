@@ -15,31 +15,32 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, GetHierarchy, ToStringTag, True} from "../internal";
+import { assert, GetHierarchy, ToStringTag } from "../internal";
 import { HierarchyIterable, Hierarchical } from "../types";
 import { Map, Set } from "../collections";
 import { Axis } from "./axis";
 import { toArray } from "./toArray";
+import { T } from "./common";
 
 /**
- * Creates a [[HierarchyIterable]] for the bottom-most elements of a [[HierarchyIterable]]. 
+ * Creates a [[HierarchyIterable]] for the bottom-most elements of a [[HierarchyIterable]].
  * Elements of `source` that are an ancestor of any other element of `source` are removed.
- * 
+ *
  * @param source A [[HierarchyIterable]] object.
  * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
  */
 export function bottomMost<TNode, T extends TNode, U extends T>(source: HierarchyIterable<TNode, T>, predicate: (value: T) => value is U): HierarchyIterable<TNode, U>;
 /**
- * Creates a [[HierarchyIterable]] for the bottom-most elements of a [[HierarchyIterable]]. 
+ * Creates a [[HierarchyIterable]] for the bottom-most elements of a [[HierarchyIterable]].
  * Elements of `source` that are an ancestor of any other element of `source` are removed.
- * 
+ *
  * @param source A [[HierarchyIterable]] object.
  * @param predicate An optional callback used to filter the results.
  * @category Hierarchy
  */
 export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate?: (value: T) => boolean): HierarchyIterable<TNode, T>;
-export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (value: T) => boolean = True): HierarchyIterable<TNode, T> {
+export function bottomMost<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>, predicate: (value: T) => boolean = T): HierarchyIterable<TNode, T> {
     assert.mustBeHierarchyIterable(source, "source");
     return new BottomMostIterable(source, predicate);
 }

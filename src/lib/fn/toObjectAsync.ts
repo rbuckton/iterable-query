@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Creates an Object for the elements of `source`.
@@ -37,7 +38,7 @@ export async function toObjectAsync<T>(source: AsyncQueryable<T>, prototype: obj
  * @category Scalar
  */
 export async function toObjectAsync<T, V>(source: AsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V | PromiseLike<V>): Promise<object>;
-export async function toObjectAsync<T>(source: AsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<object> {
+export async function toObjectAsync<T>(source: AsyncQueryable<T>, prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => T | PromiseLike<T> = identity): Promise<object> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeObjectOrNull(prototype, "prototype");
     assert.mustBeFunction(keySelector, "keySelector");

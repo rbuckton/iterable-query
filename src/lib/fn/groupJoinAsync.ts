@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
+import { assert, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "../fn/empty";
+import { identity } from "./common";
 
 /**
  * Creates a grouped [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner [[AsyncQueryable]] object.
@@ -57,7 +58,7 @@ class AsyncGroupJoinIterable<O, I, K, R> implements AsyncIterable<R> {
     async *[Symbol.asyncIterator](): AsyncIterator<R> {
         const outerKeySelector = this._outerKeySelector;
         const resultSelector = this._resultSelector;
-        const map = await CreateGroupingsAsync(this._inner, this._innerKeySelector, Identity);
+        const map = await CreateGroupingsAsync(this._inner, this._innerKeySelector, identity);
         for await (const outerElement of this._outer) {
             const outerKey = outerKeySelector(outerElement);
             const innerElements = map.get(outerKey) || empty<I>();

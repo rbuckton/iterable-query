@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { identity } from "./common";
 
 /**
  * Computes a scalar value by applying an accumulator callback over each element.
@@ -45,7 +46,7 @@ export function reduceAsync<T, U>(source: AsyncQueryable<T>, accumulator: (curre
  * @category Scalar
  */
 export function reduceAsync<T, U, R>(source: AsyncQueryable<T>, accumulator: (current: U, element: T, offset: number) => U | PromiseLike<T>, seed: U, resultSelector: (result: U, count: number) => R | PromiseLike<R>): Promise<R>;
-export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>, seed?: T, resultSelector: (result: T, count: number) => T | PromiseLike<T> = Identity): Promise<T> {
+export function reduceAsync<T>(source: AsyncQueryable<T>, accumulator: (current: T, element: T, offset: number) => T | PromiseLike<T>, seed?: T, resultSelector: (result: T, count: number) => T | PromiseLike<T> = identity): Promise<T> {
     return reduceAsyncCore(source, accumulator, seed, arguments.length > 2, resultSelector);
 }
 

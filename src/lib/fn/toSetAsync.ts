@@ -15,26 +15,27 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Set } from "../collections";
+import { identity } from "./common";
 
 /**
  * Creates a Set for the elements of the Query.
- * 
+ *
  * @param source An [[AsyncQueryable]] object.
  * @category Scalar
  */
 export function toSetAsync<T>(source: AsyncQueryable<T>): Promise<Set<T>>;
 /**
  * Creates a Set for the elements of the Query.
- * 
+ *
  * @param source An [[AsyncQueryable]] object.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
 export function toSetAsync<T, V>(source: AsyncQueryable<T>, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Set<V>>;
-export async function toSetAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<Set<T>> {
+export async function toSetAsync<T>(source: AsyncQueryable<T>, elementSelector: (element: T) => T | PromiseLike<T> = identity): Promise<Set<T>> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(elementSelector, "elementSelector");
     const set = new Set<T>();

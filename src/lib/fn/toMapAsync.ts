@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, Identity, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Map } from "../collections";
+import { identity } from "./common";
 
 /**
  * Creates a Map for the elements of the source.
@@ -36,7 +37,7 @@ export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (
  * @category Scalar
  */
 export async function toMapAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Map<K, V>>;
-export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = Identity): Promise<Map<K, T>> {
+export async function toMapAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = identity): Promise<Map<K, T>> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");

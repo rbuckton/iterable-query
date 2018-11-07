@@ -22,6 +22,7 @@ export * from "./types";
 export * from "./query";
 export * from "./asyncQuery";
 export * from "./lookup";
+export * from "./lazy";
 export * from "./collections";
 import * as fn from "./fn";
 export { fn };
