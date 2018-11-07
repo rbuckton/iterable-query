@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, MakeTuple, GetIterator, IteratorClose, ToIterable, ToStringTag} from "../internal";
+import { assert, GetIterator, IteratorClose, ToIterable, ToStringTag } from "../internal";
 import { Queryable } from "../types";
+import { tuple } from "./common";
 
 /**
  * Creates a subquery that combines two [[Queryable]] objects by combining elements
@@ -37,7 +38,7 @@ export function zip<T, U>(left: Queryable<T>, right: Queryable<U>): Iterable<[T,
  * @category Join
  */
 export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => R): Iterable<R>;
-export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => [T, U] | R = MakeTuple): Iterable<[T, U] | R> {
+export function zip<T, U, R>(left: Queryable<T>, right: Queryable<U>, selector: (left: T, right: U) => [T, U] | R = tuple): Iterable<[T, U] | R> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
     assert.mustBeFunction(selector, "selector");

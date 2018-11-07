@@ -170,6 +170,8 @@
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#toobjectasync" class="tsd-kind-icon">to<wbr>Object<wbr>Async</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#toset" class="tsd-kind-icon">to<wbr>Set</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#tosetasync" class="tsd-kind-icon">to<wbr>Set<wbr>Async</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#unzip" class="tsd-kind-icon">unzip</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#unzipasync" class="tsd-kind-icon">unzip<wbr>Async</a></li>
 							</ul>
 							<h3>Functions (Subquery)</h3>
 							<ul class="tsd-index-list">
@@ -321,6 +323,7 @@
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#lazy" class="tsd-kind-icon">lazy</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_iterable_query_fn_.html#noop" class="tsd-kind-icon">noop</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#thunk" class="tsd-kind-icon">thunk</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_iterable_query_fn_.html#tuple" class="tsd-kind-icon">tuple</a></li>
 							</ul>
 						</section>
 					</div>
@@ -8524,6 +8527,223 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="https://tc39.github.io/ecma262/#sec-set-objects" target="external" class="tsd-signature-type">Set</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+					<a name="unzip" class="tsd-anchor"></a>
+					<h3>unzip</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">unzip&lt;T&gt;<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="_iterable_query_.html#queryable"  class="tsd-signature-type">Queryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+						<li class="tsd-signature tsd-kind-icon">unzip&lt;T, U&gt;<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="_iterable_query_.html#queryable"  class="tsd-signature-type">Queryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, partSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/unzip.ts#L27">fn/unzip.ts:27</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Unzips a sequence of tuples into a tuple of sequences.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>category</dt>
+									<dd><p>Scalar</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+								T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">]</span>        </li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									source: <a href="_iterable_query_.html#queryable"  class="tsd-signature-type">Queryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A <a href="_iterable_query_.html#queryable">Queryable</a></p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
+							<ul class="tsd-parameters">
+							</ul>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/unzip.ts#L34">fn/unzip.ts:34</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Unzips a sequence of tuples into a tuple of sequences.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>category</dt>
+									<dd><p>Scalar</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+								T        </li>
+								<li>
+								U<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">]</span>        </li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									source: <a href="_iterable_query_.html#queryable"  class="tsd-signature-type">Queryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A <a href="_iterable_query_.html#queryable">Queryable</a></p>
+										</div>
+									</div>
+								</li>
+								<li>
+									partSelector: <span class="tsd-signature-type">function</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A callback that converts a result into a tuple.</p>
+										</div>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">U</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+														value: <span class="tsd-signature-type">T</span>                            </li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">U</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
+							<ul class="tsd-parameters">
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+					<a name="unzipasync" class="tsd-anchor"></a>
+					<h3>unzip<wbr>Async</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">unzip<wbr>Async&lt;T&gt;<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="_iterable_query_.html#asyncqueryable"  class="tsd-signature-type">AsyncQueryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">unzip<wbr>Async&lt;T, U&gt;<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="_iterable_query_.html#asyncqueryable"  class="tsd-signature-type">AsyncQueryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, partSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/unzipAsync.ts#L27">fn/unzipAsync.ts:27</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Unzips a sequence of tuples into a tuple of sequences.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>category</dt>
+									<dd><p>Scalar</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+								T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">]</span>        </li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									source: <a href="_iterable_query_.html#asyncqueryable"  class="tsd-signature-type">AsyncQueryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>An <a href="_iterable_query_.html#asyncqueryable">AsyncQueryable</a></p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/unzipAsync.ts#L34">fn/unzipAsync.ts:34</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Unzips a sequence of tuples into a tuple of sequences.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>category</dt>
+									<dd><p>Scalar</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+								T        </li>
+								<li>
+								U<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">]</span>        </li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									source: <a href="_iterable_query_.html#asyncqueryable"  class="tsd-signature-type">AsyncQueryable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>An <a href="_iterable_query_.html#asyncqueryable">AsyncQueryable</a></p>
+										</div>
+									</div>
+								</li>
+								<li>
+									partSelector: <span class="tsd-signature-type">function</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A callback that converts a result into a tuple.</p>
+										</div>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">PromiseLike</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+														value: <span class="tsd-signature-type">T</span>                            </li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">U</span>
+														<span class="tsd-signature-symbol"> | </span>
+														<span class="tsd-signature-type">PromiseLike</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">&gt;</span>
+													</h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -22364,7 +22584,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zip.ts#L29">fn/zip.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zip.ts#L30">fn/zip.ts:30</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -22409,7 +22629,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zip.ts#L39">fn/zip.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zip.ts#L40">fn/zip.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -22493,7 +22713,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zipAsync.ts#L29">fn/zipAsync.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zipAsync.ts#L30">fn/zipAsync.ts:30</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -22538,7 +22758,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zipAsync.ts#L39">fn/zipAsync.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/zipAsync.ts#L40">fn/zipAsync.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -25516,7 +25736,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/common.ts#L83">fn/common.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/common.ts#L88">fn/common.ts:88</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -25538,7 +25758,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/common.ts#L80">fn/common.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/common.ts#L85">fn/common.ts:85</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -25880,6 +26100,38 @@
 									</ul>
 								</li>
 							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+					<a name="tuple" class="tsd-anchor"></a>
+					<h3>tuple</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">tuple&lt;A&gt;<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/fn/common.ts#L80">fn/common.ts:80</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Makes a tuple from the provided arguments</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+								A<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">]</span>        </li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+								<span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">A</span>                            </li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">A</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -26535,10 +26787,19 @@
 						<a href="_iterable_query_fn_.html#topmostasync" class="tsd-kind-icon">top<wbr>Most<wbr>Async</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+						<a href="_iterable_query_fn_.html#tuple" class="tsd-kind-icon">tuple</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="_iterable_query_fn_.html#union" class="tsd-kind-icon">union</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
 						<a href="_iterable_query_fn_.html#unionasync" class="tsd-kind-icon">union<wbr>Async</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+						<a href="_iterable_query_fn_.html#unzip" class="tsd-kind-icon">unzip</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+						<a href="_iterable_query_fn_.html#unzipasync" class="tsd-kind-icon">unzip<wbr>Async</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-not-exported">
 						<a href="_iterable_query_fn_.html#where" class="tsd-kind-icon">where</a>

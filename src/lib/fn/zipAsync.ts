@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, MakeTuple, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
+import { assert, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { tuple } from "./common";
 
 /**
  * Creates a subquery that combines two [[AsyncQueryable]] objects by combining elements
@@ -37,7 +38,7 @@ export function zipAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>
  * @category Join
  */
 export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => R | PromiseLike<R>): AsyncIterable<R>;
-export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => PromiseLike<[T, U] | R> | [T, U] | R = MakeTuple): AsyncIterable<[T, U] | R> {
+export function zipAsync<T, U, R>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, selector: (left: T, right: U) => PromiseLike<[T, U] | R> | [T, U] | R = tuple): AsyncIterable<[T, U] | R> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<U>(right, "right");
     assert.mustBeFunction(selector, "selector");

@@ -76,6 +76,11 @@ export function lazy<T, A extends any[]>(factory: (...args: A) => T, ...args: A)
     return Lazy.from(factory, ...args);
 }
 
+/** Makes a tuple from the provided arguments */
+export function tuple<A extends [any?, ...any[]]>(...args: A): A {
+    return args;
+}
+
 /** Always returns `true` */
 export function T(): true { return true; }
 

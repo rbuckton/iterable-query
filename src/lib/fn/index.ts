@@ -101,6 +101,8 @@ export * from "./toObject";
 export * from "./toObjectAsync";
 export * from "./toSet";
 export * from "./toSetAsync";
+export * from "./unzip";
+export * from "./unzipAsync";
 // subqueries
 export * from "./append";
 export * from "./appendAsync";

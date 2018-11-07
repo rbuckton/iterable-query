@@ -1003,14 +1003,6 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     // #region Scalar
 
     /**
-     * Eagerly evaluate the query, returning a new `Query`.
-     * @category Scalar
-     */
-    eval(): Flow<this, T> {
-        return from(fn.eval(GetSource(this))) as Flow<this, T>;
-    }
-
-    /**
      * Computes a scalar value by applying an accumulator callback over each element.
      *
      * @param accumulator the callback used to compute the result.
@@ -1428,6 +1420,32 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      */
     drain(): void {
         fn.drain(GetSource(this));
+    }
+
+    /**
+     * Eagerly evaluate the query, returning a new `Query`.
+     * @category Scalar
+     */
+    eval(): Flow<this, T> {
+        return from(fn.eval(GetSource(this))) as Flow<this, T>;
+    }
+
+    /**
+     * Unzips a sequence of tuples into a tuple of sequences.
+     * @param source A [[Queryable]]
+     * @category Scalar
+     */
+    unzip<T extends [any, ...any[]]>(this: Query<T>): { [I in keyof T]: T[I][]; };
+
+    /**
+     * Unzips a sequence of tuples into a tuple of sequences.
+     * @param source A [[Queryable]]
+     * @param partSelector A callback that converts a result into a tuple.
+     * @category Scalar
+     */
+    unzip<T, U extends [any, ...any[]]>(this: Query<T>, partSelector: (value: T) => U): { [I in keyof U]: U[I][]; };
+    unzip<T extends [any, ...any[]]>(this: Query<T>, partSelector?: (value: T) => T): any {
+        return fn.unzip(GetSource(this), partSelector!);
     }
 
     /**

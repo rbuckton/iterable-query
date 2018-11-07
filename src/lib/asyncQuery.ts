@@ -1437,6 +1437,22 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Unzips a sequence of tuples into a tuple of sequences.
+     * @category Scalar
+     */
+    unzip<T extends [any, ...any[]]>(this: Query<T>): Promise<{ [I in keyof T]: T[I][]; }>;
+
+    /**
+     * Unzips a sequence of tuples into a tuple of sequences.
+     * @param partSelector A callback that converts a result into a tuple.
+     * @category Scalar
+     */
+    unzip<T, U extends [any, ...any[]]>(this: Query<T>, partSelector: (value: T) => U | PromiseLike<U>): Promise<{ [I in keyof U]: U[I][]; }>;
+    unzip<T extends [any, ...any[]]>(this: Query<T>, partSelector?: (value: T) => T | PromiseLike<T>): Promise<any> {
+        return fn.unzipAsync(GetAsyncSource(this), partSelector!);
+    }
+
+    /**
      * Creates an Array for the elements of the Query.
      * @category Scalar
      */
