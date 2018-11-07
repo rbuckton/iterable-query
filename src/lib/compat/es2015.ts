@@ -31,9 +31,9 @@ function hasNativeSymbol() {
 
 function hasNativeCollections() {
     return typeof Map !== "undefined"
-        && typeof Set === "undefined"
-        && typeof WeakMap === "undefined"
-        && typeof WeakSet === "undefined";
+        && typeof Set !== "undefined"
+        && typeof WeakMap !== "undefined"
+        && typeof WeakSet !== "undefined";
 }
 
 function getGlobal(): object {
