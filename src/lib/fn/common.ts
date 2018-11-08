@@ -25,16 +25,17 @@ export function identity<T>(value: T): T {
     return value;
 }
 
-const weakThunks = new WeakMap<object, () => any>();
 /** Creates a function that always returns the provided value. */
-export function thunk<T>(value: T): () => T;
-export function thunk(value: any): () => any {
-    if (typeof value === "object" && value !== null) {
-        let f = weakThunks.get(value);
-        if (!f) weakThunks.set(value, f = () => value);
-        return f;
-    }
+export function thunk<T>(value: T): () => T {
     return () => value;
+}
+
+/** Creates a function that returns the property value for the provided key. */
+export function property<T extends object, K extends keyof T = keyof T>(key: K): (value: T) => T[K];
+/** Creates a function that returns the property value for the provided key. */
+export function property<K extends PropertyKey>(key: K): <T extends object>(value: T) => K extends keyof T ? T[K] : unknown;
+export function property<T, K extends keyof T>(key: K): (value: T) => T[K] {
+    return (value: T) => value[key];
 }
 
 /** A function that does nothing. */
