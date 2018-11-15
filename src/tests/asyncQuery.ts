@@ -17,6 +17,12 @@ describe("AsyncQuery", () => {
     describe("new()", () => {
         it("Iterable", () => expect(new AsyncQuery([1, 2, 3])).to.equalSequenceAsync([1, 2, 3]));
         it("ArrayLike", () => expect(new AsyncQuery({ 0: 1, 1: 2, 2: 3, length: 3 })).to.equalSequenceAsync([1, 2, 3]));
+        it("AsyncQuery", () => {
+            const source: any[] = [];
+            const query1 = new AsyncQuery(source);
+            const query2 = new AsyncQuery(query1);
+            expect(query2["_source"]).to.equal(source);
+        });
         theory.throws("throws if 'source' is", (source: any) => new AsyncQuery(source), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, undefined],
@@ -1040,6 +1046,15 @@ describe("AsyncQuery", () => {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
+    });
+    describe("filterDefined()", () => {
+        it("filterDefined()", async () => expect(await AsyncQuery.from([1, undefined, 2]).filterDefined().toArray()).to.deep.equal([1, 2]));
+    });
+    describe("whereDefined()", () => {
+        it("whereDefined()", async () => expect(await AsyncQuery.from([1, undefined, 2]).whereDefined().toArray()).to.deep.equal([1, 2]));
+    });
+    describe("unzip()", () => {
+        it("unzips", async () => expect(await AsyncQuery.from([[1, "a"], [2, "b"]] as [number, string][]).unzip()).to.deep.equal([[1, 2], ["a", "b"]]));
     });
 });
 describe("AsyncOrderedQuery", () => {

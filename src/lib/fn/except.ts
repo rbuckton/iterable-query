@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { toSet } from "./toSet";
 
@@ -54,8 +54,7 @@ class ExceptIterable<T> implements Iterable<T> {
     *[Symbol.iterator](): Iterator<T> {
         const set = toSet(this._right);
         for (const element of this._left) {
-            if (!set.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element)) {
                 yield element;
             }
         }

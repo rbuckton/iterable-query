@@ -1,20 +1,19 @@
 // @ts-check
 const gulp = require('gulp');
-const log = require('fancy-log');
 const del = require('del');
-const mocha = require('gulp-mocha');
-const istanbul = require('gulp-istanbul');
-const { build } = require("./scripts/build");
 const minimist = require("minimist");
 const typedoc = require("./scripts/typedoc");
+const coverage = require("./scripts/coverage");
+const { build } = require("./scripts/build");
+const { mocha } = require("./scripts/mocha");
+
 const options = /** @type {minimist.ParsedArgs & Options} */ (minimist(process.argv.slice(2), {
-    boolean: ["force", "verbose"],
+    boolean: ["force", "verbose", "coverage"],
     alias: { "f": "force" },
-    default: { force: false, verbose: "minimal" }
+    default: { force: false, verbose: "minimal", coverage: true }
 }));
 
 let useDebug = process.env.npm_lifecycle_event !== "prepublishOnly";
-let useCoverage = false;
 let watching = false;
 
 gulp.task("typedoc", build("src/typedoc/plugin"));
@@ -26,9 +25,7 @@ gulp.task("build", ["build:lib", "build:es2015", "build:es5", "build:tests"]);
 gulp.task("clean:dist", () => del("dist"));
 gulp.task("clean:docs", () => del("docs"));
 gulp.task("clean", ["clean:dist", "clean:docs"]);
-gulp.task("cover", setCoverage());
-gulp.task("test:pre-test", ["build"], preTest());
-gulp.task("test", ["test:pre-test"], test({ main: "dist/tests/index.js", coverage: { thresholds: { global: 80 } } }));
+gulp.task("test", ["build"], test({ main: "dist/tests/index.js" }));
 gulp.task("watch", watch(["src/**/*"], ["test"]));
 gulp.task("default", ["docs", "test"]);
 gulp.task("docs", ["typedoc"], () => gulp.src("src/lib/**/*.ts", { read: false })
@@ -53,35 +50,33 @@ gulp.task("docs", ["typedoc"], () => gulp.src("src/lib/**/*.ts", { read: false }
     })));
 gulp.task("prepublishOnly", ["clean"], () => gulp.start(["test", "docs"]));
 
-function setCoverage() {
-    return function () {
-        useCoverage = true;
-    };
-}
+/**
+ * @param {{ main: string; }} opts
+ */
+function test(opts) {
+    return async function () {
+        let coverageTempDirectory;
+        if (options.coverage) {
+            coverageTempDirectory = "./coverage/tmp";
+            await coverage.init(coverageTempDirectory);
+        }
 
-function preTest() {
-    return function () {
-        if (useCoverage) {
-            return gulp.src(['dist/lib/*.js', 'dist/es5/*.js'])
-                .pipe(istanbul())
-                .pipe(istanbul.hookRequire());
+        await mocha({ files: [opts.main], reporter: watching ? "min" : "dot", coverageTempDirectory });
+
+        if (options.coverage) {
+            await coverage.write({
+                exclude: ["coverage/**", "**/mode_modules/**", "dist/tests/**", "dist/{es2015,lib}/compat/**"],
+                reporter: ["html"],
+                tempDirectory: coverageTempDirectory
+            });
         }
     };
 }
 
-function test(opts) {
-    return function () {
-        var stream = gulp
-            .src(opts.main, { read: false })
-            .pipe(mocha({ reporter: watching ? 'min' : 'dot' }));
-        return useCoverage
-            ? stream
-                .pipe(istanbul.writeReports({ reporters: ["text", "html"] }))
-                .pipe(istanbul.enforceThresholds(opts.coverage))
-            : stream;
-    };
-}
-
+/**
+ * @param {string[]} src
+ * @param {string[]} tasks
+ */
 function watch(src, tasks) {
     return function () {
         watching = true;
@@ -91,7 +86,8 @@ function watch(src, tasks) {
 
 /**
  * @typedef Options
- * @property {boolean} [force]
- * @property {boolean|"minimal"} [verbose]
+ * @property {boolean} force
+ * @property {boolean|"minimal"} verbose
+ * @property {boolean} coverage
  */
 void 0;

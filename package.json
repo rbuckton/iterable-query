@@ -4,12 +4,13 @@
   "description": "Query library for ECMAScript iterables.",
   "main": "dist/lib",
   "typings": "dist/lib",
-  "dependencies": {},
+  "dependencies": {
+    "tslib": "^1.9.3"
+  },
   "devDependencies": {
     "@types/chai": "^4.1.4",
     "@types/gulp": "^3.8.36",
     "@types/gulp-if": "0.0.33",
-    "@types/gulp-mocha": "0.0.32",
     "@types/merge2": "^1.1.4",
     "@types/minimist": "^1.2.0",
     "@types/mocha": "^5.2.5",
@@ -17,18 +18,19 @@
     "@types/orchestrator": "^0.3.2",
     "@types/source-map-support": "^0.4.1",
     "@types/vinyl": "^2.0.2",
+    "c8": "^3.2.1",
     "chai": "^4.1.2",
     "del": "^3.0.0",
+    "foreground-child": "^1.5.6",
     "gulp": "^3.9.1",
     "gulp-if": "^2.0.2",
-    "gulp-istanbul": "^0.10.3",
-    "gulp-mocha": "^2.2.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typedoc": "^2.2.0",
     "gulp-typescript": "^5.0.0-alpha.3",
     "gulp-util": "^3.0.7",
     "merge2": "^1.2.2",
     "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
     "prex": "^0.4.3",
     "source-map-support": "^0.5.6",
@@ -58,7 +60,7 @@
     "order",
     "hierarchy"
   ],
-  "author": "Ron Buckton (rbuckton@outlook.com)",
+  "author": "Ron Buckton (rbuckton@chronicles.org)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/rbuckton/iterable-query/issues"

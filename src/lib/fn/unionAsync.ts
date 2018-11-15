@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
+import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, TryAdd } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
 
@@ -62,14 +62,12 @@ class AsyncUnionIterable<T> implements AsyncIterable<T> {
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
         const set = new Set<T>();
         for await (const element of this._left) {
-            if (!set.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element)) {
                 yield element;
             }
         }
         for await (const element of this._right) {
-            if (!set.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element)) {
                 yield element;
             }
         }

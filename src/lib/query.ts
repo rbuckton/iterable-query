@@ -624,8 +624,28 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
+    intersect<TNode, T extends TNode, UNode extends TNode, U extends UNode & T>(this: HierarchyQuery<TNode, T>, right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<TNode, T extends TNode, U extends T>(this: HierarchyQuery<TNode, T>, right: Queryable<U>): HierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<TNode, T extends TNode>(this: HierarchyQuery<TNode, T>, right: Queryable<T>): HierarchyQuery<TNode, T>;
+    /**
+     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
     intersect<UNode extends T, U extends UNode>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
-
     /**
      * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
@@ -633,7 +653,6 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @category Subquery
      */
     intersect<U extends T>(right: Queryable<U>): Query<U>;
-
     /**
      * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
      *
@@ -651,8 +670,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    union(right: Queryable<T>): Query<T> {
-        return from(fn.union(GetSource(this), GetSource(right)));
+    union(right: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.union(GetSource(this), GetSource(right))) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -661,8 +680,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    except(right: Queryable<T>): Query<T> {
-        return from(fn.except(GetSource(this), GetSource(right)));
+    except(right: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.except(GetSource(this), GetSource(right))) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -671,8 +690,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    relativeComplement(right: Queryable<T>): Query<T> {
-        return from(fn.relativeComplement(GetSource(this), GetSource(right)));
+    relativeComplement(right: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.relativeComplement(GetSource(this), GetSource(right))) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -681,8 +700,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    symmetricDifference(right: Queryable<T>): Query<T> {
-        return from(fn.symmetricDifference(GetSource(this), GetSource(right)));
+    symmetricDifference(right: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.symmetricDifference(GetSource(this), GetSource(right))) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -693,8 +712,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    xor(right: Queryable<T>): Query<T> {
-        return from(fn.xor(GetSource(this), GetSource(right)));
+    xor(right: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.xor(GetSource(this), GetSource(right))) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -703,8 +722,8 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    concat(right: Queryable<T>): Query<T> {
-        return from(fn.concat(GetSource(this), GetSource(right)));
+    concat(right: Queryable<T>): UnorderedFlow<this, T> {
+        return from(fn.concat(GetSource(this), GetSource(right))) as UnorderedFlow<this, T>;
     }
 
     /**
@@ -1572,99 +1591,6 @@ export class HierarchyQuery<TNode, T extends TNode = TNode> extends Query<T> imp
         assert.mustBeHierarchyIterable(source as HierarchyIterable<T>, "source");
         super(source);
     }
-
-    // #region Subquery
-
-    /**
-     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<UNode extends TNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
-
-    /**
-     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<U extends T>(right: Queryable<U>): HierarchyQuery<TNode, U>;
-
-    /**
-     * Creates a subquery for the set intersection of this `Query` and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect(right: Queryable<T>): HierarchyQuery<TNode, T>;
-    intersect(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.intersect(GetSource(this), GetSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the set union of this `Query` and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    union(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.union(GetSource(this), GetSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the set difference between this and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    except(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.except(GetSource(this), GetSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the set difference between this and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    relativeComplement(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.relativeComplement(GetSource(this), GetSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    symmetricDifference(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.symmetricDifference(GetSource(this), GetSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the symmetric difference between this and another [[Queryable]].
-     *
-     * This is an alias for `symmetricDifference`.
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    xor(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.xor(GetSource(this), GetSource(right)));
-    }
-
-    /**
-     * Creates a subquery that concatenates this `Query` with another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    concat(right: Queryable<T>): HierarchyQuery<TNode, T> {
-        return from(fn.concat(GetSource(this), GetSource(right)));
-    }
-
-    // #endregion Subquery
 
     // #region Hierarchy
 

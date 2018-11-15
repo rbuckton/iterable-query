@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
+import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, TryAdd } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
 import { toSetAsync } from "./toSetAsync";
@@ -70,13 +70,12 @@ class AsyncSymmetricDifferenceIterable<T> implements AsyncIterable<T> {
         const right = await toSetAsync(this._right);
         const set = new Set<T>();
         for await (const element of this._left) {
-            if (!set.has(element) && !right.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element) && !right.has(element)) {
+                yield element;
             }
         }
         for (const element of right) {
-            if (!set.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element)) {
                 yield element;
             }
         }

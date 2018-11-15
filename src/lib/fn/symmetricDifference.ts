@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
+import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
 import { toSet } from "./toSet";
@@ -70,13 +70,12 @@ class SymmetricDifferenceIterable<T> implements Iterable<T> {
         const right = toSet(this._right);
         const set = new Set<T>();
         for (const element of this._left) {
-            if (!set.has(element) && !right.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element) && !right.has(element)) {
+                yield element;
             }
         }
         for (const element of right) {
-            if (!set.has(element)) {
-                set.add(element);
+            if (TryAdd(set, element)) {
                 yield element;
             }
         }

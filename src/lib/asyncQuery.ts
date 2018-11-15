@@ -634,11 +634,31 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<TNode, T extends TNode, UNode extends TNode, U extends UNode & T>(this: AsyncHierarchyQuery<TNode, T>, right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<TNode, T extends TNode, U extends T>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<U>): AsyncHierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<TNode, T extends TNode>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
     intersect<UNode extends T, U extends UNode>(right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
-
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
@@ -646,7 +666,6 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @category Subquery
      */
     intersect<U extends T>(right: AsyncQueryable<U>): AsyncQuery<U>;
-
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
@@ -664,8 +683,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    union(right: AsyncQueryable<T>): AsyncQuery<T> {
-        return fromAsync(fn.unionAsync(GetAsyncSource(this), GetAsyncSource(right)));
+    union(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.unionAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -674,8 +693,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    except(right: AsyncQueryable<T>): AsyncQuery<T> {
-        return fromAsync(fn.exceptAsync(GetAsyncSource(this), GetAsyncSource(right)));
+    except(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.exceptAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -686,8 +705,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    relativeComplement(right: AsyncQueryable<T>): AsyncQuery<T> {
-        return fromAsync(fn.relativeComplementAsync(GetAsyncSource(this), GetAsyncSource(right)));
+    relativeComplement(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.relativeComplementAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -696,8 +715,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    symmetricDifference(right: AsyncQueryable<T>): AsyncQuery<T> {
-        return fromAsync(fn.symmetricDifferenceAsync(GetAsyncSource(this), GetAsyncSource(right)));
+    symmetricDifference(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.symmetricDifferenceAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -708,27 +727,27 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    xor(right: AsyncQueryable<T>): AsyncQuery<T> {
-        return fromAsync(fn.xorAsync(GetAsyncSource(this), GetAsyncSource(right)));
+    xor(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.xorAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
-     * Creates a subquery that concatenates this Query with another [[AsyncQueryable]].
+     * Creates a subquery that concatenates this [[AsyncQuery]] with another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    concat(right: AsyncQueryable<T>): AsyncQuery<T> {
-        return fromAsync(fn.concatAsync(GetAsyncSource(this), GetAsyncSource(right)));
+    concat(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.concatAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
-     * Creates a subquery for the distinct elements of this Query.
+     * Creates a subquery for the distinct elements of this [[AsyncQuery]].
      * @category Subquery
      */
     distinct(): AsyncUnorderedFlow<this, T>;
     /**
-     * Creates a subquery for the distinct elements of this Query.
+     * Creates a subquery for the distinct elements of this [[AsyncQuery]].
      *
      * @param keySelector A callback used to select the key to determine uniqueness.
      * @category Subquery
@@ -739,7 +758,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates a subquery for the elements of this Query with the provided value appended to the end.
+     * Creates a subquery for the elements of this [[AsyncQuery]] with the provided value appended to the end.
      *
      * @param value The value to append.
      * @category Subquery
@@ -749,7 +768,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates a subquery for the elements of this Query with the provided value prepended to the beginning.
+     * Creates a subquery for the elements of this [[AsyncQuery]] with the provided value prepended to the beginning.
      *
      * @param value The value to prepend.
      * @category Subquery
@@ -759,7 +778,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates a subquery for the elements of this Query with the provided range
+     * Creates a subquery for the elements of this [[AsyncQuery]] with the provided range
      * patched into the results.
      *
      * @param start The offset at which to patch the range.
@@ -772,7 +791,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates a subquery that contains the provided default value if this Query
+     * Creates a subquery that contains the provided default value if this [[AsyncQuery]]
      * contains no elements.
      *
      * @param defaultValue The default value.
@@ -783,7 +802,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates a subquery that splits this Query into one or more pages.
+     * Creates a subquery that splits this [[AsyncQuery]] into one or more pages.
      * While advancing from page to page is evaluated lazily, the elements of the page are
      * evaluated eagerly.
      *
@@ -825,7 +844,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Groups each element of this Query by its key.
+     * Groups each element of this [[AsyncQuery]] by its key.
      *
      * @param keySelector A callback used to select the key for an element.
      * @category Subquery
@@ -919,7 +938,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * Creates a subquery for the correlated elements of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
      * @param inner A [[Queryable]] object.
-     * @param outerKeySelector A callback used to select the key for an element in this Query.
+     * @param outerKeySelector A callback used to select the key for an element in this [[AsyncQuery]].
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
      * @category Join
@@ -932,7 +951,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * Creates a subquery for the correlated elements of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
      * @param inner A [[Queryable]] object.
-     * @param outerKeySelector A callback used to select the key for an element in this Query.
+     * @param outerKeySelector A callback used to select the key for an element in this [[AsyncQuery]].
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
      * @category Join
@@ -942,7 +961,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates a subquery that combines this Query with another [[AsyncQueryable]] by combining elements
+     * Creates a subquery that combines this [[AsyncQuery]] with another [[AsyncQueryable]] by combining elements
      * in tuples.
      *
      * @param right An [[AsyncQueryable]] object.
@@ -951,7 +970,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     zip<U>(right: AsyncQueryable<U>): AsyncQuery<[T, U]>;
 
     /**
-     * Creates a subquery that combines this Query with another [[AsyncQueryable]] by combining elements
+     * Creates a subquery that combines this [[AsyncQuery]] with another [[AsyncQueryable]] by combining elements
      * using the supplied callback.
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1225,7 +1244,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Computes a scalar value indicating whether every element in this Query corresponds to a matching element
+     * Computes a scalar value indicating whether every element in this [[AsyncQuery]] corresponds to a matching element
      * in another [[AsyncQueryable]] at the same position.
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1234,7 +1253,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     corresponds(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
-     * Computes a scalar value indicating whether every element in this Query corresponds to a matching element
+     * Computes a scalar value indicating whether every element in this [[AsyncQuery]] corresponds to a matching element
      * in another [[AsyncQueryable]] at the same position.
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1267,7 +1286,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query include
+     * Computes a scalar value indicating whether the elements of this [[AsyncQuery]] include
      * an exact sequence of elements from another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1276,7 +1295,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     includesSequence(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query include
+     * Computes a scalar value indicating whether the elements of this [[AsyncQuery]] include
      * an exact sequence of elements from another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1289,7 +1308,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query start
+     * Computes a scalar value indicating whether the elements of this [[AsyncQuery]] start
      * with the same sequence of elements in another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1298,7 +1317,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     startsWith(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query start
+     * Computes a scalar value indicating whether the elements of this [[AsyncQuery]] start
      * with the same sequence of elements in another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1311,7 +1330,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query end
+     * Computes a scalar value indicating whether the elements of this [[AsyncQuery]] end
      * with the same sequence of elements in another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1320,7 +1339,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     endsWith(right: AsyncQueryable<T>): Promise<boolean>;
 
     /**
-     * Computes a scalar value indicating whether the elements of this Query end
+     * Computes a scalar value indicating whether the elements of this [[AsyncQuery]] end
      * with the same sequence of elements in another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -1440,15 +1459,15 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * Unzips a sequence of tuples into a tuple of sequences.
      * @category Scalar
      */
-    unzip<T extends [any, ...any[]]>(this: Query<T>): Promise<{ [I in keyof T]: T[I][]; }>;
+    unzip<T extends [any, ...any[]]>(this: AsyncQuery<T>): Promise<{ [I in keyof T]: T[I][]; }>;
 
     /**
      * Unzips a sequence of tuples into a tuple of sequences.
      * @param partSelector A callback that converts a result into a tuple.
      * @category Scalar
      */
-    unzip<T, U extends [any, ...any[]]>(this: Query<T>, partSelector: (value: T) => U | PromiseLike<U>): Promise<{ [I in keyof U]: U[I][]; }>;
-    unzip<T extends [any, ...any[]]>(this: Query<T>, partSelector?: (value: T) => T | PromiseLike<T>): Promise<any> {
+    unzip<T, U extends [any, ...any[]]>(this: AsyncQuery<T>, partSelector: (value: T) => U | PromiseLike<U>): Promise<{ [I in keyof U]: U[I][]; }>;
+    unzip<T extends [any, ...any[]]>(this: AsyncQuery<T>, partSelector?: (value: T) => T | PromiseLike<T>): Promise<any> {
         return fn.unzipAsync(GetAsyncSource(this), partSelector!);
     }
 
@@ -1573,101 +1592,6 @@ export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQu
         super(source);
     }
 
-    // #region Subquery
-
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    intersect<UNode extends TNode, U extends UNode & T>(right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
-
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    intersect<U extends T>(right: AsyncQueryable<U>): AsyncHierarchyQuery<TNode, U>;
-
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    intersect(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
-    intersect(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.intersectAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the set union of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    union(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.unionAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the set difference (a.k.a. 'relative complement') between this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    except(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.exceptAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the set difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * This is an alias for `except`.
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    relativeComplement(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.relativeComplementAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the symmetric difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    symmetricDifference(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.symmetricDifferenceAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    /**
-     * Creates a subquery for the symmetric difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * This is an alias for `symmetricDifference`.
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    xor(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.xorAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    /**
-     * Creates a subquery that concatenates this Query with another [[AsyncQueryable]].
-     *
-     * @param right An [[AsyncQueryable]] object.
-     * @category Subquery
-     */
-    concat(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T> {
-        return fromAsync(fn.concatAsync(GetAsyncSource(this), GetAsyncSource(right)));
-    }
-
-    // #endregion Subquery
-
     // #region Hierarchy
 
     /**
@@ -1766,7 +1690,7 @@ export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQu
     }
 
     /**
-     * Creates a subquery for this query.
+     * Creates a subquery for this [[Asyncquery]].
      *
      * @param predicate A callback used to filter the results.
      * @category Hierarchy
@@ -1774,7 +1698,7 @@ export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQu
     self<U extends T>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
     /**
-     * Creates a subquery for this query.
+     * Creates a subquery for this [[Asyncquery]].
      *
      * @param predicate A callback used to filter the results.
      * @category Hierarchy
@@ -1782,7 +1706,7 @@ export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQu
     self<U extends TNode>(predicate: (element: TNode) => element is U): AsyncHierarchyQuery<TNode, U>;
 
     /**
-     * Creates a subquery for this query.
+     * Creates a subquery for this [[Asyncquery]].
      *
      * @param predicate A callback used to filter the results.
      * @category Hierarchy

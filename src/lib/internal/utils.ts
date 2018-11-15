@@ -210,3 +210,10 @@ export function SelectValue<T extends object, K extends keyof T>(this: T, key: K
 export function SelectEntry<T extends object, K extends keyof T>(this: T, key: K) {
     return tuple(key, this[key]);
 }
+
+/** @internal */
+export function TryAdd<T>(set: Set<T>, value: T): boolean {
+    const size = set.size;
+    set.add(value);
+    return set.size > size;
+}

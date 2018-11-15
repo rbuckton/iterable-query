@@ -1,16 +1,23 @@
 import "../lib/compat";
 import { expect } from "chai";
 import { theory } from "./test-utils";
-import { Query, Lookup, from } from "../lib";
+import { Query, Lookup, from, Comparable, HierarchyQuery } from "../lib";
 import * as users from "./data/users";
 import * as nodes from "./data/nodes";
 import * as books from "./data/books";
 import * as numbers from "./data/numbers";
 
 describe("Query", () => {
-    describe("new()", () => {
+    // Query
+    describe("constructor()", () => {
         it("Iterable", () => expect(new Query([1, 2, 3])).to.equalSequence([1, 2, 3]));
         it("ArrayLike", () => expect(new Query({ 0: 1, 1: 2, 2: 3, length: 3 })).to.equalSequence([1, 2, 3]));
+        it("AsyncQuery", () => {
+            const source: any[] = [];
+            const query1 = new Query(source);
+            const query2 = new Query(query1);
+            expect(query2["_source"]).to.equal(source);
+        });
         theory.throws("throws if 'source' is", (source: any) => new Query(source), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, undefined],
@@ -180,6 +187,7 @@ describe("Query", () => {
             "non-queryable": [TypeError, 0]
         });
     });
+    // Subquery
     describe("filter()", () => {
         it("filters", () => expect(Query.from([1, 2, 3]).filter(x => x >= 2)).to.equalSequence([2, 3]));
         theory.throws("throws if 'predicate' is", (predicate: any) => Query.from([]).filter(predicate), {
@@ -195,6 +203,12 @@ describe("Query", () => {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
+    });
+    describe("filterDefined()", () => {
+        it("filterDefined()", () => expect(Query.from([1, undefined, 2]).filterDefined().toArray()).to.deep.equal([1, 2]));
+    });
+    describe("whereDefined()", () => {
+        it("whereDefined()", () => expect(Query.from([1, undefined, 2]).whereDefined().toArray()).to.deep.equal([1, 2]));
     });
     describe("map()", () => {
         it("maps", () => expect(Query.from([1, 2, 3]).map(x => x * 2)).to.equalSequence([2, 4, 6]));
@@ -297,6 +311,14 @@ describe("Query", () => {
             "non-function": [TypeError, ""]
         });
     });
+    describe("skipUntil()", () => {
+        it("skips until", () => expect(Query.from([1, 2, 1, 3]).skipUntil(x => x >= 2)).to.equalSequence([2, 1, 3]));
+        theory.throws("throws if 'predicate' is", (predicate: any) => Query.from([]).skipUntil(predicate), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
     describe("take()", () => {
         it("takes", () => expect(Query.from([1, 2, 3]).take(2)).to.equalSequence([1, 2]));
         it("takes none", () => expect(Query.from([1, 2, 3]).take(0)).to.equalSequence([]));
@@ -329,6 +351,14 @@ describe("Query", () => {
             "non-function": [TypeError, ""]
         });
     });
+    describe("takeUntil()", () => {
+        it("takes until", () => expect(Query.from([1, 2, 3, 1]).takeUntil(x => x >= 3)).to.equalSequence([1, 2]));
+        theory.throws("throws if 'predicate' is", (predicate: any) => Query.from([]).takeUntil(predicate), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
     describe("intersect()", () => {
         it("intersects", () => expect(Query.from([1, 1, 2, 3, 4]).intersect([1, 3, 3, 5, 7])).to.equalSequence([1, 3]));
         it("intersects none", () => expect(Query.from([1, 1, 2, 3, 4]).intersect([])).to.equalSequence([]));
@@ -349,8 +379,35 @@ describe("Query", () => {
         });
     });
     describe("except()", () => {
-        it("excepts", () => expect(Query.from([1, 1, 2, 3, 4]).except([2, 4])).to.equalSequence([1, 3]));
+        it("excepts", () => expect(Query.from([1, 1, 2, 3, 4]).except([2, 4, 5])).to.equalSequence([1, 3]));
         theory.throws("throws if 'other' is", (other: any) => Query.from([]).except(other), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-object": [TypeError, 0],
+            "non-queryable": [TypeError, {}]
+        });
+    });
+    describe("relativeComplement()", () => {
+        it("relativeComplement", () => expect(Query.from([1, 1, 2, 3, 4]).relativeComplement([2, 4, 5])).to.equalSequence([1, 3]));
+        theory.throws("throws if 'other' is", (other: any) => Query.from([]).except(other), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-object": [TypeError, 0],
+            "non-queryable": [TypeError, {}]
+        });
+    });
+    describe("symmetricDifference()", () => {
+        it("symmetricDifference", () => expect(Query.from([1, 1, 2, 3, 4]).symmetricDifference([2, 4, 5])).to.equalSequence([1, 3, 5]));
+        theory.throws("throws if 'other' is", (other: any) => Query.from([]).symmetricDifference(other), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-object": [TypeError, 0],
+            "non-queryable": [TypeError, {}]
+        });
+    });
+    describe("xor()", () => {
+        it("xor", () => expect(Query.from([1, 1, 2, 3, 4]).xor([2, 4, 5])).to.equalSequence([1, 3, 5]));
+        theory.throws("throws if 'other' is", (other: any) => Query.from([]).xor(other), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-object": [TypeError, 0],
@@ -423,53 +480,6 @@ describe("Query", () => {
             "Infinity": [RangeError, Infinity]
         });
     });
-    describe("zip()", () => {
-        const data: [number[], string[], [number, string][]][] = [
-            [[1, 2, 3], ["a", "b", "c"], [[1, "a"], [2, "b"], [3, "c"]]],
-            [[1, 2], ["a", "b", "c"], [[1, "a"], [2, "b"]]],
-            [[1, 2, 3], ["a", "b"], [[1, "a"], [2, "b"]]],
-        ];
-        theory("zips", data, (left, right, expected) => expect(Query.from(left).zip(right).toArray()).to.deep.equal(expected));
-        theory.throws("throws if 'right' is", (right: any) => Query.from([]).zip(right), {
-            "undefined": [TypeError, undefined],
-            "null": [TypeError, null],
-            "non-object": [TypeError, 0],
-            "non-queryable": [TypeError, {}]
-        });
-        theory.throws("throws if 'selector' is", (selector: any) => Query.from([]).zip([], selector), {
-            "null": [TypeError, null],
-            "non-function": [TypeError, ""]
-        });
-    });
-    describe("orderBy()", () => {
-        it("orders", () => expect(Query.from([3, 1, 2]).orderBy(x => x)).to.equalSequence([1, 2, 3]));
-        it("orders same", () => {
-            const q = Query.from(books.books_same).orderBy(x => x.title).toArray();
-            expect(q[0]).to.equal(books.bookB2);
-            expect(q[1]).to.equal(books.bookB2_same);
-        });
-        theory.throws("throws if 'keySelector' is", (keySelector: any) => Query.from([]).orderBy(keySelector), {
-            "undefined": [TypeError, undefined],
-            "null": [TypeError, null],
-            "non-function": [TypeError, ""]
-        });
-        theory.throws("throws if 'comparison' is", (comparison: any) => Query.from([]).orderBy(x => x, comparison), {
-            "null": [TypeError, null],
-            "non-function": [TypeError, ""]
-        });
-    });
-    describe("orderByDescending()", () => {
-        it("orders", () => expect(Query.from([3, 1, 2]).orderByDescending(x => x)).to.equalSequence([3, 2, 1]));
-        theory.throws("throws if 'keySelector' is", (keySelector: any) => Query.from([]).orderByDescending(keySelector), {
-            "undefined": [TypeError, undefined],
-            "null": [TypeError, null],
-            "non-function": [TypeError, ""]
-        });
-        theory.throws("throws if 'comparison' is", (comparison: any) => Query.from([]).orderByDescending(x => x, comparison), {
-            "null": [TypeError, null],
-            "non-function": [TypeError, ""]
-        });
-    });
     describe("spanMap()", () => {
         it("odd/even spans", () => expect(Query.from([1, 3, 2, 4, 5, 7]).spanMap(k => k % 2 === 1).map(g => Array.from(g)).toArray()).to.deep.equal([[1, 3], [2, 4], [5, 7]]));
         it("empty", () => expect(Query.from([]).spanMap(k => k % 2 === 1)).to.equalSequence([]));
@@ -521,6 +531,36 @@ describe("Query", () => {
                 ]);
         });
     });
+    describe("scan()", () => {
+        it("scans sums", () => expect(Query.from([1, 2, 3]).scan((c, e) => c + e, 0)).to.equalSequence([1, 3, 6]));
+        it("scans sums no seed", () => expect(Query.from([1, 2, 3]).scan((c, e) => c + e)).to.equalSequence([3, 6]));
+        theory.throws("throws if 'accumulator' is", (accumulator: any) => Query.from([]).scan(accumulator), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
+    describe("scanRight()", () => {
+        it("scans sums from right", () => expect(Query.from([1, 2, 3]).scanRight((c, e) => c + e, 0)).to.equalSequence([3, 5, 6]));
+        it("scans sums from right no seed", () => expect(Query.from([1, 2, 3]).scanRight((c, e) => c + e)).to.equalSequence([5, 6]));
+        theory.throws("throws if 'accumulator' is", (accumulator: any) => Query.from([]).scanRight(accumulator), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
+    describe("through()", () => {
+        it("pipes through", () => expect(Query.from([1, 2]).through(q => {
+            expect(q).to.equalSequence([1, 2]);
+            return Query.from([3, 4]);
+        })).to.equalSequence([3, 4]));
+        theory.throws("throws if 'callback' is", (callback: any) => Query.from([]).through(callback), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
+    // Joins
     describe("groupJoin()", () => {
         it("joins groups", () => expect(Query.from(users.roles).groupJoin(users.users, g => g.name, u => u.role, (role, users) => ({ role: role, users: users.toArray() })).toArray())
             .to.deep.equal([
@@ -579,24 +619,85 @@ describe("Query", () => {
             "non-function": [TypeError, ""]
         });
     });
-    describe("scan()", () => {
-        it("scans sums", () => expect(Query.from([1, 2, 3]).scan((c, e) => c + e, 0)).to.equalSequence([1, 3, 6]));
-        it("scans sums no seed", () => expect(Query.from([1, 2, 3]).scan((c, e) => c + e)).to.equalSequence([3, 6]));
-        theory.throws("throws if 'accumulator' is", (accumulator: any) => Query.from([]).scan(accumulator), {
+    describe("fullJoin()", () => {
+        it("joins", () => expect(Query.from(users.roles).fullJoin(users.users, g => g.name, u => u.role, (role, user) => ({ role: role, user: user })).toArray())
+            .to.deep.equal([
+                { role: users.adminRole, user: users.aliceUser },
+                { role: users.userRole, user: users.bobUser },
+                { role: users.userRole, user: users.daveUser },
+                { role: users.guestRole, user: undefined }
+            ]));
+        theory.throws("throws if 'inner' is", (inner: any) => Query.from([]).fullJoin(inner, x => x, x => x, x => x), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-object": [TypeError, 0],
+            "non-queryable": [TypeError, {}]
+        });
+        theory.throws("throws if 'outerKeySelector' is", (outerKeySelector: any) => Query.from([]).fullJoin([], outerKeySelector, x => x, x => x), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+        theory.throws("throws if 'innerKeySelector' is", (innerKeySelector: any) => Query.from([]).fullJoin([], x => x, innerKeySelector, x => x), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+        theory.throws("throws if 'resultSelector' is", (resultSelector: any) => Query.from([]).fullJoin([], x => x, x => x, resultSelector), {
             "undefined": [TypeError, undefined],
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
     });
-    describe("scanRight()", () => {
-        it("scans sums from right", () => expect(Query.from([1, 2, 3]).scanRight((c, e) => c + e, 0)).to.equalSequence([3, 5, 6]));
-        it("scans sums from right no seed", () => expect(Query.from([1, 2, 3]).scanRight((c, e) => c + e)).to.equalSequence([5, 6]));
-        theory.throws("throws if 'accumulator' is", (accumulator: any) => Query.from([]).scanRight(accumulator), {
+    describe("zip()", () => {
+        const data: [number[], string[], [number, string][]][] = [
+            [[1, 2, 3], ["a", "b", "c"], [[1, "a"], [2, "b"], [3, "c"]]],
+            [[1, 2], ["a", "b", "c"], [[1, "a"], [2, "b"]]],
+            [[1, 2, 3], ["a", "b"], [[1, "a"], [2, "b"]]],
+        ];
+        theory("zips", data, (left, right, expected) => expect(Query.from(left).zip(right).toArray()).to.deep.equal(expected));
+        theory.throws("throws if 'right' is", (right: any) => Query.from([]).zip(right), {
             "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-object": [TypeError, 0],
+            "non-queryable": [TypeError, {}]
+        });
+        theory.throws("throws if 'selector' is", (selector: any) => Query.from([]).zip([], selector), {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
         });
     });
+    // Ordering
+    describe("orderBy()", () => {
+        it("orders", () => expect(Query.from([3, 1, 2]).orderBy(x => x)).to.equalSequence([1, 2, 3]));
+        it("orders same", () => {
+            const q = Query.from(books.books_same).orderBy(x => x.title).toArray();
+            expect(q[0]).to.equal(books.bookB2);
+            expect(q[1]).to.equal(books.bookB2_same);
+        });
+        theory.throws("throws if 'keySelector' is", (keySelector: any) => Query.from([]).orderBy(keySelector), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+        theory.throws("throws if 'comparison' is", (comparison: any) => Query.from([]).orderBy(x => x, comparison), {
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
+    describe("orderByDescending()", () => {
+        it("orders", () => expect(Query.from([3, 1, 2]).orderByDescending(x => x)).to.equalSequence([3, 2, 1]));
+        theory.throws("throws if 'keySelector' is", (keySelector: any) => Query.from([]).orderByDescending(keySelector), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+        theory.throws("throws if 'comparison' is", (comparison: any) => Query.from([]).orderByDescending(x => x, comparison), {
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+    });
+    // Scalars
     describe("reduce()", () => {
         it("reduces sum", () => expect(Query.from([1, 2, 3]).reduce((c, e) => c + e)).to.equal(6));
         it("reduces average", () => expect(Query.from([1, 2, 3]).reduce((c, e) => c + e, 0, (r, c) => r / c)).to.equal(2));
@@ -664,6 +765,11 @@ describe("Query", () => {
     describe("min()", () => {
         it("finds minimum", () => expect(Query.from([5, 6, 3, 9, 4]).min()).to.equal(3));
         it("finds undefined when empty", () => expect(Query.from([]).min()).to.be.undefined);
+        it("uses comparable", () => {
+            const a = { [Comparable.compareTo](x: any) { return -1; } };
+            const b = { [Comparable.compareTo](x: any) { return +1; } };
+            expect(Query.from([a, b]).min()).to.equal(a);
+        });
         theory.throws("throws if 'comparison' is", (comparison: any) => Query.from([]).min(comparison), {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
@@ -672,9 +778,42 @@ describe("Query", () => {
     describe("max()", () => {
         it("finds maximum", () => expect(Query.from([5, 6, 3, 9, 4]).max()).to.equal(9));
         it("finds undefined when empty", () => expect(Query.from([]).max()).to.be.undefined);
+        it("uses comparable", () => {
+            const a = { [Comparable.compareTo](x: any) { return -1; } };
+            const b = { [Comparable.compareTo](x: any) { return +1; } };
+            expect(Query.from([a, b]).max()).to.equal(b);
+        });
         theory.throws("throws if 'comparison' is", (comparison: any) => Query.from([]).max(comparison), {
             "null": [TypeError, null],
             "non-function": [TypeError, ""]
+        });
+    });
+    describe("sum()", () => {
+        it("calculates sum", () => expect(Query.from([1, 2, 3]).sum()).to.equal(6));
+        it("calculates sum using projection", () => expect(Query.from(["1", "2", "3"]).sum(x => +x)).to.equal(6));
+        it("calculates zero sum when empty", () => expect(Query.from([]).sum()).to.equal(0));
+        theory.throws("throws if 'elementSelector' is", (elementSelector: any) => Query.from([]).sum(elementSelector), {
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+        theory.throws("throws if sequence contains", (element: any) => Query.from([element]).sum(), {
+            "null": [TypeError, null],
+            "undefined": [TypeError, undefined],
+            "non-number": [TypeError, {}]
+        });
+    });
+    describe("average()", () => {
+        it("calculates average", () => expect(Query.from([1, 2, 3]).average()).to.equal(2));
+        it("calculates average using projection", () => expect(Query.from(["1", "2", "3"]).average(x => +x)).to.equal(2));
+        it("calculates zero average when empty", () => expect(Query.from([]).average()).to.equal(0));
+        theory.throws("throws if 'elementSelector' is", (elementSelector: any) => Query.from([]).average(elementSelector), {
+            "null": [TypeError, null],
+            "non-function": [TypeError, ""]
+        });
+        theory.throws("throws if sequence contains", (element: any) => Query.from([element]).average(), {
+            "null": [TypeError, null],
+            "undefined": [TypeError, undefined],
+            "non-number": [TypeError, {}]
         });
     });
     describe("some()", () => {
@@ -789,6 +928,22 @@ describe("Query", () => {
             "Infinity": [TypeError, Infinity]
         });
     });
+    describe("nth()", () => {
+        it("at offset 0", () => expect(Query.from([1, 2, 3]).nth(0)).to.equal(1));
+        it("at offset 1", () => expect(Query.from([1, 2, 3]).nth(1)).to.equal(2));
+        it("at offset -1", () => expect(Query.from([1, 2, 3]).nth(-1)).to.equal(3));
+        it("at offset -2", () => expect(Query.from([1, 2, 3]).nth(-2)).to.equal(2));
+        it("at offset greater than size", () => expect(Query.from([1, 2, 3]).nth(3)).to.be.undefined);
+        it("at negative offset greater than size", () => expect(Query.from([1, 2, 3]).nth(-4)).to.be.undefined);
+        theory.throws("throws if 'offset' is", (offset: any) => Query.from([]).nth(offset), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-number": [TypeError, ""],
+            "float": [TypeError, 1.5],
+            "NaN": [TypeError, NaN],
+            "Infinity": [TypeError, Infinity]
+        });
+    });
     describe("span()", () => {
         it("gets initial span", () => expect(Query.from([1, 2, 3, 4]).span(x => x < 3).map(x => x.toArray())).to.deep.equal([[1, 2], [3, 4]]));
         it("gets whole source", () => expect(Query.from([1, 2, 3, 4]).span(x => x < 5).map(x => x.toArray())).to.deep.equal([[1, 2, 3, 4], []]));
@@ -842,13 +997,16 @@ describe("Query", () => {
             expect(received).to.deep.equal([1, 2, 3, 4]);
         });
     });
-    describe("toHierarchy()", () => {
-        theory.throws("throws if 'hierarchy' is", (hierarchy: any) => Query.from([]).toHierarchy(hierarchy), {
-            "undefined": [TypeError, undefined],
-            "null": [TypeError, null],
-            "non-object": [TypeError, ""],
-            "wrong shape": [TypeError, {}]
+    describe("eval()", () => {
+        it("eval", () => {
+            const received: number[] = [];
+            const q = Query.from([1, 2, 3, 4]).do(x => received.push(x)).eval();
+            expect(q).to.equalSequence([1, 2, 3, 4]);
+            expect(received).to.deep.equal([1, 2, 3, 4]);
         });
+    });
+    describe("unzip()", () => {
+        it("unzips", () => expect(Query.from([[1, "a"], [2, "b"]] as [number, string][]).unzip()).to.deep.equal([[1, 2], ["a", "b"]]));
     });
     describe("toArray()", () => {
         it("creates array", () => expect(Query.from([1, 2, 3, 4]).toArray()).to.deep.equal([1, 2, 3, 4]));
@@ -916,6 +1074,15 @@ describe("Query", () => {
     describe("toJSON()", () => {
         it("is array", () => expect(Query.from([1, 2, 3, 4]).toJSON()).to.be.deep.equal([1, 2, 3, 4]));
     });
+    // Hierarchy
+    describe("toHierarchy()", () => {
+        theory.throws("throws if 'hierarchy' is", (hierarchy: any) => Query.from([]).toHierarchy(hierarchy), {
+            "undefined": [TypeError, undefined],
+            "null": [TypeError, null],
+            "non-object": [TypeError, ""],
+            "wrong shape": [TypeError, {}]
+        });
+    });
 });
 describe("OrderedQuery", () => {
     describe("thenBy()", () => {
@@ -944,6 +1111,9 @@ describe("OrderedQuery", () => {
     });
 });
 describe("HierarchyQuery", () => {
+    describe("constructor()", () => {
+        it("with hierarchy", () => expect(new HierarchyQuery([1, 2, 3], numbers.numberHierarchy)).to.equalSequence([1, 2, 3]));
+    });
     describe("filter()", () => {
         it("filters", () => expect(Query.from([1, 2, 3], numbers.numberHierarchy).filter(x => x >= 2)).to.equalSequence([2, 3]));
         theory.throws("throws if 'predicate' is", (predicate: any) => Query.from([], numbers.numberHierarchy).filter(predicate), {

@@ -82,21 +82,23 @@ const es2017 = new Sandbox({
     requires
 });
 
+function requireCommon(sandbox: Sandbox) {
+    sandbox.require("./chai-iterable");
+    sandbox.require("./query");
+    sandbox.require("./asyncQuery");
+    sandbox.require("./lazy");
+    sandbox.require("./lookup");
+}
+
 describe("es5", () => {
-    es5.require("./chai-iterable");
+    requireCommon(es5);
     es5.require("./collections");
-    es5.require("./query");
-    es5.require("./asyncQuery");
 });
 
 describe("es2015", () => {
-    es2015.require("./chai-iterable");
-    es2015.require("./query");
-    es2015.require("./asyncQuery");
+    requireCommon(es2015);
 });
 
 describe("es2017", () => {
-    es2017.require("./chai-iterable");
-    es2017.require("./query");
-    es2017.require("./asyncQuery");
+    requireCommon(es2017);
 });

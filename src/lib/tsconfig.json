@@ -5,6 +5,7 @@
         "lib": ["esnext"],
         "outDir": "../../dist/lib",
         "experimentalDecorators": true,
+        "importHelpers": true,
         "noEmitOnError": true,
         "noImplicitAny": true,
         "sourceMap": true,
