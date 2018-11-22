@@ -15,10 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, TryAdd } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
-import { Set } from "../collections";
-import { toSetAsync } from "./toSetAsync";
+import { assert } from "../internal";
+import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
+import { symmetricDifferenceByAsync } from './symmetricDifferenceByAsync';
+import { identity } from './common';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
@@ -53,31 +53,5 @@ export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: Asyn
 export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    return FlowHierarchy(new AsyncSymmetricDifferenceIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
-}
-
-@ToStringTag("AsyncSymmetricDifferenceIterable")
-class AsyncSymmetricDifferenceIterable<T> implements AsyncIterable<T> {
-    private _left: PossiblyAsyncIterable<T>;
-    private _right: PossiblyAsyncIterable<T>;
-
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<T> {
-        const right = await toSetAsync(this._right);
-        const set = new Set<T>();
-        for await (const element of this._left) {
-            if (TryAdd(set, element) && !right.has(element)) {
-                yield element;
-            }
-        }
-        for (const element of right) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-    }
+    return symmetricDifferenceByAsync(left, right, identity);
 }

@@ -232,3 +232,8 @@ export type PossiblyAsyncHierarchyIterable<TNode, T extends TNode = TNode> = Asy
 export type PossiblyAsyncOrderedIterable<T> = AsyncOrderedIterable<T> | OrderedIterable<T>;
 export type PossiblyAsyncOrderedHierarchyIterable<TNode, T extends TNode = TNode> = AsyncOrderedHierarchyIterable<TNode, T> | OrderedHierarchyIterable<TNode, T>;
 export type QueriedType<T> = T extends Queryable<infer U> ? U : never;
+
+export interface WritableArrayLike<T> {
+    [index: number]: T;
+    length: number;
+}

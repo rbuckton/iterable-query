@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd} from "../internal";
+import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
-import { toSet } from "./toSet";
+import { exceptBy } from './exceptBy';
+import { identity } from './common';
 
 /**
  * Creates a [[HierarchyIterable]] for the set difference between a [[HierarchyIterable]] and a [[Queryable]] object.
@@ -28,7 +29,7 @@ import { toSet } from "./toSet";
  */
 export function except<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
 /**
- * Creates a subquery for the set difference between two [[Queryable]] objects.
+ * Creates an [[Iterable]] for the set difference between two [[Queryable]] objects.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
@@ -38,25 +39,5 @@ export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
 export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return FlowHierarchy(new ExceptIterable(ToIterable(left), ToIterable(right)), left);
-}
-
-@ToStringTag("ExceptIterable")
-class ExceptIterable<T> implements Iterable<T> {
-    private _left: Iterable<T>;
-    private _right: Iterable<T>;
-
-    constructor(left: Iterable<T>, right: Iterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    *[Symbol.iterator](): Iterator<T> {
-        const set = toSet(this._right);
-        for (const element of this._left) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-    }
+    return exceptBy(left, right, identity);
 }

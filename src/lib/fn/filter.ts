@@ -15,8 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
+import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
+import { filterBy } from './filterBy';
+import { identity } from './common';
 
 /**
  * Creates a [[HierarchyIterable]] whose elements match the supplied predicate.
@@ -61,26 +63,5 @@ export function filter<T>(source: Queryable<T>, predicate: (element: T, offset: 
 export function filter<T>(source: Queryable<T>, predicate: (element: T, offset: number) => boolean): Iterable<T> {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(predicate, "predicate");
-    return FlowHierarchy(new FilterIterable(ToIterable(source), predicate), source);
-}
-
-@ToStringTag("FilterIterable")
-class FilterIterable<T> implements Iterable<T> {
-    private _source: Iterable<T>;
-    private _predicate: (element: T, offset: number) => boolean;
-
-    constructor(source: Iterable<T>, predicate: (element: T, offset: number) => boolean) {
-        this._source = source;
-        this._predicate = predicate;
-    }
-
-    *[Symbol.iterator](): Iterator<T> {
-        const predicate = this._predicate;
-        let offset = 0;
-        for (const element of this._source) {
-            if (predicate(element, offset++)) {
-                yield element;
-            }
-        }
-    }
+    return filterBy(source, identity, predicate);
 }

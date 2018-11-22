@@ -15,10 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd } from "../internal";
+import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
-import { Set } from "../collections";
-import { toSet } from "./toSet";
+import { symmetricDifferenceBy } from './symmetricDifferenceBy';
+import { identity } from './common';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
@@ -53,31 +53,5 @@ export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>):
 export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return FlowHierarchy(new SymmetricDifferenceIterable(ToIterable(left), ToIterable(right)), left, right);
-}
-
-@ToStringTag("SymmetricDifferenceIterable")
-class SymmetricDifferenceIterable<T> implements Iterable<T> {
-    private _left: Iterable<T>;
-    private _right: Iterable<T>;
-
-    constructor(left: Iterable<T>, right: Iterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    *[Symbol.iterator](): Iterator<T> {
-        const right = toSet(this._right);
-        const set = new Set<T>();
-        for (const element of this._left) {
-            if (TryAdd(set, element) && !right.has(element)) {
-                yield element;
-            }
-        }
-        for (const element of right) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-    }
+    return symmetricDifferenceBy(left, right, identity);
 }

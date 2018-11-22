@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
-import { toSetAsync } from "./toSetAsync";
+import { assert } from "../internal";
+import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
+import { exceptByAsync } from './exceptByAsync';
+import { identity } from './common';
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the set difference between a [[HierarchyIterable]] or an [[AsyncHierarchyIterable]] and an [[AsyncQueryable]] object.
@@ -38,26 +39,5 @@ export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>
 export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    return FlowHierarchy(new AsyncExceptIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left);
-}
-
-@ToStringTag("AsyncExceptIterable")
-class AsyncExceptIterable<T> implements AsyncIterable<T> {
-    private _left: PossiblyAsyncIterable<T>;
-    private _right: PossiblyAsyncIterable<T>;
-
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<T> {
-        const set = await toSetAsync(this._right);
-        for await (const element of this._left) {
-            if (!set.has(element)) {
-                set.add(element);
-                yield element;
-            }
-        }
-    }
+    return exceptByAsync(left, right, identity);
 }

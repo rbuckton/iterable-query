@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd} from "../internal";
+import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
-import { Set } from "../collections";
+import { unionBy } from './unionBy';
+import { identity } from './common';
 
 /**
  * Creates a subquery for the set union of two [[Queryable]] objects.
@@ -46,30 +47,5 @@ export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
 export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return FlowHierarchy(new UnionIterable(ToIterable(left), ToIterable(right)), left, right);
-}
-
-@ToStringTag("UnionIterable")
-class UnionIterable<T> implements Iterable<T> {
-    private _left: Iterable<T>;
-    private _right: Iterable<T>;
-
-    constructor(left: Iterable<T>, right: Iterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    *[Symbol.iterator](): Iterator<T> {
-        const set = new Set<T>();
-        for (const element of this._left) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-        for (const element of this._right) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-    }
+    return unionBy(left, right, identity);
 }

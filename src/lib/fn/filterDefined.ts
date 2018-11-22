@@ -17,7 +17,8 @@
 
 import { IsDefined } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
-import { filter } from "./filter";
+import { identity } from './common';
+import { filterBy } from './filterBy';
 
 /**
  * Creates a [[HierarchyIterable]] whose elements are neither `null` nor `undefined`.
@@ -27,12 +28,28 @@ import { filter } from "./filter";
  */
 export function filterDefined<TNode, T extends TNode>(source: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, NonNullable<T>>;
 /**
+ * Creates a [[HierarchyIterable]] where the selected key for each element is neither `null` nor `undefined`.
+ *
+ * @param source A [[HierarchyIterable]] object.
+ * @param keySelector A callback used to select the key for each element.
+ * @category Subquery
+ */
+export function filterDefined<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (value: T) => K): HierarchyIterable<TNode, T>;
+/**
  * Creates an [[Iterable]] whose elements are neither `null` nor `undefined`.
  *
  * @param source A [[Queryable]] object.
  * @category Subquery
  */
 export function filterDefined<T>(source: Queryable<T>): Iterable<NonNullable<T>>;
-export function filterDefined<T>(source: Queryable<T>): Iterable<NonNullable<T>> {
-    return filter(source, IsDefined);
+/**
+ * Creates an [[Iterable]] where the selected key for each element is neither `null` nor `undefined`.
+ *
+ * @param source A [[Queryable]] object.
+ * @param keySelector A callback used to select the key for each element.
+ * @category Subquery
+ */
+export function filterDefined<T, K>(source: Queryable<T>, keySelector: (value: T) => K): Iterable<T>;
+export function filterDefined<T>(source: Queryable<T>, keySelector: (value: T) => T = identity): Iterable<T> {
+    return filterBy(source, keySelector, IsDefined);
 }

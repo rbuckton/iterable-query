@@ -166,6 +166,11 @@ export function SameValue(x: any, y: any): boolean {
 }
 
 /** @internal */
+export function SameValueZero(x: any, y: any): boolean {
+    return (x === y) || (x !== x && y !== y);
+}
+
+/** @internal */
 export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V[]> {
     const map = new Map<K, V[]>();
     for (const item of ToIterable(source)) {

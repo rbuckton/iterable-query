@@ -15,8 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
-import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
+import { assert } from "../internal";
+import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable } from "../types";
+import { filterByAsync } from './filterByAsync';
+import { identity } from './common';
 
 /**
  * Creates an [[AsyncHierarchyIterable]] whose elements match the supplied predicate.
@@ -61,27 +63,5 @@ export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T
 export function filterAsync<T>(source: AsyncQueryable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(predicate, "predicate");
-    return FlowHierarchy(new AsyncFilterIterable(ToPossiblyAsyncIterable(source), predicate), source);
-}
-
-@ToStringTag("AsyncFilterIterable")
-class AsyncFilterIterable<T> implements AsyncIterable<T> {
-    private _source: PossiblyAsyncIterable<T>;
-    private _predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>;
-
-    constructor(source: PossiblyAsyncIterable<T>, predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>) {
-        this._source = source;
-        this._predicate = predicate;
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<T> {
-        const predicate = this._predicate;
-        let offset = 0;
-        for await (const element of this._source) {
-            const result = predicate(element, offset++);
-            if (typeof result === "boolean" ? result : await result) {
-                yield element;
-            }
-        }
-    }
+    return filterByAsync(source, identity, predicate);
 }

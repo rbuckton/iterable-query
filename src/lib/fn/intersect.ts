@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
+import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
-import { toSet } from "./toSet";
+import { intersectBy } from './intersectBy';
+import { identity } from './common';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] object and a [[Queryable]] object.
@@ -46,28 +47,5 @@ export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<
 export function intersect<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return FlowHierarchy(new IntersectIterable(ToIterable(left), ToIterable(right)), left, right);
-}
-
-@ToStringTag("IntersectIterable")
-class IntersectIterable<T> implements Iterable<T> {
-    private _left: Iterable<T>;
-    private _right: Iterable<T>;
-
-    constructor(left: Iterable<T>, right: Iterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    *[Symbol.iterator](): Iterator<T> {
-        const set = toSet(this._right);
-        if (set.size <= 0) {
-            return;
-        }
-        for (const element of this._left) {
-            if (set.delete(element)) {
-                yield element;
-            }
-        }
-    }
+    return intersectBy(left, right, identity);
 }

@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, TryAdd } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
-import { Set } from "../collections";
+import { assert } from "../internal";
+import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
+import { identity } from './common';
+import { unionByAsync } from './unionByAsync';
 
 /**
  * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
@@ -46,30 +47,5 @@ export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>)
 export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable(left, "left");
     assert.mustBeAsyncQueryable(right, "right");
-    return FlowHierarchy(new AsyncUnionIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
-}
-
-@ToStringTag("AsyncUnionIterable")
-class AsyncUnionIterable<T> implements AsyncIterable<T> {
-    private _left: PossiblyAsyncIterable<T>;
-    private _right: PossiblyAsyncIterable<T>;
-
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<T> {
-        const set = new Set<T>();
-        for await (const element of this._left) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-        for await (const element of this._right) {
-            if (TryAdd(set, element)) {
-                yield element;
-            }
-        }
-    }
+    return unionByAsync(left, right, identity);
 }

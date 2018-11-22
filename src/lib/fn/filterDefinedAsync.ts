@@ -17,7 +17,8 @@
 
 import { IsDefined } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, AsyncQueryable } from "../types";
-import { filterAsync } from "./filterAsync";
+import { filterByAsync } from './filterByAsync';
+import { identity } from './common';
 
 /**
  * Creates an [[AsyncHierarchyIterable]] whose elements are neither `null` nor `undefined`.
@@ -27,12 +28,28 @@ import { filterAsync } from "./filterAsync";
  */
 export function filterDefinedAsync<TNode, T extends TNode>(source: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, NonNullable<T>>;
 /**
+ * Creates an [[AsyncHierarchyIterable]] where the selected key for each element is neither `null` nor `undefined`.
+ *
+ * @param source A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
+ * @param keySelector A callback used to select the key for each element.
+ * @category Subquery
+ */
+export function filterDefinedAsync<TNode, T extends TNode, K>(source: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (value: T) => K): AsyncHierarchyIterable<TNode, T>;
+/**
  * Creates an [[AsyncIterable]] whose elements are neither `null` nor `undefined`.
  *
  * @param source An [[AsyncQueryable]] object.
  * @category Subquery
  */
 export function filterDefinedAsync<T>(source: AsyncQueryable<T>): AsyncIterable<NonNullable<T>>;
-export function filterDefinedAsync<T>(source: AsyncQueryable<T>): AsyncIterable<NonNullable<T>> {
-    return filterAsync(source, IsDefined);
+/**
+ * Creates an [[AsyncIterable]] where the selected key for each element is neither `null` nor `undefined`.
+ *
+ * @param source An [[AsyncQueryable]] object.
+ * @param keySelector A callback used to select the key for each element.
+ * @category Subquery
+ */
+export function filterDefinedAsync<T, K>(source: AsyncQueryable<T>, keySelector: (value: T) => K): AsyncIterable<T>;
+export function filterDefinedAsync<T>(source: AsyncQueryable<T>, keySelector: (value: T) => T = identity): AsyncIterable<T> {
+    return filterByAsync(source, keySelector, IsDefined);
 }

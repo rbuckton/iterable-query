@@ -17,7 +17,7 @@
 
 import * as fn from "./fn";
 import { assert, IsPossiblyAsyncHierarchyIterable, GetHierarchy, ToPossiblyAsyncIterable, ThenByAsync, ToAsyncOrderedIterable, MakeAsyncHierarchyIterable, ToAsyncOrderedHierarchyIterable, IsPossiblyAsyncOrderedIterable, IsPossiblyAsyncOrderedHierarchyIterable, GetAsyncSource, GetAsyncIterator, AsyncQuerySource } from "./internal";
-import { OrderedHierarchyIterable, HierarchyIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable, Page, KeyValuePair, AsyncHierarchyIterable, AsyncChoice, QueriedType } from "./types";
+import { OrderedHierarchyIterable, HierarchyIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncQueryable, AsyncOrderedHierarchyIterable, AsyncOrderedIterable, Page, KeyValuePair, AsyncHierarchyIterable, AsyncChoice, QueriedType, WritableArrayLike } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeAsyncOptions } from "./fn";
 import { Query, from } from "./query";
@@ -351,6 +351,17 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Creates a subquery where the selected key for each element matches the supplied predicate.
+     *
+     * @param keySelector A callback used to select the key for each element.
+     * @param predicate A callback used to match each key.
+     * @category Subquery
+     */
+    filterBy<K>(keySelector: (element: T) => K, predicate: (key: K, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.filterByAsync(GetAsyncSource(this), keySelector, predicate)) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
      * Creates a subquery whose elements match the supplied predicate.
      * This is an alias for `filter`.
      *
@@ -372,12 +383,31 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Creates a subquery where the selected key for each element matches the supplied predicate.
+     *
+     * @param keySelector A callback used to select the key for each element.
+     * @param predicate A callback used to match each key.
+     * @category Subquery
+     */
+    whereBy<K>(keySelector: (element: T) => K, predicate: (key: K, offset: number) => boolean): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.whereByAsync(GetAsyncSource(this), keySelector, predicate)) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
      * Creates a subquery whose elements are neither `null` nor `undefined`.
      *
      * @category Subquery
      */
-    filterDefined(): AsyncUnorderedFlow<this, NonNullable<T>> {
-        return fromAsync(fn.filterDefinedAsync(GetAsyncSource(this))) as AsyncUnorderedFlow<this, NonNullable<T>>;
+    filterDefined(): AsyncUnorderedFlow<this, NonNullable<T>>;
+    /**
+     * Creates a subquery where the selected key for each element is neither `null` nor `undefined`.
+     *
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    filterDefined<K>(keySelector: (element: T) => K): AsyncUnorderedFlow<this, T>;
+    filterDefined<K>(keySelector?: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.filterDefinedAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -387,8 +417,16 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      *
      * @category Subquery
      */
-    whereDefined(): AsyncUnorderedFlow<this, NonNullable<T>> {
-        return fromAsync(fn.whereDefinedAsync(GetAsyncSource(this))) as AsyncUnorderedFlow<this, NonNullable<T>>;
+    whereDefined(): AsyncUnorderedFlow<this, NonNullable<T>>;
+    /**
+     * Creates a subquery where the selected key for each element is neither `null` nor `undefined`.
+     *
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    whereDefined<K>(keySelector: (element: T) => K): AsyncUnorderedFlow<this, T>;
+    whereDefined<K>(keySelector?: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.whereDefinedAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -537,6 +575,16 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Creates a subquery with every instance of the specified value removed.
+     *
+     * @param values The values to exclude.
+     * @category Subquery
+     */
+    exclude(...values: [T | PromiseLike<T>, ...(T | PromiseLike<T>)[]]): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.excludeAsync(GetAsyncSource(this), ...values)) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
      * Creates a subquery containing all elements except the first elements up to the supplied
      * count.
      *
@@ -678,6 +726,58 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<TNode, T extends TNode, UNode extends TNode, U extends UNode & T, K>(this: AsyncHierarchyQuery<TNode, T>, right: PossiblyAsyncHierarchyIterable<UNode, U>, keySelector: (element: T) => K): AsyncHierarchyQuery<UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<TNode, T extends TNode, U extends T, K>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<U>, keySelector: (element: T) => K): AsyncHierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<TNode, T extends TNode, K>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncHierarchyQuery<TNode, T>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<UNode extends T, U extends UNode, K>(right: PossiblyAsyncHierarchyIterable<UNode, U>, keySelector: (element: T) => K): AsyncHierarchyQuery<UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<U extends T, K>(right: AsyncQueryable<U>, keySelector: (element: T) => K): AsyncQuery<U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncQuery<T>;
+    intersectBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncQuery<T> {
+        return fromAsync(fn.intersectByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector));
+    }
+
+    /**
      * Creates a subquery for the set union of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -688,6 +788,17 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Creates a subquery for the set union of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    unionBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.unionByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
      * Creates a subquery for the set difference (a.k.a. 'relative complement') between this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -695,6 +806,17 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      */
     except(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
         return fromAsync(fn.exceptAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
+     * Creates a subquery for the set difference between this and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    exceptBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.exceptByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -710,6 +832,19 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Creates a subquery for the set difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * This is an alias for `except`.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    relativeComplementBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.relativeComplementByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
      * Creates a subquery for the symmetric difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
      * @param right An [[AsyncQueryable]] object.
@@ -722,6 +857,17 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     /**
      * Creates a subquery for the symmetric difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    symmetricDifferenceBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.symmetricDifferenceByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
+     * Creates a subquery for the symmetric difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
      * This is an alias for `symmetricDifference`.
      *
      * @param right An [[AsyncQueryable]] object.
@@ -729,6 +875,19 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      */
     xor(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
         return fromAsync(fn.xorAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    }
+
+    /**
+     * Creates a subquery for the symmetric difference between this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * This is an alias for `symmetricDifference`.
+     *
+     * @param right An [[AsyncQueryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    xorBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
+        return fromAsync(fn.xorByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
     }
 
     /**
@@ -1174,6 +1333,17 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
+     * Gets the minimum element in the query, optionally comparing the keys of each element using the supplied callback.
+     *
+     * @param keySelector A callback used to choose the key to compare.
+     * @param keyComparison An optional callback used to compare the keys.
+     * @category Scalar
+     */
+    minBy<K>(keySelector: (element: T) => K, keyComparison?: (x: K, y: K) => number): Promise<T | undefined> {
+        return fn.minByAsync(GetAsyncSource(this), keySelector, keyComparison);
+    }
+
+    /**
      * Gets the maximum element in the query, optionally comparing elements using the supplied
      * callback.
      *
@@ -1182,6 +1352,17 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      */
     max(comparison?: (x: T, y: T) => number): Promise<T | undefined> {
         return fn.maxAsync(GetAsyncSource(this), comparison);
+    }
+
+    /**
+     * Gets the maximum element in the query, optionally comparing the keys of each element using the supplied callback.
+     *
+     * @param keySelector A callback used to choose the key to compare.
+     * @param keyComparison An optional callback used to compare the keys.
+     * @category Scalar
+     */
+    maxBy<K>(keySelector: (element: T) => K, keyComparison?: (x: K, y: K) => number): Promise<T | undefined> {
+        return fn.maxByAsync(GetAsyncSource(this), keySelector, keyComparison);
     }
 
     /**
@@ -1263,6 +1444,31 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     corresponds<U>(right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
     corresponds(right: AsyncQueryable<T>, equalityComparison?: (left: T, right: T) => boolean): Promise<boolean> {
         return fn.correspondsAsync(GetAsyncSource(this), GetAsyncSource(right), equalityComparison!);
+    }
+
+    /**
+     * Computes a scalar value indicating whether every element in this [[AsyncQuery]] corresponds to a matching element
+     * in another [[Queryable]] at the same position.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Scalar
+     */
+    correspondsBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): Promise<boolean>;
+
+    /**
+     * Computes a scalar value indicating whether the key for every element in this [[AsyncQuery]] corresponds to a matching key
+     * in `right` at the same position.
+     *
+     * @param right A [[Queryable]] object.
+     * @param leftKeySelector A callback used to select the key for each element in this [[Query]].
+     * @param rightKeySelector A callback used to select the key for each element in `right`.
+     * @param equalityComparison An optional callback used to compare the equality of two keys.
+     * @category Scalar
+     */
+    correspondsBy<U, K>(right: AsyncQueryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, equalityComparison?: (left: K, right: K) => boolean): Promise<boolean>;
+    correspondsBy<U, K>(right: AsyncQueryable<U>, leftKeySelector: (element: T) => K, rightKeySelector?: (element: U) => K, equalityComparison?: (left: K, right: K) => boolean): Promise<boolean> {
+        return fn.correspondsByAsync(GetAsyncSource(this), GetAsyncSource(right), leftKeySelector, rightKeySelector!, equalityComparison);
     }
 
     /**
@@ -1565,6 +1771,18 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V | PromiseLike<V>): Promise<object>;
     toObject(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => T | PromiseLike<T>): Promise<object> {
         return fn.toObjectAsync(GetAsyncSource(this), prototype, keySelector, elementSelector!);
+    }
+
+    /**
+     * Writes each element to a destination array.
+     *
+     * @param dest The destination array.
+     * @param start The offset into the array at which to start writing.
+     * @param count The number of elements to write to the array.
+     * @category Scalar
+     */
+    copyTo<U extends WritableArrayLike<T>>(dest: U, start?: number, count?: number): Promise<U> {
+        return fn.copyToAsync(GetAsyncSource(this), dest, start, count);
     }
 
     // #endregion Scalar

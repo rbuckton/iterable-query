@@ -15,8 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetIterator, ToIterable, IteratorClose} from "../internal";
+import { assert, SameValue } from "../internal";
 import { Queryable } from "../types";
+import { correspondsBy } from './correspondsBy';
+import { identity } from './common';
 
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
@@ -41,26 +43,5 @@ export function corresponds<T>(left: Queryable<T>, right: Queryable<T>, equality
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
     assert.mustBeFunction(equalityComparison, "equalityComparison");
-    const leftIterator = GetIterator(ToIterable(left));
-    let leftDone = false;
-    let leftValue: T;
-    try {
-        const rightIterator = GetIterator(ToIterable(right));
-        let rightDone = false;
-        let rightValue: T;
-        try {
-            for (;;) {
-                ({ done: leftDone, value: leftValue } = leftIterator.next());
-                ({ done: rightDone, value: rightValue } = rightIterator.next());
-                if (leftDone && rightDone) return true;
-                if (Boolean(leftDone) !== Boolean(rightDone) || !equalityComparison(leftValue, rightValue)) return false;
-            }
-        }
-        finally {
-            if (!rightDone) IteratorClose(rightIterator);
-        }
-    }
-    finally {
-        if (!leftDone) IteratorClose(leftIterator);
-    }
+    return correspondsBy(left, right, identity, identity, equalityComparison);
 }

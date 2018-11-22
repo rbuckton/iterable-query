@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
-import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
-import { toSetAsync } from "./toSetAsync";
+import { assert } from "../internal";
+import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
+import { intersectByAsync } from './intersectByAsync';
+import { identity } from './common';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object and an [[AsyncQueryable]] object.
@@ -46,28 +47,5 @@ export function intersectAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable
 export function intersectAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    return FlowHierarchy(new AsyncIntersectIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right)), left, right);
-}
-
-@ToStringTag("AsyncIntersectIterable")
-class AsyncIntersectIterable<T> implements AsyncIterable<T> {
-    private _left: PossiblyAsyncIterable<T>;
-    private _right: PossiblyAsyncIterable<T>;
-
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>) {
-        this._left = left;
-        this._right = right;
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<T> {
-        const set = await toSetAsync(this._right);
-        if (set.size <= 0) {
-            return;
-        }
-        for await (const element of this._left) {
-            if (set.delete(element)) {
-                yield element;
-            }
-        }
-    }
+    return intersectByAsync(left, right, identity);
 }

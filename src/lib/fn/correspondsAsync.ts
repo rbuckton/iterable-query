@@ -15,8 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable } from "../internal";
+import { assert, SameValue } from "../internal";
 import { AsyncQueryable } from "../types";
+import { correspondsByAsync } from './correspondsByAsync';
+import { identity } from './common';
 
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
@@ -41,26 +43,5 @@ export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQ
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
     assert.mustBeFunction(equalityComparison, "equalityComparison");
-    const leftIterator = GetAsyncIterator(ToPossiblyAsyncIterable(left));
-    let leftDone = false;
-    let leftValue: T;
-    try {
-        const rightIterator = GetAsyncIterator(ToPossiblyAsyncIterable(right));
-        let rightDone = false;
-        let rightValue: T;
-        try {
-            for (;;) {
-                ({ done: leftDone, value: leftValue } = await leftIterator.next());
-                ({ done: rightDone, value: rightValue } = await rightIterator.next());
-                if (leftDone && rightDone) return true;
-                if (Boolean(leftDone) !== Boolean(rightDone) || !equalityComparison(leftValue, rightValue)) return false;
-            }
-        }
-        finally {
-            if (!rightDone) await AsyncIteratorClose(rightIterator);
-        }
-    }
-    finally {
-        if (!leftDone) await AsyncIteratorClose(leftIterator);
-    }
+    return await correspondsByAsync(left, right, identity, identity, equalityComparison);
 }

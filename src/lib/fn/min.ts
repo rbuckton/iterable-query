@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable } from "../internal";
+import { assert } from "../internal";
 import { Queryable } from "../types";
-import { compare } from "./common";
+import { compare, identity } from "./common";
+import { minBy } from './minBy';
 
 /**
  * Gets the minimum element of a [[Queryable]], optionally comparing elements using the supplied callback.
@@ -29,16 +30,5 @@ import { compare } from "./common";
 export function min<T>(source: Queryable<T>, comparison: (x: T, y: T) => number = compare): T | undefined {
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(comparison, "comparison");
-    let hasResult = false;
-    let result: T | undefined;
-    for (const element of ToIterable(source)) {
-        if (!hasResult) {
-            result = element;
-            hasResult = true;
-        }
-        else if (comparison(element, result!) < 0) {
-            result = element;
-        }
-    }
-    return result;
+    return minBy(source, identity, comparison);
 }
