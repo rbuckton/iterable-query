@@ -25,30 +25,30 @@ import { Query, from } from "./query";
 /**
  * Flows the base type of a [[Query]] as an unordered query with a new iterated type.
  */
-export type AsyncUnorderedFlow<S extends AsyncQueryable<any>, T> =
+export type AsyncUnorderedQueryFlow<S extends AsyncQueryable<any>, T> =
     S extends Hierarchical<infer TNode> ? AsyncHierarchyQuery<TNode, TNode & T> :
     AsyncQuery<T>;
 
 /**
  * Flows the base type of a [[Query]] as an ordered query with a new iterated type.
  */
-export type AsyncOrderedFlow<S extends AsyncQueryable<any>, T> =
+export type AsyncOrderedQueryFlow<S extends AsyncQueryable<any>, T> =
     S extends Hierarchical<infer TNode> ? AsyncOrderedHierarchyQuery<TNode, TNode & T> :
     AsyncOrderedQuery<T>;
 
 /**
  * Flows the base type of a [[Query]] as a hierarchical query with a new iterated type.
  */
-export type AsyncHierarchyFlow<S extends AsyncQueryable<any>, T> =
+export type AsyncHierarchyQueryFlow<S extends AsyncQueryable<any>, T> =
     S extends AsyncOrderedIterable<T> ? AsyncOrderedHierarchyQuery<T, T> :
     AsyncHierarchyQuery<T, T>;
 
 /**
  * Flows the base type of a [[Query]] with a new iterated type.
  */
-export type AsyncFlow<S extends AsyncQueryable<any>, T> =
-    S extends AsyncOrderedIterable<T> ? AsyncOrderedFlow<S, T> :
-    AsyncUnorderedFlow<S, T>;
+export type AsyncQueryFlow<S extends AsyncQueryable<any>, T> =
+    S extends AsyncOrderedIterable<T> ? AsyncOrderedQueryFlow<S, T> :
+    AsyncUnorderedQueryFlow<S, T>;
 
 /**
  * Creates an [[AsyncQuery]] from an [[AsyncQueryable]] source.
@@ -337,7 +337,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    filter<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncUnorderedFlow<this, U>;
+    filter<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncUnorderedQueryFlow<this, U>;
 
     /**
      * Creates a subquery whose elements match the supplied predicate.
@@ -345,9 +345,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    filter(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T>;
-    filter(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.filterAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedFlow<this, T>;
+    filter(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T>;
+    filter(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.filterAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -357,8 +357,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each key.
      * @category Subquery
      */
-    filterBy<K>(keySelector: (element: T) => K, predicate: (key: K, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.filterByAsync(GetAsyncSource(this), keySelector, predicate)) as AsyncUnorderedFlow<this, T>;
+    filterBy<K>(keySelector: (element: T) => K, predicate: (key: K, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.filterByAsync(GetAsyncSource(this), keySelector, predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -368,7 +368,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    where<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncUnorderedFlow<this, U>;
+    where<U extends T>(predicate: (element: T, offset: number) => element is U): AsyncUnorderedQueryFlow<this, U>;
 
     /**
      * Creates a subquery whose elements match the supplied predicate.
@@ -377,9 +377,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    where(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T>;
-    where(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.whereAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedFlow<this, T>;
+    where(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T>;
+    where(predicate: (element: T, offset: number) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.whereAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -389,8 +389,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each key.
      * @category Subquery
      */
-    whereBy<K>(keySelector: (element: T) => K, predicate: (key: K, offset: number) => boolean): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.whereByAsync(GetAsyncSource(this), keySelector, predicate)) as AsyncUnorderedFlow<this, T>;
+    whereBy<K>(keySelector: (element: T) => K, predicate: (key: K, offset: number) => boolean): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.whereByAsync(GetAsyncSource(this), keySelector, predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -398,16 +398,16 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      *
      * @category Subquery
      */
-    filterDefined(): AsyncUnorderedFlow<this, NonNullable<T>>;
+    filterDefined(): AsyncUnorderedQueryFlow<this, NonNullable<T>>;
     /**
      * Creates a subquery where the selected key for each element is neither `null` nor `undefined`.
      *
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    filterDefined<K>(keySelector: (element: T) => K): AsyncUnorderedFlow<this, T>;
-    filterDefined<K>(keySelector?: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.filterDefinedAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedFlow<this, T>;
+    filterDefined<K>(keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T>;
+    filterDefined<K>(keySelector?: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.filterDefinedAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -417,16 +417,16 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      *
      * @category Subquery
      */
-    whereDefined(): AsyncUnorderedFlow<this, NonNullable<T>>;
+    whereDefined(): AsyncUnorderedQueryFlow<this, NonNullable<T>>;
     /**
      * Creates a subquery where the selected key for each element is neither `null` nor `undefined`.
      *
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    whereDefined<K>(keySelector: (element: T) => K): AsyncUnorderedFlow<this, T>;
-    whereDefined<K>(keySelector?: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.whereDefinedAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedFlow<this, T>;
+    whereDefined<K>(keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T>;
+    whereDefined<K>(keySelector?: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.whereDefinedAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -505,7 +505,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback The callback to invoke.
      * @category Subquery
      */
-    do(callback: (element: T, offset: number) => void): AsyncUnorderedFlow<this, T>;
+    do(callback: (element: T, offset: number) => void): AsyncUnorderedQueryFlow<this, T>;
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -513,7 +513,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback The callback to invoke.
      * @category Subquery
      */
-    do(callback: (element: T, offset: number) => PromiseLike<void>): AsyncUnorderedFlow<this, T>;
+    do(callback: (element: T, offset: number) => PromiseLike<void>): AsyncUnorderedQueryFlow<this, T>;
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -521,9 +521,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback The callback to invoke.
      * @category Subquery
      */
-    do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedFlow<this, T>;
-    do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.doAsync(GetAsyncSource(this), callback)) as AsyncUnorderedFlow<this, T>;
+    do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedQueryFlow<this, T>;
+    do(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.doAsync(GetAsyncSource(this), callback)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -533,7 +533,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback The callback to invoke.
      * @category Subquery
      */
-    tap(callback: (element: T, offset: number) => void): AsyncUnorderedFlow<this, T>;
+    tap(callback: (element: T, offset: number) => void): AsyncUnorderedQueryFlow<this, T>;
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -542,7 +542,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback The callback to invoke.
      * @category Subquery
      */
-    tap(callback: (element: T, offset: number) => PromiseLike<void>): AsyncUnorderedFlow<this, T>;
+    tap(callback: (element: T, offset: number) => PromiseLike<void>): AsyncUnorderedQueryFlow<this, T>;
 
     /**
      * Lazily invokes a callback as each element of the query is iterated.
@@ -551,9 +551,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback The callback to invoke.
      * @category Subquery
      */
-    tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedFlow<this, T>;
-    tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.tapAsync(GetAsyncSource(this), callback)) as AsyncUnorderedFlow<this, T>;
+    tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedQueryFlow<this, T>;
+    tap(callback: (element: T, offset: number) => PromiseLike<void> | void): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.tapAsync(GetAsyncSource(this), callback)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -562,16 +562,16 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param callback A callback function.
      * @category Subquery
      */
-    through<R extends Queryable<any> = Queryable<any>>(callback: (source: this) => R): AsyncFlow<R, QueriedType<R>> {
-        return fromAsync(fn.throughAsync(this, callback)) as AsyncFlow<R, QueriedType<R>>;
+    through<R extends Queryable<any> = Queryable<any>>(callback: (source: this) => R): AsyncQueryFlow<R, QueriedType<R>> {
+        return fromAsync(fn.throughAsync(this, callback)) as AsyncQueryFlow<R, QueriedType<R>>;
     }
 
     /**
      * Creates a subquery whose elements are in the reverse order.
      * @category Subquery
      */
-    reverse(): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.reverseAsync(GetAsyncSource(this))) as AsyncUnorderedFlow<this, T>;
+    reverse(): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.reverseAsync(GetAsyncSource(this))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -580,8 +580,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param values The values to exclude.
      * @category Subquery
      */
-    exclude(...values: [T | PromiseLike<T>, ...(T | PromiseLike<T>)[]]): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.excludeAsync(GetAsyncSource(this), ...values)) as AsyncUnorderedFlow<this, T>;
+    exclude(...values: [T | PromiseLike<T>, ...(T | PromiseLike<T>)[]]): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.excludeAsync(GetAsyncSource(this), ...values)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -591,8 +591,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param count The number of elements to skip.
      * @category Subquery
      */
-    skip(count: number): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.skipAsync(GetAsyncSource(this), count)) as AsyncUnorderedFlow<this, T>;
+    skip(count: number): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.skipAsync(GetAsyncSource(this), count)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -602,8 +602,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param count The number of elements to skip.
      * @category Subquery
      */
-    skipRight(count: number): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.skipRightAsync(GetAsyncSource(this), count)) as AsyncUnorderedFlow<this, T>;
+    skipRight(count: number): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.skipRightAsync(GetAsyncSource(this), count)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -613,8 +613,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    skipWhile(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.skipWhileAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedFlow<this, T>;
+    skipWhile(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.skipWhileAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -624,8 +624,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    skipUntil(predicate: (element: T) => boolean): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.skipUntilAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedFlow<this, T>;
+    skipUntil(predicate: (element: T) => boolean): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.skipUntilAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -635,8 +635,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param count The number of elements to take.
      * @category Subquery
      */
-    take(count: number): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.takeAsync(GetAsyncSource(this), count)) as AsyncUnorderedFlow<this, T>;
+    take(count: number): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.takeAsync(GetAsyncSource(this), count)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -646,8 +646,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param count The number of elements to take.
      * @category Subquery
      */
-    takeRight(count: number): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.takeRightAsync(GetAsyncSource(this), count)) as AsyncUnorderedFlow<this, T>;
+    takeRight(count: number): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.takeRightAsync(GetAsyncSource(this), count)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -656,7 +656,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    takeWhile<U extends T>(predicate: (element: T) => element is U): AsyncUnorderedFlow<this, U>;
+    takeWhile<U extends T>(predicate: (element: T) => element is U): AsyncUnorderedQueryFlow<this, U>;
 
     /**
      * Creates a subquery containing the first elements that match the supplied predicate.
@@ -664,9 +664,9 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    takeWhile(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T>;
-    takeWhile(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.takeWhileAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedFlow<this, T>;
+    takeWhile(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T>;
+    takeWhile(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.takeWhileAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -675,8 +675,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param predicate A callback used to match each element.
      * @category Subquery
      */
-    takeUntil(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.takeUntilAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedFlow<this, T>;
+    takeUntil(predicate: (element: T) => boolean | PromiseLike<boolean>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.takeUntilAsync(GetAsyncSource(this), predicate)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -783,8 +783,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    union(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.unionAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    union(right: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.unionAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -794,8 +794,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    unionBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.unionByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    unionBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.unionByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -804,8 +804,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    except(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.exceptAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    except(right: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.exceptAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -815,8 +815,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    exceptBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.exceptByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    exceptBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.exceptByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -827,8 +827,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    relativeComplement(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.relativeComplementAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    relativeComplement(right: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.relativeComplementAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -840,8 +840,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    relativeComplementBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.relativeComplementByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    relativeComplementBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.relativeComplementByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -850,8 +850,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    symmetricDifference(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.symmetricDifferenceAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    symmetricDifference(right: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.symmetricDifferenceAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -861,8 +861,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    symmetricDifferenceBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.symmetricDifferenceByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    symmetricDifferenceBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.symmetricDifferenceByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -873,8 +873,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    xor(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.xorAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    xor(right: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.xorAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -886,8 +886,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    xorBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.xorByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedFlow<this, T>;
+    xorBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.xorByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -896,24 +896,24 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    concat(right: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.concatAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedFlow<this, T>;
+    concat(right: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.concatAsync(GetAsyncSource(this), GetAsyncSource(right))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
      * Creates a subquery for the distinct elements of this [[AsyncQuery]].
      * @category Subquery
      */
-    distinct(): AsyncUnorderedFlow<this, T>;
+    distinct(): AsyncUnorderedQueryFlow<this, T>;
     /**
      * Creates a subquery for the distinct elements of this [[AsyncQuery]].
      *
      * @param keySelector A callback used to select the key to determine uniqueness.
      * @category Subquery
      */
-    distinct<K>(keySelector: (value: T) => K): AsyncUnorderedFlow<this, T>;
-    distinct(keySelector?: (value: T) => T): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.distinctAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedFlow<this, T>;
+    distinct<K>(keySelector: (value: T) => K): AsyncUnorderedQueryFlow<this, T>;
+    distinct(keySelector?: (value: T) => T): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.distinctAsync(GetAsyncSource(this), keySelector!)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -922,8 +922,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param value The value to append.
      * @category Subquery
      */
-    append(value: PromiseLike<T> | T): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.appendAsync(GetAsyncSource(this), value)) as AsyncUnorderedFlow<this, T>;
+    append(value: PromiseLike<T> | T): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.appendAsync(GetAsyncSource(this), value)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -932,8 +932,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param value The value to prepend.
      * @category Subquery
      */
-    prepend(value: PromiseLike<T> | T): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.prependAsync(GetAsyncSource(this), value)) as AsyncUnorderedFlow<this, T>;
+    prepend(value: PromiseLike<T> | T): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.prependAsync(GetAsyncSource(this), value)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -945,8 +945,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param range The range to patch into the result.
      * @category Subquery
      */
-    patch(start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.patchAsync(GetAsyncSource(this), start, skipCount, range && GetAsyncSource(range))) as AsyncUnorderedFlow<this, T>;
+    patch(start: number, skipCount?: number, range?: AsyncQueryable<T>): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.patchAsync(GetAsyncSource(this), start, skipCount, range && GetAsyncSource(range))) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -956,8 +956,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param defaultValue The default value.
      * @category Subquery
      */
-    defaultIfEmpty(defaultValue: PromiseLike<T> | T): AsyncUnorderedFlow<this, T> {
-        return fromAsync(fn.defaultIfEmptyAsync(GetAsyncSource(this), defaultValue)) as AsyncUnorderedFlow<this, T>;
+    defaultIfEmpty(defaultValue: PromiseLike<T> | T): AsyncUnorderedQueryFlow<this, T> {
+        return fromAsync(fn.defaultIfEmptyAsync(GetAsyncSource(this), defaultValue)) as AsyncUnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -1152,8 +1152,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedFlow<this, T> {
-        return fromAsync(fn.orderByAsync(GetAsyncSource(this), keySelector, comparison)) as AsyncOrderedFlow<this, T>;
+    orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedQueryFlow<this, T> {
+        return fromAsync(fn.orderByAsync(GetAsyncSource(this), keySelector, comparison)) as AsyncOrderedQueryFlow<this, T>;
     }
 
     /**
@@ -1163,8 +1163,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedFlow<this, T> {
-        return fromAsync(fn.orderByDescendingAsync(GetAsyncSource(this), keySelector, comparison)) as AsyncOrderedFlow<this, T>;
+    orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): AsyncOrderedQueryFlow<this, T> {
+        return fromAsync(fn.orderByDescendingAsync(GetAsyncSource(this), keySelector, comparison)) as AsyncOrderedQueryFlow<this, T>;
     }
 
     // #endregion Order
@@ -1177,8 +1177,8 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param hierarchy A HierarchyProvider.
      * @category Hierarchy
      */
-    toHierarchy(hierarchy: HierarchyProvider<T>): AsyncHierarchyFlow<this, T> {
-        return fromAsync(fn.toHierarchyAsync(GetAsyncSource(this), hierarchy)) as AsyncHierarchyFlow<this, T>;
+    toHierarchy(hierarchy: HierarchyProvider<T>): AsyncHierarchyQueryFlow<this, T> {
+        return fromAsync(fn.toHierarchyAsync(GetAsyncSource(this), hierarchy)) as AsyncHierarchyQueryFlow<this, T>;
     }
 
     // #endregion Hierarchy
