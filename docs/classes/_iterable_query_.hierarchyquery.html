@@ -279,7 +279,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1832">query.ts:1832</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1879">query.ts:1879</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -293,7 +293,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1833">query.ts:1833</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1880">query.ts:1880</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1431,7 +1431,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#copyto">copyTo</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1810">query.ts:1810</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1857">query.ts:1857</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4138,21 +4138,40 @@
 					<a name="toobject" class="tsd-anchor"></a>
 					<h3>to<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Object<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Object&lt;V&gt;<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, elementSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Object<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Object&lt;V&gt;<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, elementSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, descriptorSelector<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#toobject">toObject</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1788">query.ts:1788</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1811">query.ts:1811</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates an <code>object</code> for the elements of the <a href="_iterable_query_.query.html">Query</a>.</p>
+									<p>Creates an Object for the elements of the <a href="_iterable_query_.query.html">Query</a>. Properties are added via <code>Object.defineProperty</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// As a regular object</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+
+<span class="hljs-comment">// with a custom prototype</span>
+<span class="hljs-keyword">const</span> baseObject = { toString() { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.x}</span>:<span class="hljs-subst">${this.y}</span>`</span> } };
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(baseObject, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+obj.toString(); <span class="hljs-comment">// "x",1:"y",2</span>
+
+<span class="hljs-comment">// with a null prototype</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// undefined</span></code></pre>
 								<dl class="tsd-comment-tags">
 									<dt>category</dt>
 									<dd><p>Scalar</p>
@@ -4162,10 +4181,11 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>                        &mdash;
+									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
 										<div class="lead">
-											<p>The prototype for the object.</p>
+											<p>The prototype for the object. If <code>prototype</code> is <code>null</code>, an object with a <code>null</code>
+											prototype is created. If <code>prototype</code> is <code>undefined</code>, the default <code>Object.prototype</code> is used.</p>
 										</div>
 									</div>
 								</li>
@@ -4201,13 +4221,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#toobject">toObject</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1797">query.ts:1797</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1844">query.ts:1844</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates an <code>object</code> for the elements of the <a href="_iterable_query_.query.html">Query</a>.</p>
+									<p>Creates an Object for the elements the <a href="_iterable_query_.query.html">Query</a>. Properties are added via <code>Object.defineProperty</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// As a regular object</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+
+<span class="hljs-comment">// with a custom prototype</span>
+<span class="hljs-keyword">const</span> baseObject = { toString() { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.x}</span>:<span class="hljs-subst">${this.y}</span>`</span> } };
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(baseObject, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+obj.toString(); <span class="hljs-comment">// 1:2</span>
+
+<span class="hljs-comment">// with a null prototype</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// undefined</span></code></pre>
 								<dl class="tsd-comment-tags">
 									<dt>category</dt>
 									<dd><p>Scalar</p>
@@ -4222,10 +4261,11 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>                        &mdash;
+									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
 										<div class="lead">
-											<p>The prototype for the object.</p>
+											<p>The prototype for the object. If <code>prototype</code> is <code>null</code>, an object with a <code>null</code>
+											prototype is created. If <code>prototype</code> is <code>undefined</code>, the default <code>Object.prototype</code> is used.</p>
 										</div>
 									</div>
 								</li>
@@ -4278,6 +4318,14 @@
 											</ul>
 										</li>
 									</ul>
+								</li>
+								<li>
+									<span class="tsd-flag ts-flagOptional">Optional</span> descriptorSelector: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A callback that defines the <code>PropertyDescriptor</code> for each property.</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
@@ -9405,7 +9453,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1869">query.ts:1869</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1916">query.ts:1916</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9456,7 +9504,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1877">query.ts:1877</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1924">query.ts:1924</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9495,7 +9543,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1888">query.ts:1888</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1935">query.ts:1935</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9546,7 +9594,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1896">query.ts:1896</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1943">query.ts:1943</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9585,7 +9633,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2113">query.ts:2113</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2160">query.ts:2160</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9631,7 +9679,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2120">query.ts:2120</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2167">query.ts:2167</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9665,7 +9713,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1991">query.ts:1991</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2038">query.ts:2038</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9716,7 +9764,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1999">query.ts:1999</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2046">query.ts:2046</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9755,7 +9803,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1907">query.ts:1907</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1954">query.ts:1954</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9806,7 +9854,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1915">query.ts:1915</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1962">query.ts:1962</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9845,7 +9893,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1926">query.ts:1926</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1973">query.ts:1973</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9896,7 +9944,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1934">query.ts:1934</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1981">query.ts:1981</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9934,7 +9982,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2087">query.ts:2087</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2134">query.ts:2134</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -9974,7 +10022,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1972">query.ts:1972</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2019">query.ts:2019</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10025,7 +10073,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1980">query.ts:1980</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2027">query.ts:2027</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10064,7 +10112,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1851">query.ts:1851</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1898">query.ts:1898</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10115,7 +10163,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1858">query.ts:1858</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1905">query.ts:1905</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10155,7 +10203,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1945">query.ts:1945</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1992">query.ts:1992</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10206,7 +10254,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1953">query.ts:1953</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2000">query.ts:2000</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10257,7 +10305,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1961">query.ts:1961</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2008">query.ts:2008</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10296,7 +10344,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2010">query.ts:2010</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2057">query.ts:2057</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10347,7 +10395,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2018">query.ts:2018</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2065">query.ts:2065</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10386,7 +10434,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2067">query.ts:2067</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2114">query.ts:2114</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10437,7 +10485,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2075">query.ts:2075</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2122">query.ts:2122</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10476,7 +10524,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2029">query.ts:2029</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2076">query.ts:2076</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10527,7 +10575,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2037">query.ts:2037</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2084">query.ts:2084</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10566,7 +10614,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2048">query.ts:2048</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2095">query.ts:2095</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10617,7 +10665,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2056">query.ts:2056</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2103">query.ts:2103</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10695,7 +10743,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2096">query.ts:2096</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2143">query.ts:2143</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10741,7 +10789,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2103">query.ts:2103</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2150">query.ts:2150</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -10778,7 +10826,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_iterable_query_.hierarchyiterable.html">HierarchyIterable</a>.<a href="../interfaces/_iterable_query_.hierarchyiterable.html#_hierarchical_hierarchy_">[Hierarchical.hierarchy]</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2127">query.ts:2127</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L2174">query.ts:2174</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_iterable_query_.hierarchyprovider.html"  class="tsd-signature-type">HierarchyProvider</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TNode</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -10797,7 +10845,7 @@
 								<p>Implementation of <a href="../interfaces/_iterable_query_.hierarchyiterable.html">HierarchyIterable</a>.<a href="../interfaces/_iterable_query_.hierarchyiterable.html#_symbol_iterator_">[Symbol.iterator]</a></p>
 								<p>Inherited from <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#_symbol_iterator_">[Symbol.iterator]</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1820">query.ts:1820</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1867">query.ts:1867</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-symbol.iterator" target="external" class="tsd-signature-type">Iterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -10815,7 +10863,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_iterable_query_.query.html">Query</a>.<a href="_iterable_query_.query.html#tojson">toJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1814">query.ts:1814</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1861">query.ts:1861</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></h4>

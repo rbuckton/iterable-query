@@ -1752,25 +1752,71 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     }
 
     /**
-     * Creates an `object` for the elements of the `Query`.
+     * Creates an Object for the elements of the [[AsyncQuery]]. Properties are added via `Object.defineProperty`.
      *
-     * @param prototype The prototype for the object.
+     * ```ts
+     * // As a regular object
+     * const obj = await fromAsync([Promise.resolve(["x", 1]), ["y", 2]]).toObject(undefined, a => a[0]);
+     * obj.x; // ["x", 1]
+     * obj.y; // ["y", 2]
+     * typeof obj.toString; // function
+     *
+     * // with a custom prototype
+     * const baseObject = { toString() { return `${this.x}:${this.y}` } };
+     * const obj = await fromAsync([Promise.resolve(["x", 1]), ["y", 2]]).toObject(baseObject, a => a[0]);
+     * obj.x; // ["x", 1]
+     * obj.y; // ["y", 2]
+     * typeof obj.toString; // function
+     * obj.toString(); // "x",1:"y",2
+     *
+     * // with a null prototype
+     * const obj = await fromAsync([Promise.resolve(["x", 1]), ["y", 2]]).toObject(null, a => a[0]);
+     * obj.x; // ["x", 1]
+     * obj.y; // ["y", 2]
+     * typeof obj.toString; // undefined
+     * ```
+     *
+     * @param prototype The prototype for the object. If `prototype` is `null`, an object with a `null`
+     * prototype is created. If `prototype` is `undefined`, the default `Object.prototype` is used.
      * @param keySelector A callback used to select a key for each element.
      * @category Scalar
      */
-    toObject(prototype: object | null, keySelector: (element: T) => PropertyKey): Promise<object>;
-
+    toObject(prototype: object | null | undefined, keySelector: (element: T) => PropertyKey): Promise<object>;
     /**
-     * Creates an `object` for the elements of the `Query`.
+     * Creates an Object for the elements the [[Query]]. Properties are added via `Object.defineProperty`.
      *
-     * @param prototype The prototype for the object.
+     * ```ts
+     * // As a regular object
+     * const obj = await fromAsync([Promise.resolve(["x", 1]), ["y", 2]]).toObject(undefined, a => a[0], a => a[1]);
+     * obj.x; // 1
+     * obj.y; // 2
+     * typeof obj.toString; // function
+     *
+     * // with a custom prototype
+     * const baseObject = { toString() { return `${this.x}:${this.y}` } };
+     * const obj = await fromAsync([Promise.resolve(["x", 1]), ["y", 2]]).toObject(baseObject, a => a[0], a => a[1]);
+     * obj.x; // 1
+     * obj.y; // 2
+     * typeof obj.toString; // function
+     * obj.toString(); // 1:2
+     *
+     * // with a null prototype
+     * const obj = await fromAsync([Promise.resolve(["x", 1]), ["y", 2]]).toObject(null, a => a[0], a => a[1]);
+     * obj.x; // 1
+     * obj.y; // 2
+     * typeof obj.toString; // undefined
+     * ```
+     *
+     * @param prototype The prototype for the object. If `prototype` is `null`, an object with a `null`
+     * prototype is created. If `prototype` is `undefined`, the default `Object.prototype` is used.
      * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
+     * @param descriptorSelector A callback that defines the `PropertyDescriptor` for each property.
      * @category Scalar
      */
-    toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V | PromiseLike<V>): Promise<object>;
-    toObject(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => T | PromiseLike<T>): Promise<object> {
-        return fn.toObjectAsync(GetAsyncSource(this), prototype, keySelector, elementSelector!);
+    toObject<V>(prototype: object | null | undefined, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V | PromiseLike<V>, descriptorSelector?: (key: PropertyKey, element: V) => PropertyDescriptor): Promise<object>;
+    toObject<V>(prototype: object | null | undefined, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => V | PromiseLike<V>, descriptorSelector?: (key: PropertyKey, element: V) => PropertyDescriptor): Promise<object> {
+        return fn.toObjectAsync(GetAsyncSource(this), prototype, keySelector, elementSelector!, descriptorSelector);
     }
 
     /**

@@ -186,7 +186,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
 
     /**
      * Creates a [[Query]] with no elements.
-     * 
+     *
      * @category Query
      */
     static empty<T>(): Query<T> {
@@ -563,7 +563,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
 
     /**
      * Creates a subquery whose elements are in the reverse order.
-     * 
+     *
      * @category Subquery
      */
     reverse(): UnorderedQueryFlow<this, T> {
@@ -1779,24 +1779,71 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     }
 
     /**
-     * Creates an `object` for the elements of the [[Query]].
+     * Creates an Object for the elements of the [[Query]]. Properties are added via `Object.defineProperty`.
      *
-     * @param prototype The prototype for the object.
+     * ```ts
+     * // As a regular object
+     * const obj = from([["x", 1], ["y", 2]]).toObject(undefined, a => a[0]);
+     * obj.x; // ["x", 1]
+     * obj.y; // ["y", 2]
+     * typeof obj.toString; // function
+     *
+     * // with a custom prototype
+     * const baseObject = { toString() { return `${this.x}:${this.y}` } };
+     * const obj = from([["x", 1], ["y", 2]]).toObject(baseObject, a => a[0]);
+     * obj.x; // ["x", 1]
+     * obj.y; // ["y", 2]
+     * typeof obj.toString; // function
+     * obj.toString(); // "x",1:"y",2
+     *
+     * // with a null prototype
+     * const obj = from([["x", 1], ["y", 2]]).toObject(null, a => a[0]);
+     * obj.x; // ["x", 1]
+     * obj.y; // ["y", 2]
+     * typeof obj.toString; // undefined
+     * ```
+     *
+     * @param prototype The prototype for the object. If `prototype` is `null`, an object with a `null`
+     * prototype is created. If `prototype` is `undefined`, the default `Object.prototype` is used.
      * @param keySelector A callback used to select a key for each element.
      * @category Scalar
      */
-    toObject(prototype: object | null, keySelector: (element: T) => PropertyKey): object;
+    toObject(prototype: object | null | undefined, keySelector: (element: T) => PropertyKey): object;
     /**
-     * Creates an `object` for the elements of the [[Query]].
+     * Creates an Object for the elements the [[Query]]. Properties are added via `Object.defineProperty`.
      *
-     * @param prototype The prototype for the object.
+     * ```ts
+     * // As a regular object
+     * const obj = from([["x", 1], ["y", 2]]).toObject(undefined, a => a[0], a => a[1]);
+     * obj.x; // 1
+     * obj.y; // 2
+     * typeof obj.toString; // function
+     *
+     * // with a custom prototype
+     * const baseObject = { toString() { return `${this.x}:${this.y}` } };
+     * const obj = from([["x", 1], ["y", 2]]).toObject(baseObject, a => a[0], a => a[1]);
+     * obj.x; // 1
+     * obj.y; // 2
+     * typeof obj.toString; // function
+     * obj.toString(); // 1:2
+     *
+     * // with a null prototype
+     * const obj = from([["x", 1], ["y", 2]]).toObject(null, a => a[0], a => a[1]);
+     * obj.x; // 1
+     * obj.y; // 2
+     * typeof obj.toString; // undefined
+     * ```
+     *
+     * @param prototype The prototype for the object. If `prototype` is `null`, an object with a `null`
+     * prototype is created. If `prototype` is `undefined`, the default `Object.prototype` is used.
      * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
+     * @param descriptorSelector A callback that defines the `PropertyDescriptor` for each property.
      * @category Scalar
      */
-    toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V): object;
-    toObject<V>(prototype: object | null, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => V): object {
-        return fn.toObject(GetSource(this), prototype, keySelector, elementSelector!);
+    toObject<V>(prototype: object | null | undefined, keySelector: (element: T) => PropertyKey, elementSelector: (element: T) => V, descriptorSelector?: (key: PropertyKey, element: V) => PropertyDescriptor): object;
+    toObject<V>(prototype: object | null | undefined, keySelector: (element: T) => PropertyKey, elementSelector?: (element: T) => V, descriptorSelector?: (key: PropertyKey, element: V) => PropertyDescriptor): object {
+        return fn.toObject(GetSource(this), prototype, keySelector, elementSelector!, descriptorSelector);
     }
 
     /**

@@ -1381,7 +1381,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1810">query.ts:1810</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1857">query.ts:1857</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4041,20 +4041,39 @@
 					<a name="toobject" class="tsd-anchor"></a>
 					<h3>to<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Object<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Object&lt;V&gt;<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, elementSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Object<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Object&lt;V&gt;<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, elementSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, descriptorSelector<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1788">query.ts:1788</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1811">query.ts:1811</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates an <code>object</code> for the elements of the <a href="_iterable_query_.query.html">Query</a>.</p>
+									<p>Creates an Object for the elements of the <a href="_iterable_query_.query.html">Query</a>. Properties are added via <code>Object.defineProperty</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// As a regular object</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+
+<span class="hljs-comment">// with a custom prototype</span>
+<span class="hljs-keyword">const</span> baseObject = { toString() { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.x}</span>:<span class="hljs-subst">${this.y}</span>`</span> } };
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(baseObject, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+obj.toString(); <span class="hljs-comment">// "x",1:"y",2</span>
+
+<span class="hljs-comment">// with a null prototype</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// undefined</span></code></pre>
 								<dl class="tsd-comment-tags">
 									<dt>category</dt>
 									<dd><p>Scalar</p>
@@ -4064,10 +4083,11 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>                        &mdash;
+									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
 										<div class="lead">
-											<p>The prototype for the object.</p>
+											<p>The prototype for the object. If <code>prototype</code> is <code>null</code>, an object with a <code>null</code>
+											prototype is created. If <code>prototype</code> is <code>undefined</code>, the default <code>Object.prototype</code> is used.</p>
 										</div>
 									</div>
 								</li>
@@ -4102,13 +4122,32 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1797">query.ts:1797</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1844">query.ts:1844</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates an <code>object</code> for the elements of the <a href="_iterable_query_.query.html">Query</a>.</p>
+									<p>Creates an Object for the elements the <a href="_iterable_query_.query.html">Query</a>. Properties are added via <code>Object.defineProperty</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// As a regular object</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+
+<span class="hljs-comment">// with a custom prototype</span>
+<span class="hljs-keyword">const</span> baseObject = { toString() { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.x}</span>:<span class="hljs-subst">${this.y}</span>`</span> } };
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(baseObject, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+obj.toString(); <span class="hljs-comment">// 1:2</span>
+
+<span class="hljs-comment">// with a null prototype</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">from</span>([[<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// undefined</span></code></pre>
 								<dl class="tsd-comment-tags">
 									<dt>category</dt>
 									<dd><p>Scalar</p>
@@ -4123,10 +4162,11 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>                        &mdash;
+									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
 										<div class="lead">
-											<p>The prototype for the object.</p>
+											<p>The prototype for the object. If <code>prototype</code> is <code>null</code>, an object with a <code>null</code>
+											prototype is created. If <code>prototype</code> is <code>undefined</code>, the default <code>Object.prototype</code> is used.</p>
 										</div>
 									</div>
 								</li>
@@ -4179,6 +4219,14 @@
 											</ul>
 										</li>
 									</ul>
+								</li>
+								<li>
+									<span class="tsd-flag ts-flagOptional">Optional</span> descriptorSelector: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A callback that defines the <code>PropertyDescriptor</code> for each property.</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
@@ -9264,7 +9312,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1820">query.ts:1820</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1867">query.ts:1867</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-symbol.iterator" target="external" class="tsd-signature-type">Iterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -9281,7 +9329,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1814">query.ts:1814</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/query.ts#L1861">query.ts:1861</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></h4>

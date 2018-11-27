@@ -222,3 +222,13 @@ export function TryAdd<T>(set: Set<T>, value: T): boolean {
     set.add(value);
     return set.size > size;
 }
+
+/** @internal */
+export function MakeDescriptor<K, V>(_key: K, value: V) {
+    return {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value
+    };
+}

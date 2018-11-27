@@ -1347,7 +1347,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/asyncQuery.ts#L1784">asyncQuery.ts:1784</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/asyncQuery.ts#L1830">asyncQuery.ts:1830</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3966,20 +3966,39 @@
 					<a name="toobject" class="tsd-anchor"></a>
 					<h3>to<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Object<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Object&lt;V&gt;<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, elementSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Object<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Object&lt;V&gt;<span class="tsd-signature-symbol">(</span>prototype<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, elementSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, descriptorSelector<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/asyncQuery.ts#L1761">asyncQuery.ts:1761</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/asyncQuery.ts#L1784">asyncQuery.ts:1784</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates an <code>object</code> for the elements of the <code>Query</code>.</p>
+									<p>Creates an Object for the elements of the <a href="_iterable_query_.asyncquery.html">AsyncQuery</a>. Properties are added via <code>Object.defineProperty</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// As a regular object</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">await</span> fromAsync([<span class="hljs-built_in">Promise</span>.resolve([<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>]), [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+
+<span class="hljs-comment">// with a custom prototype</span>
+<span class="hljs-keyword">const</span> baseObject = { toString() { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.x}</span>:<span class="hljs-subst">${this.y}</span>`</span> } };
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">await</span> fromAsync([<span class="hljs-built_in">Promise</span>.resolve([<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>]), [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(baseObject, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+obj.toString(); <span class="hljs-comment">// "x",1:"y",2</span>
+
+<span class="hljs-comment">// with a null prototype</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">await</span> fromAsync([<span class="hljs-built_in">Promise</span>.resolve([<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>]), [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>]);
+obj.x; <span class="hljs-comment">// ["x", 1]</span>
+obj.y; <span class="hljs-comment">// ["y", 2]</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// undefined</span></code></pre>
 								<dl class="tsd-comment-tags">
 									<dt>category</dt>
 									<dd><p>Scalar</p>
@@ -3989,10 +4008,11 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>                        &mdash;
+									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
 										<div class="lead">
-											<p>The prototype for the object.</p>
+											<p>The prototype for the object. If <code>prototype</code> is <code>null</code>, an object with a <code>null</code>
+											prototype is created. If <code>prototype</code> is <code>undefined</code>, the default <code>Object.prototype</code> is used.</p>
 										</div>
 									</div>
 								</li>
@@ -4027,13 +4047,32 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/asyncQuery.ts#L1771">asyncQuery.ts:1771</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/asyncQuery.ts#L1817">asyncQuery.ts:1817</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates an <code>object</code> for the elements of the <code>Query</code>.</p>
+									<p>Creates an Object for the elements the <a href="_iterable_query_.query.html">Query</a>. Properties are added via <code>Object.defineProperty</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// As a regular object</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">await</span> fromAsync([<span class="hljs-built_in">Promise</span>.resolve([<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>]), [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+
+<span class="hljs-comment">// with a custom prototype</span>
+<span class="hljs-keyword">const</span> baseObject = { toString() { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.x}</span>:<span class="hljs-subst">${this.y}</span>`</span> } };
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">await</span> fromAsync([<span class="hljs-built_in">Promise</span>.resolve([<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>]), [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(baseObject, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// function</span>
+obj.toString(); <span class="hljs-comment">// 1:2</span>
+
+<span class="hljs-comment">// with a null prototype</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">await</span> fromAsync([<span class="hljs-built_in">Promise</span>.resolve([<span class="hljs-string">"x"</span>, <span class="hljs-number">1</span>]), [<span class="hljs-string">"y"</span>, <span class="hljs-number">2</span>]]).toObject(<span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> a[<span class="hljs-number">1</span>]);
+obj.x; <span class="hljs-comment">// 1</span>
+obj.y; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">typeof</span> obj.toString; <span class="hljs-comment">// undefined</span></code></pre>
 								<dl class="tsd-comment-tags">
 									<dt>category</dt>
 									<dd><p>Scalar</p>
@@ -4048,10 +4087,11 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>                        &mdash;
+									prototype: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
 										<div class="lead">
-											<p>The prototype for the object.</p>
+											<p>The prototype for the object. If <code>prototype</code> is <code>null</code>, an object with a <code>null</code>
+											prototype is created. If <code>prototype</code> is <code>undefined</code>, the default <code>Object.prototype</code> is used.</p>
 										</div>
 									</div>
 								</li>
@@ -4107,6 +4147,14 @@
 											</ul>
 										</li>
 									</ul>
+								</li>
+								<li>
+									<span class="tsd-flag ts-flagOptional">Optional</span> descriptorSelector: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span>                        &mdash;
+									<div class="tsd-comment tsd-typography" style="display: inline-block">
+										<div class="lead">
+											<p>A callback that defines the <code>PropertyDescriptor</code> for each property.</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-promise-objects" target="external" class="tsd-signature-type">Promise</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></h4>
