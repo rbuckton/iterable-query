@@ -19,7 +19,6 @@ import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
 import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
 import { QuerySource, AsyncQuerySource } from "./types";
-import { tuple } from "../fn";
 
 /** @internal */
 export function GetIterator<T>(source: Iterable<T>): Iterator<T> {
@@ -204,16 +203,6 @@ export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (ele
 /** @internal */
 export function SelectGroupingKey<K, V>(grouping: Grouping<K, V>) {
     return grouping[Grouping.key];
-}
-
-/** @internal */
-export function SelectValue<T extends object, K extends keyof T>(this: T, key: K) {
-    return this[key];
-}
-
-/** @internal */
-export function SelectEntry<T extends object, K extends keyof T>(this: T, key: K) {
-    return tuple(key, this[key]);
 }
 
 /** @internal */

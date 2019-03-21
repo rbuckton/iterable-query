@@ -563,7 +563,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @category Subquery
      */
     through<R extends Queryable<any> = Queryable<any>>(callback: (source: this) => R): AsyncQueryFlow<R, QueriedType<R>> {
-        return fromAsync(fn.throughAsync(this, callback)) as AsyncQueryFlow<R, QueriedType<R>>;
+        return fromAsync(fn.throughAsync(this, callback)) as unknown as AsyncQueryFlow<R, QueriedType<R>>;
     }
 
     /**
@@ -682,31 +682,10 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<TNode, T extends TNode, UNode extends TNode, U extends UNode & T>(this: AsyncHierarchyQuery<TNode, T>, right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<TNode, T extends TNode, U extends T>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<U>): AsyncHierarchyQuery<TNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<TNode, T extends TNode>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
-     *
      * @param right An [[AsyncQueryable]] object.
      * @category Subquery
      */
-    intersect<UNode extends T, U extends UNode>(right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
+    intersect<UNode, U extends UNode & T>(right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
      *
@@ -721,34 +700,10 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @category Subquery
      */
     intersect(right: AsyncQueryable<T>): AsyncQuery<T>;
-    intersect(right: AsyncQueryable<T>): AsyncQuery<T> {
+    intersect(right: AsyncQueryable<T> | PossiblyAsyncHierarchyIterable<unknown, T>): AsyncQuery<T> | AsyncHierarchyQuery<unknown, T> {
         return fromAsync(fn.intersectAsync(GetAsyncSource(this), GetAsyncSource(right)));
     }
 
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
-     *
-     * @param right A [[Queryable]] object.
-     * @param keySelector A callback used to select the key for each element.
-     * @category Subquery
-     */
-    intersectBy<TNode, T extends TNode, UNode extends TNode, U extends UNode & T, K>(this: AsyncHierarchyQuery<TNode, T>, right: PossiblyAsyncHierarchyIterable<UNode, U>, keySelector: (element: T) => K): AsyncHierarchyQuery<UNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
-     *
-     * @param right A [[Queryable]] object.
-     * @param keySelector A callback used to select the key for each element.
-     * @category Subquery
-     */
-    intersectBy<TNode, T extends TNode, U extends T, K>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<U>, keySelector: (element: T) => K): AsyncHierarchyQuery<TNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
-     *
-     * @param right A [[Queryable]] object.
-     * @param keySelector A callback used to select the key for each element.
-     * @category Subquery
-     */
-    intersectBy<TNode, T extends TNode, K>(this: AsyncHierarchyQuery<TNode, T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncHierarchyQuery<TNode, T>;
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
      *
@@ -756,7 +711,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @param keySelector A callback used to select the key for each element.
      * @category Subquery
      */
-    intersectBy<UNode extends T, U extends UNode, K>(right: PossiblyAsyncHierarchyIterable<UNode, U>, keySelector: (element: T) => K): AsyncHierarchyQuery<UNode, U>;
+    intersectBy<UNode, U extends UNode & T, K>(right: PossiblyAsyncHierarchyIterable<UNode, U>, keySelector: (element: T) => K): AsyncHierarchyQuery<UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
      *
@@ -773,7 +728,7 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * @category Subquery
      */
     intersectBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncQuery<T>;
-    intersectBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncQuery<T> {
+    intersectBy<K>(right: AsyncQueryable<T> | PossiblyAsyncHierarchyIterable<unknown, T>, keySelector: (element: T) => K): AsyncQuery<T> | AsyncHierarchyQuery<unknown, T> {
         return fromAsync(fn.intersectByAsync(GetAsyncSource(this), GetAsyncSource(right), keySelector));
     }
 
@@ -1367,10 +1322,12 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
 
     /**
      * Computes the sum for a series of numbers.
+     * 
+     * NOTE: If any element is not a `number`, this overload will throw.
      *
      * @category Scalar
      */
-    sum(this: AsyncQuery<number>): Promise<number>;
+    sum(): Promise<T extends number ? number : never>;
 
     /**
      * Computes the sum for a series of numbers.
@@ -1385,11 +1342,12 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
 
     /**
      * Computes the average for a series of numbers.
+     * 
      * NOTE: If any element is not a `number`, this overload will throw.
      *
      * @category Scalar
      */
-    average(this: AsyncQuery<number>): Promise<number>;
+    average(): Promise<T extends number ? number : never>;
 
     /**
      * Computes the average for a series of numbers.
@@ -1665,15 +1623,15 @@ export class AsyncQuery<T> implements AsyncIterable<T> /*, AsyncQuerySource<T>*/
      * Unzips a sequence of tuples into a tuple of sequences.
      * @category Scalar
      */
-    unzip<T extends [any, ...any[]]>(this: AsyncQuery<T>): Promise<{ [I in keyof T]: T[I][]; }>;
+    unzip(): Promise<T extends [any, ...any[]] ? { [I in keyof T]: T[I][]; } : unknown[]>;
 
     /**
      * Unzips a sequence of tuples into a tuple of sequences.
      * @param partSelector A callback that converts a result into a tuple.
      * @category Scalar
      */
-    unzip<T, U extends [any, ...any[]]>(this: AsyncQuery<T>, partSelector: (value: T) => U | PromiseLike<U>): Promise<{ [I in keyof U]: U[I][]; }>;
-    unzip<T extends [any, ...any[]]>(this: AsyncQuery<T>, partSelector?: (value: T) => T | PromiseLike<T>): Promise<any> {
+    unzip<U extends [any, ...any[]]>(partSelector: (value: T) => U | PromiseLike<U>): Promise<{ [I in keyof U]: U[I][]; }>;
+    unzip<U extends [any, ...any[]]>(partSelector?: (value: T) => U | PromiseLike<U>): Promise<{ [I in keyof U]: U[I][]; } | unknown[]> {
         return fn.unzipAsync(GetAsyncSource(this), partSelector!);
     }
 
@@ -2144,6 +2102,57 @@ export class AsyncHierarchyQuery<TNode, T extends TNode = TNode> extends AsyncQu
     [Hierarchical.hierarchy](): HierarchyProvider<TNode> {
         return GetHierarchy(GetAsyncSource(this));
     }
+}
+
+export interface AsyncHierarchyQuery<TNode, T extends TNode = TNode> {
+    // #region Subquery
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<UNode extends TNode, U extends UNode & T>(right: PossiblyAsyncHierarchyIterable<UNode, U>): AsyncHierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<U extends T>(right: AsyncQueryable<U>): AsyncHierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect(right: AsyncQueryable<T>): AsyncHierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<UNode extends TNode, U extends UNode & T, K>(right: PossiblyAsyncHierarchyIterable<UNode, U>, keySelector: (element: T) => K): AsyncHierarchyQuery<UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<U extends T, K>(right: AsyncQueryable<U>, keySelector: (element: T) => K): AsyncHierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[AsyncQuery]] and another [[AsyncQueryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @category Subquery
+     */
+    intersectBy<K>(right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncHierarchyQuery<TNode, T>;
+    // #endregion Subquery
 }
 
 /**

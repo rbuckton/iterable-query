@@ -15,7 +15,7 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, IteratorClose, ToStringTag} from "../internal";
+import { assert, IteratorClose, ToStringTag } from "../internal";
 
 export interface ConsumeOptions {
     /** Indicates whether iterated elements should be cached for subsequent iterations. */

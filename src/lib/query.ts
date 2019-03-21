@@ -684,28 +684,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @category Subquery
      */
-    intersect<TNode, T extends TNode, UNode extends TNode, U extends UNode & T>(this: HierarchyQuery<TNode, T>, right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<TNode, T extends TNode, U extends T>(this: HierarchyQuery<TNode, T>, right: Queryable<U>): HierarchyQuery<TNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<TNode, T extends TNode>(this: HierarchyQuery<TNode, T>, right: Queryable<T>): HierarchyQuery<TNode, T>;
-    /**
-     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
-     *
-     * @param right A [[Queryable]] object.
-     * @category Subquery
-     */
-    intersect<UNode extends T, U extends UNode>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
+    intersect<UNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
@@ -720,7 +699,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @category Subquery
      */
     intersect(right: Queryable<T>): Query<T>;
-    intersect(right: Queryable<T>): Query<T> {
+    intersect(right: Queryable<T> | HierarchyIterable<unknown, T>): Query<T> | HierarchyQuery<unknown, T> {
         return from(fn.intersect(GetSource(this), GetSource(right)));
     }
 
@@ -732,34 +711,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param keySelector.element An element from which to select a key.
      * @category Subquery
      */
-    intersectBy<TNode, T extends TNode, UNode extends TNode, U extends UNode & T, K>(this: HierarchyQuery<TNode, T>, right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K): HierarchyQuery<UNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
-     *
-     * @param right A [[Queryable]] object.
-     * @param keySelector A callback used to select the key for each element.
-     * @param keySelector.element An element from which to select a key.
-     * @category Subquery
-     */
-    intersectBy<TNode, T extends TNode, U extends T, K>(this: HierarchyQuery<TNode, T>, right: Queryable<U>, keySelector: (element: T) => K): HierarchyQuery<TNode, U>;
-    /**
-     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
-     *
-     * @param right A [[Queryable]] object.
-     * @param keySelector A callback used to select the key for each element.
-     * @param keySelector.element An element from which to select a key.
-     * @category Subquery
-     */
-    intersectBy<TNode, T extends TNode, K>(this: HierarchyQuery<TNode, T>, right: Queryable<T>, keySelector: (element: T) => K): HierarchyQuery<TNode, T>;
-    /**
-     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
-     *
-     * @param right A [[Queryable]] object.
-     * @param keySelector A callback used to select the key for each element.
-     * @param keySelector.element An element from which to select a key.
-     * @category Subquery
-     */
-    intersectBy<UNode extends T, U extends UNode, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K): HierarchyQuery<UNode, U>;
+    intersectBy<UNode, U extends UNode & T, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K): HierarchyQuery<UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
      *
@@ -778,7 +730,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @category Subquery
      */
     intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K): Query<T>;
-    intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K): Query<T> {
+    intersectBy<K>(right: Queryable<T> | HierarchyIterable<unknown, T>, keySelector: (element: T) => K): Query<T> | HierarchyQuery<unknown, T> {
         return from(fn.intersectBy(GetSource(this), GetSource(right), keySelector));
     }
 
@@ -1411,7 +1363,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      *
      * @category Scalar
      */
-    sum(this: Query<number>): number;
+    sum(): T extends number ? number : never;
     /**
      * Computes the sum for a series of numbers.
      *
@@ -1427,7 +1379,7 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      *
      * @category Scalar
      */
-    average(this: Query<number>): number;
+    average(): T extends number ? number : never;
     /**
      * Computes the average for a series of numbers.
      *
@@ -1696,15 +1648,15 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param source A [[Queryable]]
      * @category Scalar
      */
-    unzip<T extends [any, ...any[]]>(this: Query<T>): { [I in keyof T]: T[I][]; };
+    unzip(): T extends [any, ...any[]] ? { [I in keyof T]: T[I][]; } : unknown[];
     /**
      * Unzips a sequence of tuples into a tuple of sequences.
      * @param source A [[Queryable]]
      * @param partSelector A callback that converts a result into a tuple.
      * @category Scalar
      */
-    unzip<T, U extends [any, ...any[]]>(this: Query<T>, partSelector: (value: T) => U): { [I in keyof U]: U[I][]; };
-    unzip<T extends [any, ...any[]]>(this: Query<T>, partSelector?: (value: T) => T): any {
+    unzip<U extends [any, ...any[]]>(partSelector: (value: T) => U): { [I in keyof U]: U[I][]; };
+    unzip<U extends [any, ...any[]]>(partSelector?: (value: T) => U): any {
         return fn.unzip(GetSource(this), partSelector!);
     }
 
@@ -2175,6 +2127,62 @@ export class HierarchyQuery<TNode, T extends TNode = TNode> extends Query<T> imp
         return GetHierarchy(GetSource(this));
     }
 }
+
+export interface HierarchyQuery<TNode, T extends TNode = TNode> {
+    // #region Subquery
+
+    /**
+     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<UNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>): HierarchyQuery<TNode | UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect<U extends T>(right: Queryable<U>): HierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
+     *
+     * @param right A [[Queryable]] object.
+     * @category Subquery
+     */
+    intersect(right: Queryable<T>): HierarchyQuery<TNode, T>;
+
+    /**
+     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @param keySelector.element An element from which to select a key.
+     * @category Subquery
+     */
+    intersectBy<UNode, U extends UNode & T, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K): HierarchyQuery<TNode | UNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @param keySelector.element An element from which to select a key.
+     * @category Subquery
+     */
+    intersectBy<U extends T, K>(right: Queryable<U>, keySelector: (element: T) => K): HierarchyQuery<TNode, U>;
+    /**
+     * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
+     *
+     * @param right A [[Queryable]] object.
+     * @param keySelector A callback used to select the key for each element.
+     * @param keySelector.element An element from which to select a key.
+     * @category Subquery
+     */
+    intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K): HierarchyQuery<TNode, T>;
+    // #endregion
+}
+
 
 /**
  * Represents an ordered sequence of elements.
