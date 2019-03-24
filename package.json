@@ -1,6 +1,6 @@
 {
   "name": "iterable-query",
-  "version": "1.0.0-pre.13",
+  "version": "1.0.0-pre.14",
   "description": "Query library for ECMAScript iterables.",
   "main": "index",
   "typings": "index",
