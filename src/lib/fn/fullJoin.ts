@@ -22,6 +22,7 @@ import { map } from "./map";
 import { Lookup } from "../lookup";
 import { defaultIfEmpty } from "./defaultIfEmpty";
 import { identity } from "./common";
+import { Equaler } from 'equatable';
 
 /**
  * Creates an [[Iterable]] for the correlated elements between an outer [[Queryable]] object and an inner
@@ -32,15 +33,17 @@ import { identity } from "./common";
  * @param outerKeySelector A callback used to select the key for an element in `outer`.
  * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Join
  */
-export function fullJoin<O, I, K, R>(outer: Queryable<O>, inner: Queryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R): Iterable<R> {
+export function fullJoin<O, I, K, R>(outer: Queryable<O>, inner: Queryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R, keyEqualer?: Equaler<K>): Iterable<R> {
     assert.mustBeQueryable(outer, "outer");
     assert.mustBeQueryable(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
     assert.mustBeFunction(innerKeySelector, "innerKeySelector");
     assert.mustBeFunction(resultSelector, "resultSelector");
-    return new FullJoinIterable(ToIterable(outer), ToIterable(inner), outerKeySelector, innerKeySelector, resultSelector);
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+    return new FullJoinIterable(ToIterable(outer), ToIterable(inner), outerKeySelector, innerKeySelector, resultSelector, keyEqualer);
 }
 
 @ToStringTag("FullJoinIterable")
@@ -50,20 +53,22 @@ class FullJoinIterable<O, I, K, R> implements Iterable<R> {
     private _outerKeySelector: (element: O) => K;
     private _innerKeySelector: (element: I) => K;
     private _resultSelector: (outer: O | undefined, inner: I | undefined) => R;
+    private _keyEqualer?: Equaler<K>
 
-    constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R) {
+    constructor(outer: Iterable<O>, inner: Iterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R, keyEqualer?: Equaler<K>) {
         this._outer = outer;
         this._inner = inner;
         this._outerKeySelector = outerKeySelector;
         this._innerKeySelector = innerKeySelector;
         this._resultSelector = resultSelector;
+        this._keyEqualer = keyEqualer;
     }
 
     *[Symbol.iterator](): Iterator<R> {
         const resultSelector = this._resultSelector;
-        const outerLookup = new Lookup(CreateGroupings(this._outer, this._outerKeySelector, identity));
-        const innerLookup = new Lookup(CreateGroupings(this._inner, this._innerKeySelector, identity));
-        const keys = union(map(outerLookup, SelectGroupingKey), map(innerLookup, SelectGroupingKey));
+        const outerLookup = new Lookup(CreateGroupings(this._outer, this._outerKeySelector, identity, this._keyEqualer));
+        const innerLookup = new Lookup(CreateGroupings(this._inner, this._innerKeySelector, identity, this._keyEqualer));
+        const keys = union(map(outerLookup, SelectGroupingKey), map(innerLookup, SelectGroupingKey), this._keyEqualer);
         for (const key of keys) {
             const outer = defaultIfEmpty<O | undefined>(outerLookup.get(key), undefined);
             const inner = defaultIfEmpty<I | undefined>(innerLookup.get(key), undefined);

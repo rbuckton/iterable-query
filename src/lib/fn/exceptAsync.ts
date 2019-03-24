@@ -19,25 +19,29 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
 import { exceptByAsync } from './exceptByAsync';
 import { identity } from './common';
+import { Equaler } from 'equatable';
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the set difference between a [[HierarchyIterable]] or an [[AsyncHierarchyIterable]] and an [[AsyncQueryable]] object.
  *
  * @param left A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function exceptAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
+export function exceptAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates an [[AsyncIterable]] for the set difference between two [[AsyncQueryable]] objects.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
-export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncIterable<T>;
+export function exceptAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    return exceptByAsync(left, right, identity);
+    assert.mustBeEqualerOrUndefined(equaler, "equaler");
+    return exceptByAsync(left, right, identity, equaler);
 }

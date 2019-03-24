@@ -15,10 +15,11 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue} from "../internal";
+import { assert } from "../internal";
 import { Queryable } from "../types";
 import { takeRight } from "./takeRight";
 import { toArray } from "./toArray";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of `left` end
@@ -26,23 +27,25 @@ import { toArray } from "./toArray";
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler An optional callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function endsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
+export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
 /**
  * Computes a scalar value indicating whether the elements of `left` end
  * with the same sequence of elements in `right`.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
+ * @param equaler An optional callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function endsWith<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
+export function endsWith<T, U>(left: Queryable<T>, right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): boolean {
+    if (typeof equaler === "function") equaler = Equaler.create(equaler);
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeEqualer(equaler, "equaler");
     const rightArray = toArray(right);
     const numElements = rightArray.length;
     if (numElements <= 0) {
@@ -53,7 +56,7 @@ export function endsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityCom
         return false;
     }
     for (let i = 0; i < numElements; i++) {
-        if (!equalityComparison(leftArray[i], rightArray[i])) {
+        if (!equaler.equals(leftArray[i], rightArray[i])) {
             return false;
         }
     }

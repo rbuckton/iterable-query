@@ -15,35 +15,39 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, CreateGroupings, CreateGrouping, ToStringTag, FlowHierarchy } from "../internal";
+import { assert, ToIterable, CreateGroupings, CreateGrouping, ToStringTag, FlowHierarchy, IsEqualer } from "../internal";
 import { Queryable, HierarchyIterable, HierarchyGrouping, Grouping } from "../types";
 import { identity } from "./common";
+import { Equaler } from 'equatable';
 
 /**
  * Groups each element of a [[HierarchyIterable]] by its key.
  *
  * @param source A [[HierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function groupBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): Iterable<HierarchyGrouping<K, TNode, T>>;
+export function groupBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Iterable<HierarchyGrouping<K, TNode, T>>;
 /**
  * Groups each element of a [[Queryable]] by its key.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function groupBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Iterable<Grouping<K, T>>;
+export function groupBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Iterable<Grouping<K, T>>;
 /**
  * Groups each element of a [[Queryable]] by its key.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function groupBy<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Iterable<Grouping<K, V>>;
+export function groupBy<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer?: Equaler<K>): Iterable<Grouping<K, V>>;
 /**
  * Groups each element of a [[Queryable]] by its key.
  *
@@ -51,14 +55,24 @@ export function groupBy<T, K, V>(source: Queryable<T>, keySelector: (element: T)
  * @param keySelector A callback used to select the key for an element.
  * @param elementSelector A callback used to select a value for an element.
  * @param resultSelector A callback used to select a result from a group.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Iterable<V>) => R): Iterable<R>;
-export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | V = identity, resultSelector: (key: K, elements: Iterable<T | V>) => Grouping<K, T | V> | R = CreateGrouping) {
+export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Iterable<V>) => R, keyEqualer?: Equaler<K>): Iterable<R>;
+export function groupBy<T, K, V, R>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: ((element: T) => T | V) | Equaler<K> = identity, resultSelector: ((key: K, elements: Iterable<T | V>) => Grouping<K, T | V> | R) | Equaler<K> = CreateGrouping, keyEqualer?: Equaler<K>) {
+    if (IsEqualer(elementSelector)) {
+        resultSelector = elementSelector;
+        elementSelector = identity;
+    }
+    if (IsEqualer(resultSelector)) {
+        keyEqualer = resultSelector;
+        resultSelector = CreateGrouping;
+    }
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
     assert.mustBeFunction(resultSelector, "resultSelector");
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
     return new GroupByIterable(ToIterable(source), keySelector, elementSelector, resultSelector);
 }
 

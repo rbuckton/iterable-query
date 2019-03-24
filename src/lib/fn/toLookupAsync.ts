@@ -15,31 +15,39 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CreateGroupingsAsync } from "../internal";
+import { assert, CreateGroupingsAsync, IsEqualer } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Lookup } from "../lookup";
 import { identity } from "./common";
+import { Equaler } from 'equatable';
 
 /**
  * Creates a Lookup for the elements of the source.
  *
  * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select a key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Scalar
  */
-export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K): Promise<Lookup<K, T>>;
+export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Promise<Lookup<K, T>>;
 /**
  * Creates a Lookup for the elements of the source.
  *
  * @param source An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Scalar
  */
-export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Lookup<K, V>>;
-export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T | PromiseLike<T> = identity): Promise<Lookup<K, T>> {
+export async function toLookupAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>, keyEqualer?: Equaler<K>): Promise<Lookup<K, V>>;
+export async function toLookupAsync<T, K>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: ((element: T) => T | PromiseLike<T>) | Equaler<K> = identity, keyEqualer?: Equaler<K>): Promise<Lookup<K, T>> {
+    if (IsEqualer(elementSelector)) {
+        keyEqualer = elementSelector;
+        elementSelector = identity;
+    }
     assert.mustBeAsyncQueryable<T>(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
-    return new Lookup(await CreateGroupingsAsync(source, keySelector, elementSelector));
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+    return new Lookup(await CreateGroupingsAsync(source, keySelector, elementSelector, keyEqualer), keyEqualer);
 }

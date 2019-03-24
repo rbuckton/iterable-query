@@ -18,6 +18,7 @@
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { toSetAsync } from "./toSetAsync";
+import { Equaler } from 'equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object and an [[AsyncQueryable]] object, where set identity is determined by the selected key.
@@ -25,31 +26,35 @@ import { toSetAsync } from "./toSetAsync";
  * @param left A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param right An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function intersectByAsync<TNode, T extends TNode, K>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncHierarchyIterable<TNode, T>;
+export function intersectByAsync<TNode, T extends TNode, K>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of an [[AsyncQueryable]] object and a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object, where set identity is determined by the selected key.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right A [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function intersectByAsync<TNode, T extends TNode, K>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K): AsyncHierarchyIterable<TNode, T>;
+export function intersectByAsync<TNode, T extends TNode, K>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates an [[AsyncIterable]] for the set intersection of two [[AsyncQueryable]] objects, where set identity is determined by the selected key.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function intersectByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncIterable<T>;
-export function intersectByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncIterable<T> {
+export function intersectByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncIterable<T>;
+export function intersectByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
     assert.mustBeFunction(keySelector, "keySelector");
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
     return FlowHierarchy(new AsyncIntersectByIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right), keySelector), left, right);
 }
 
@@ -58,16 +63,18 @@ class AsyncIntersectByIterable<T, K> implements AsyncIterable<T> {
     private _left: PossiblyAsyncIterable<T>;
     private _right: PossiblyAsyncIterable<T>;
     private _keySelector: (element: T) => K;
+    private _keyEqualer?: Equaler<K>;
 
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>, keySelector: (element: T) => K) {
+    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>) {
         this._left = left;
         this._right = right;
         this._keySelector = keySelector;
+        this._keyEqualer = keyEqualer;
     }
 
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
         const keySelector = this._keySelector;
-        const set = await toSetAsync(this._right, keySelector);
+        const set = await toSetAsync(this._right, keySelector, this._keyEqualer!);
         if (set.size <= 0) {
             return;
         }

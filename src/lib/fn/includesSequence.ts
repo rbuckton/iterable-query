@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, SameValue} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
 import { toArray } from "./toArray";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of `left` include
@@ -25,23 +26,25 @@ import { toArray } from "./toArray";
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>): boolean;
+export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
 /**
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
- * @param equalityComparison A callback used to compare the equality of two elements.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function includesSequence<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
+export function includesSequence<T, U>(left: Queryable<T>, right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): boolean {
+    if (typeof equaler === "function") equaler = Equaler.create(equaler);
     assert.mustBeQueryable(left, "source");
     assert.mustBeQueryable(right, "other");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeEqualer(equaler, "equaler");
     const rightArray = toArray(right);
     const numRightElements = rightArray.length;
     if (numRightElements <= 0) {
@@ -51,7 +54,7 @@ export function includesSequence<T>(left: Queryable<T>, right: Queryable<T>, equ
     for (const leftValue of ToIterable(left)) {
         for (;;) {
             const rightValue = rightArray[span.length];
-            if (equalityComparison(leftValue, rightValue)) {
+            if (equaler.equals(leftValue, rightValue)) {
                 if (span.length + 1 >= numRightElements) {
                     return true;
                 }

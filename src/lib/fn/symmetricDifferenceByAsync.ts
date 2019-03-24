@@ -18,6 +18,8 @@
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, TryAdd } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
+import { Equaler } from 'equatable';
+import { HashSet, HashMap } from 'equatable/collections';
 
 /**
  * Creates a subquery for the symmetric difference between two [[AsyncQueryable]] objects, where set identity is determined by the selected key.
@@ -27,9 +29,10 @@ import { Set } from "../collections";
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function symmetricDifferenceByAsync<TNode, T extends TNode, K>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncHierarchyIterable<TNode, T>;
+export function symmetricDifferenceByAsync<TNode, T extends TNode, K>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[AsyncQueryable]] objects, where set identity is determined by the selected key.
  * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
@@ -38,9 +41,10 @@ export function symmetricDifferenceByAsync<TNode, T extends TNode, K>(left: Poss
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function symmetricDifferenceByAsync<TNode, T extends TNode, K>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K): AsyncHierarchyIterable<TNode, T>;
+export function symmetricDifferenceByAsync<TNode, T extends TNode, K>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[AsyncQueryable]] objects, where set identity is determined by the selected key.
  * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
@@ -49,13 +53,15 @@ export function symmetricDifferenceByAsync<TNode, T extends TNode, K>(left: Asyn
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function symmetricDifferenceByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncIterable<T>;
-export function symmetricDifferenceByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K): AsyncIterable<T> {
+export function symmetricDifferenceByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncIterable<T>;
+export function symmetricDifferenceByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
     assert.mustBeFunction(keySelector, "keySelector");
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
     return FlowHierarchy(new AsyncSymmetricDifferenceByIterable(ToPossiblyAsyncIterable(left), ToPossiblyAsyncIterable(right), keySelector), left, right);
 }
 
@@ -64,24 +70,26 @@ class AsyncSymmetricDifferenceByIterable<T, K> implements AsyncIterable<T> {
     private _left: PossiblyAsyncIterable<T>;
     private _right: PossiblyAsyncIterable<T>;
     private _keySelector: (element: T) => K;
+    private _keyEqualer?: Equaler<K>;
 
-    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>, keySelector: (element: T) => K) {
+    constructor(left: PossiblyAsyncIterable<T>, right: PossiblyAsyncIterable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>) {
         this._left = left;
         this._right = right;
         this._keySelector = keySelector;
+        this._keyEqualer = keyEqualer;
     }
 
     async *[Symbol.asyncIterator](): AsyncIterator<T> {
         const keySelector = this._keySelector;
-        const rightKeys = new Set<K>();
-        const right = new Map<K, T>();
+        const rightKeys = this._keyEqualer ? new HashSet<K>(this._keyEqualer) : new Set<K>();
+        const right = this._keyEqualer ? new HashMap<K, T>(this._keyEqualer) : new Map<K, T>();
         for await (const element of this._right) {
             const key = keySelector(element);
             if (TryAdd(rightKeys, key)) {
                 right.set(key, element);
             }
-        }        
-        const set = new Set<K>();
+        }
+        const set = this._keyEqualer ? new HashSet<K>(this._keyEqualer) : new Set<K>();
         for await (const element of this._left) {
             const key = keySelector(element);
             if (TryAdd(set, key) && !right.has(key)) {

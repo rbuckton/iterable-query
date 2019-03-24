@@ -16,10 +16,12 @@
 /** @module "iterable-query" */
 
 import * as fn from "./fn";
-import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, GetIterator, QuerySource } from "./internal";
+import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, GetIterator, QuerySource, IsEqualer } from "./internal";
 import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, KeyValuePair, Page, Choice, QueriedType, WritableArrayLike } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeOptions } from "./fn";
+import { Comparison, Comparer, EqualityComparison, Equaler } from 'equatable';
+import { HashSet, HashMap } from 'equatable/collections';
 
 /**
  * Flows the base type of a [[Query]] as an unordered query with a new iterated type.
@@ -682,25 +684,28 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    intersect<UNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>): HierarchyQuery<UNode, U>;
+    intersect<UNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>, equaler?: Equaler<T>): HierarchyQuery<UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    intersect<U extends T>(right: Queryable<U>): Query<U>;
+    intersect<U extends T>(right: Queryable<U>, equaler?: Equaler<T>): Query<U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    intersect(right: Queryable<T>): Query<T>;
-    intersect(right: Queryable<T> | HierarchyIterable<unknown, T>): Query<T> | HierarchyQuery<unknown, T> {
-        return from(fn.intersect(GetSource(this), GetSource(right)));
+    intersect(right: Queryable<T>, equaler?: Equaler<T>): Query<T>;
+    intersect(right: Queryable<T> | HierarchyIterable<unknown, T>, equaler?: Equaler<T>): Query<T> | HierarchyQuery<unknown, T> {
+        return from(fn.intersect(GetSource(this), GetSource(right), equaler));
     }
 
     /**
@@ -709,39 +714,43 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    intersectBy<UNode, U extends UNode & T, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K): HierarchyQuery<UNode, U>;
+    intersectBy<UNode, U extends UNode & T, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyQuery<UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
      *
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    intersectBy<U extends T, K>(right: Queryable<U>, keySelector: (element: T) => K): Query<U>;
+    intersectBy<U extends T, K>(right: Queryable<U>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Query<U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
      *
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K): Query<T>;
-    intersectBy<K>(right: Queryable<T> | HierarchyIterable<unknown, T>, keySelector: (element: T) => K): Query<T> | HierarchyQuery<unknown, T> {
-        return from(fn.intersectBy(GetSource(this), GetSource(right), keySelector));
+    intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Query<T>;
+    intersectBy<K>(right: Queryable<T> | HierarchyIterable<unknown, T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Query<T> | HierarchyQuery<unknown, T> {
+        return from(fn.intersectBy(GetSource(this), GetSource(right), keySelector, keyEqualer));
     }
 
     /**
      * Creates a subquery for the set union of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    union(right: Queryable<T>): UnorderedQueryFlow<this, T> {
-        return from(fn.union(GetSource(this), GetSource(right))) as UnorderedQueryFlow<this, T>;
+    union(right: Queryable<T>, equaler?: Equaler<T>): UnorderedQueryFlow<this, T> {
+        return from(fn.union(GetSource(this), GetSource(right), equaler)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -750,20 +759,22 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    unionBy<K>(right: Queryable<T>, keySelector: (element: T) => K): UnorderedQueryFlow<this, T> {
-        return from(fn.unionBy(GetSource(this), GetSource(right), keySelector)) as UnorderedQueryFlow<this, T>;
+    unionBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): UnorderedQueryFlow<this, T> {
+        return from(fn.unionBy(GetSource(this), GetSource(right), keySelector, keyEqualer)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
      * Creates a subquery for the set difference between this and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    except(right: Queryable<T>): UnorderedQueryFlow<this, T> {
-        return from(fn.except(GetSource(this), GetSource(right))) as UnorderedQueryFlow<this, T>;
+    except(right: Queryable<T>, equaler?: Equaler<T>): UnorderedQueryFlow<this, T> {
+        return from(fn.except(GetSource(this), GetSource(right), equaler)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -772,20 +783,22 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    exceptBy<K>(right: Queryable<T>, keySelector: (element: T) => K): UnorderedQueryFlow<this, T> {
-        return from(fn.exceptBy(GetSource(this), GetSource(right), keySelector)) as UnorderedQueryFlow<this, T>;
+    exceptBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): UnorderedQueryFlow<this, T> {
+        return from(fn.exceptBy(GetSource(this), GetSource(right), keySelector, keyEqualer)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
      * Creates a subquery for the set difference between this and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    relativeComplement(right: Queryable<T>): UnorderedQueryFlow<this, T> {
-        return from(fn.relativeComplement(GetSource(this), GetSource(right))) as UnorderedQueryFlow<this, T>;
+    relativeComplement(right: Queryable<T>, equaler?: Equaler<T>): UnorderedQueryFlow<this, T> {
+        return from(fn.relativeComplement(GetSource(this), GetSource(right), equaler)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -794,20 +807,22 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    relativeComplementBy<K>(right: Queryable<T>, keySelector: (element: T) => K): UnorderedQueryFlow<this, T> {
-        return from(fn.relativeComplementBy(GetSource(this), GetSource(right), keySelector)) as UnorderedQueryFlow<this, T>;
+    relativeComplementBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): UnorderedQueryFlow<this, T> {
+        return from(fn.relativeComplementBy(GetSource(this), GetSource(right), keySelector, keyEqualer)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
      * Creates a subquery for the symmetric difference between this and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    symmetricDifference(right: Queryable<T>): UnorderedQueryFlow<this, T> {
-        return from(fn.symmetricDifference(GetSource(this), GetSource(right))) as UnorderedQueryFlow<this, T>;
+    symmetricDifference(right: Queryable<T>, equaler?: Equaler<T>): UnorderedQueryFlow<this, T> {
+        return from(fn.symmetricDifference(GetSource(this), GetSource(right), equaler)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -816,10 +831,11 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    symmetricDifferenceBy<K>(right: Queryable<T>, keySelector: (element: T) => K): UnorderedQueryFlow<this, T> {
-        return from(fn.symmetricDifferenceBy(GetSource(this), GetSource(right), keySelector)) as UnorderedQueryFlow<this, T>;
+    symmetricDifferenceBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): UnorderedQueryFlow<this, T> {
+        return from(fn.symmetricDifferenceBy(GetSource(this), GetSource(right), keySelector, keyEqualer)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -828,10 +844,11 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * NOTE: This is an alias for [[symmetricDifference]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    xor(right: Queryable<T>): UnorderedQueryFlow<this, T> {
-        return from(fn.xor(GetSource(this), GetSource(right))) as UnorderedQueryFlow<this, T>;
+    xor(right: Queryable<T>, equaler?: Equaler<T>): UnorderedQueryFlow<this, T> {
+        return from(fn.xor(GetSource(this), GetSource(right), equaler)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -842,10 +859,11 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    xorBy<K>(right: Queryable<T>, keySelector: (element: T) => K): UnorderedQueryFlow<this, T> {
-        return from(fn.xorBy(GetSource(this), GetSource(right), keySelector)) as UnorderedQueryFlow<this, T>;
+    xorBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): UnorderedQueryFlow<this, T> {
+        return from(fn.xorBy(GetSource(this), GetSource(right), keySelector, keyEqualer)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -860,19 +878,23 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
 
     /**
      * Creates a subquery for the distinct elements of this [[Query]].
+     * @param equaler An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    distinct(): UnorderedQueryFlow<this, T>;
+    distinct(equaler?: Equaler<T>): UnorderedQueryFlow<this, T> {
+        return from(fn.distinct(GetSource(this), equaler)) as UnorderedQueryFlow<this, T>;
+    }
+
     /**
      * Creates a subquery for the distinct elements of this [[Query]].
      *
      * @param keySelector A callback used to select the key to determine uniqueness.
-     * @param keySelector.element An element from which to select a key.
+     * @param keySelector.value An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    distinct<K>(keySelector: (value: T) => K): UnorderedQueryFlow<this, T>;
-    distinct(keySelector?: (value: T) => T): UnorderedQueryFlow<this, T> {
-        return from(fn.distinct(GetSource(this), keySelector!)) as UnorderedQueryFlow<this, T>;
+    distinctBy<K>(keySelector: (value: T) => K, keyEqualer?: Equaler<K>): UnorderedQueryFlow<this, T> {
+        return from(fn.distinctBy(GetSource(this), keySelector, keyEqualer)) as UnorderedQueryFlow<this, T>;
     }
 
     /**
@@ -971,9 +993,10 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      *
      * @param keySelector A callback used to select the key for an element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    groupBy<K>(keySelector: (element: T) => K): Query<Grouping<K, T>>;
+    groupBy<K>(keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Query<Grouping<K, T>>;
     /**
      * Groups each element by its key.
      *
@@ -981,9 +1004,10 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param keySelector.element An element from which to select a key.
      * @param elementSelector A callback used to select a value for an element.
      * @param elementSelector.element An element from which to select a value.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    groupBy<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Query<Grouping<K, V>>;
+    groupBy<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer?: Equaler<K>): Query<Grouping<K, V>>;
     /**
      * Groups each element by its key.
      *
@@ -994,11 +1018,20 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param resultSelector A callback used to select a result from a group.
      * @param resultSelector.key The key for the group.
      * @param resultSelector.elements The elements for the group.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R): Query<R>;
-    groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector?: (element: T) => V, resultSelector?: (key: K, elements: Query<V>) => R): Query<R> {
-        return from(fn.groupBy(GetSource(this), keySelector, elementSelector!, wrapResultSelector(resultSelector!)));
+    groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector: (element: T) => V, resultSelector: (key: K, elements: Query<V>) => R, keyEqualer?: Equaler<K>): Query<R>;
+    groupBy<K, V, R>(keySelector: (element: T) => K, elementSelector?: ((element: T) => V) | Equaler<K>, resultSelector?: ((key: K, elements: Query<V>) => R) | Equaler<K>, keyEqualer?: Equaler<K>): Query<R> {
+        if (IsEqualer(elementSelector)) {
+            resultSelector = elementSelector;
+            elementSelector = undefined;
+        }
+        if (IsEqualer(resultSelector)) {
+            keyEqualer = resultSelector;
+            resultSelector = undefined;
+        }
+        return from(fn.groupBy(GetSource(this), keySelector, elementSelector!, wrapResultSelector(resultSelector!), keyEqualer));
     }
 
     /**
@@ -1077,10 +1110,11 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param outerKeySelector A callback used to select the key for an element in this [[Query]].
      * @param innerKeySelector A callback used to select the key for an element in the other [[Queryable]] object.
      * @param resultSelector A callback used to select the result for the correlated elements.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Join
      */
-    groupJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R): Query<R> {
-        return from(fn.groupJoin(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, wrapResultSelector(resultSelector)));
+    groupJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: Query<I>) => R, keyEqualer?: Equaler<K>): Query<R> {
+        return from(fn.groupJoin(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, wrapResultSelector(resultSelector), keyEqualer));
     }
 
     /**
@@ -1090,10 +1124,11 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param outerKeySelector A callback used to select the key for an element in this [[Query]].
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Join
      */
-    join<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R): Query<R> {
-        return from(fn.join(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, resultSelector));
+    join<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T, inner: I) => R, keyEqualer?: Equaler<K>): Query<R> {
+        return from(fn.join(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, resultSelector, keyEqualer));
     }
 
     /**
@@ -1103,10 +1138,11 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param outerKeySelector A callback used to select the key for an element in this [[Query]].
      * @param innerKeySelector A callback used to select the key for an element in the other Queryable.
      * @param resultSelector A callback used to select the result for the correlated elements.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Join
      */
-    fullJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R): Query<R> {
-        return from(fn.fullJoin(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, resultSelector));
+    fullJoin<I, K, R>(inner: Queryable<I>, outerKeySelector: (element: T) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: T | undefined, inner: I | undefined) => R, keyEqualer?: Equaler<K>): Query<R> {
+        return from(fn.fullJoin(GetSource(this), GetSource(inner), outerKeySelector, innerKeySelector, resultSelector, keyEqualer));
     }
 
     /**
@@ -1138,22 +1174,22 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * Creates an ordered subquery whose elements are sorted in ascending order by the provided key.
      *
      * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
+     * @param comparer An optional callback used to compare two keys.
      * @category Order
      */
-    orderBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQueryFlow<this, T> {
-        return from(fn.orderBy(GetSource(this), keySelector, comparison)) as OrderedQueryFlow<this, T>;
+    orderBy<K>(keySelector: (element: T) => K, comparer?: Comparison<K> | Comparer<K>): OrderedQueryFlow<this, T> {
+        return from(fn.orderBy(GetSource(this), keySelector, comparer)) as OrderedQueryFlow<this, T>;
     }
 
     /**
      * Creates an ordered subquery whose elements are sorted in descending order by the provided key.
      *
      * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
+     * @param comparer An optional callback used to compare two keys.
      * @category Order
      */
-    orderByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQueryFlow<this, T> {
-        return from(fn.orderByDescending(GetSource(this), keySelector, comparison)) as OrderedQueryFlow<this, T>;
+    orderByDescending<K>(keySelector: (element: T) => K, comparer?: Comparison<K> | Comparer<K>): OrderedQueryFlow<this, T> {
+        return from(fn.orderByDescending(GetSource(this), keySelector, comparer)) as OrderedQueryFlow<this, T>;
     }
 
     // #endregion Order
@@ -1318,44 +1354,44 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * Gets the minimum element in the [[Query]], optionally comparing elements using the supplied
      * callback.
      *
-     * @param comparison An optional callback used to compare two elements.
+     * @param comparer An optional callback used to compare two elements.
      * @category Scalar
      */
-    min(comparison?: (x: T, y: T) => number): T | undefined {
-        return fn.min(GetSource(this), comparison);
+    min(comparer?: Comparison<T> | Comparer<T>): T | undefined {
+        return fn.min(GetSource(this), comparer);
     }
 
     /**
      * Gets the minimum element by its key in the [[Query]], optionally comparing the keys of each element using the supplied callback.
      *
      * @param keySelector A callback used to choose the key to compare.
-     * @param keyComparison An optional callback used to compare the keys.
+     * @param keyComparer An optional callback used to compare the keys.
      * @category Scalar
      */
-    minBy<K>(keySelector: (element: T) => K, keyComparison?: (x: K, y: K) => number): T | undefined {
-        return fn.minBy(GetSource(this), keySelector, keyComparison);
+    minBy<K>(keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): T | undefined {
+        return fn.minBy(GetSource(this), keySelector, keyComparer);
     }
 
     /**
      * Gets the maximum element in the [[Query]], optionally comparing elements using the supplied
      * callback.
      *
-     * @param comparison An optional callback used to compare two elements.
+     * @param comparer An optional callback used to compare two elements.
      * @category Scalar
      */
-    max(comparison?: (x: T, y: T) => number): T | undefined {
-        return fn.max(GetSource(this), comparison);
+    max(comparer?: Comparison<T> | Comparer<T>): T | undefined {
+        return fn.max(GetSource(this), comparer);
     }
 
     /**
      * Gets the maximum element by its key in the [[Query]], optionally comparing the keys of each element using the supplied callback.
      *
      * @param keySelector A callback used to choose the key to compare.
-     * @param keyComparison An optional callback used to compare the keys.
+     * @param keyComparer An optional callback used to compare the keys.
      * @category Scalar
      */
-    maxBy<K>(keySelector: (element: T) => K, keyComparison?: (x: K, y: K) => number): T | undefined {
-        return fn.maxBy(GetSource(this), keySelector, keyComparison);
+    maxBy<K>(keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): T | undefined {
+        return fn.maxBy(GetSource(this), keySelector, keyComparer);
     }
 
     /**
@@ -1426,20 +1462,21 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * in another [[Queryable]] at the same position.
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An optional callback used to compare the equality of two elements.
      * @category Scalar
      */
-    corresponds(right: Queryable<T>): boolean;
+    corresponds(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
     /**
      * Computes a scalar value indicating whether every element in this [[Query]] corresponds to a matching element
      * in another [[Queryable]] at the same position.
      *
      * @param right A [[Queryable]] object.
-     * @param equalityComparison An optional callback used to compare the equality of two elements.
+     * @param equaler An optional callback used to compare the equality of two elements.
      * @category Scalar
      */
-    corresponds<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-    corresponds<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
-        return fn.corresponds(GetSource(this), GetSource(right), equalityComparison!);
+    corresponds<U>(right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+    corresponds(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean {
+        return fn.corresponds(GetSource(this), GetSource(right), equaler!);
     }
 
     /**
@@ -1458,31 +1495,32 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * @param right A [[Queryable]] object.
      * @param leftKeySelector A callback used to select the key for each element in this [[Query]].
      * @param rightKeySelector A callback used to select the key for each element in `right`.
-     * @param equalityComparison An optional callback used to compare the equality of two keys.
+     * @param keyEqualer An optional callback used to compare the equality of two keys.
      * @category Scalar
      */
-    correspondsBy<U, K>(right: Queryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, equalityComparison?: (left: K, right: K) => boolean): boolean;
-    correspondsBy<U, K>(right: Queryable<U>, leftKeySelector: (element: T) => K, rightKeySelector?: (element: U) => K, equalityComparison?: (left: K, right: K) => boolean): boolean {
-        return fn.correspondsBy(GetSource(this), GetSource(right), leftKeySelector, rightKeySelector!, equalityComparison);
+    correspondsBy<U, K>(right: Queryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, keyEqualer?: EqualityComparison<K> | Equaler<K>): boolean;
+    correspondsBy<U, K>(right: Queryable<U>, leftKeySelector: (element: T) => K, rightKeySelector?: (element: U) => K, keyEqualer?: EqualityComparison<K> | Equaler<K>): boolean {
+        return fn.correspondsBy(GetSource(this), GetSource(right), leftKeySelector, rightKeySelector!, keyEqualer);
     }
 
     /**
      * Computes a scalar value indicating whether the provided value is included in the [[Query]].
      *
      * @param value A value.
+     * @param equaler An optional callback used to compare the equality of two elements.
      * @category Scalar
      */
-    includes(value: T): boolean;
+    includes(value: T, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
     /**
      * Computes a scalar value indicating whether the provided value is included in the [[Query]].
      *
      * @param value A value.
-     * @param equalityComparison An optional callback used to compare the equality of two elements.
+     * @param equaler An optional callback used to compare the equality of two elements.
      * @category Scalar
      */
-    includes<U>(value: U, equalityComparison: (left: T, right: U) => boolean): boolean;
-    includes(value: T, equalityComparison?: (left: T, right: T) => boolean): boolean {
-        return fn.includes(GetSource(this), value, equalityComparison!);
+    includes<U>(value: U, equaler: (left: T, right: U) => boolean): boolean;
+    includes(value: T, equaler?: EqualityComparison<T> | Equaler<T>): boolean {
+        return fn.includes(GetSource(this), value, equaler!);
     }
 
     /**
@@ -1490,20 +1528,21 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * an exact sequence of elements from another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler A callback used to compare the equality of two elements.
      * @category Scalar
      */
-    includesSequence(right: Queryable<T>): boolean;
+    includesSequence(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
     /**
      * Computes a scalar value indicating whether the elements of this [[Query]] include
      * an exact sequence of elements from another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
-     * @param equalityComparison A callback used to compare the equality of two elements.
+     * @param equaler A callback used to compare the equality of two elements.
      * @category Scalar
      */
-    includesSequence<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-    includesSequence<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
-        return fn.includesSequence(GetSource(this), GetSource(right), equalityComparison!);
+    includesSequence<U>(right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+    includesSequence(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean {
+        return fn.includesSequence(GetSource(this), GetSource(right), equaler!);
     }
 
     /**
@@ -1511,20 +1550,21 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * with the same sequence of elements in another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler A callback used to compare the equality of two elements.
      * @category Scalar
      */
-    startsWith(right: Queryable<T>): boolean;
+    startsWith(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
     /**
      * Computes a scalar value indicating whether the elements of this [[Query]] start
      * with the same sequence of elements in another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
-     * @param equalityComparison A callback used to compare the equality of two elements.
+     * @param equaler A callback used to compare the equality of two elements.
      * @category Scalar
      */
-    startsWith<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-    startsWith<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
-        return fn.startsWith(GetSource(this), GetSource(right), equalityComparison!);
+    startsWith<U>(right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+    startsWith(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean {
+        return fn.startsWith(GetSource(this), GetSource(right), equaler!);
     }
 
     /**
@@ -1532,20 +1572,21 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * with the same sequence of elements in another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler A callback used to compare the equality of two elements.
      * @category Scalar
      */
-    endsWith(right: Queryable<T>): boolean;
+    endsWith(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
     /**
      * Computes a scalar value indicating whether the elements of this [[Query]] end
      * with the same sequence of elements in another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
-     * @param equalityComparison A callback used to compare the equality of two elements.
+     * @param equaler A callback used to compare the equality of two elements.
      * @category Scalar
      */
-    endsWith<U>(right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-    endsWith<U>(right: Queryable<U>, equalityComparison?: (left: T, right: U) => boolean): boolean {
-        return fn.endsWith(GetSource(this), GetSource(right), equalityComparison!);
+    endsWith<U>(right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+    endsWith(right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean {
+        return fn.endsWith(GetSource(this), GetSource(right), equaler!);
     }
 
     /**
@@ -1683,13 +1724,27 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
     toSet(): Set<T>;
     /**
      * Creates a `Set` for the elements of the [[Query]].
+     * @param equaler An [[Equaler]] object used to compare equality.
+     * @category Scalar
+     */
+    toSet(equaler: Equaler<T>): HashSet<T>;
+    /**
+     * Creates a `Set` for the elements of the [[Query]].
      *
      * @param elementSelector A callback that selects a value for each element.
      * @category Scalar
      */
     toSet<V>(elementSelector: (element: T) => V): Set<V>;
-    toSet<V>(elementSelector?: (element: T) => V): Set<V> {
-        return fn.toSet(GetSource(this), elementSelector!);
+    /**
+     * Creates a `Set` for the elements of the [[Query]].
+     *
+     * @param elementSelector A callback that selects a value for each element.
+     * @param equaler An [[Equaler]] object used to compare equality.
+     * @category Scalar
+     */
+    toSet<V>(elementSelector: (element: T) => V, equaler: Equaler<V>): HashSet<V>;
+    toSet(elementSelector?: ((element: T) => T) | Equaler<T>, equaler?: Equaler<T>): Set<T> | HashSet<T> {
+        return fn.toSet(GetSource(this), elementSelector as (element: T) => T, equaler!);
     }
 
     /**
@@ -1703,31 +1758,50 @@ export class Query<T> implements Iterable<T> /*, QuerySource<T>*/ {
      * Creates a `Map` for the elements of the [[Query]].
      *
      * @param keySelector A callback used to select a key for each element.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
+     * @category Scalar
+     */
+    toMap<K>(keySelector: (element: T) => K, keyEqualer: Equaler<K>): HashMap<K, T>;
+    /**
+     * Creates a `Map` for the elements of the [[Query]].
+     *
+     * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
      * @category Scalar
      */
     toMap<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V>;
-    toMap<K, V>(keySelector: (element: T) => K, elementSelector?: (element: T) => V): Map<K, V> {
-        return fn.toMap(GetSource(this), keySelector, elementSelector!);
+    /**
+     * Creates a `Map` for the elements of the [[Query]].
+     *
+     * @param keySelector A callback used to select a key for each element.
+     * @param elementSelector A callback that selects a value for each element.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
+     * @category Scalar
+     */
+    toMap<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer: Equaler<K>): HashMap<K, V>;
+    toMap<K>(keySelector: (element: T) => K, elementSelector?: ((element: T) => T) | Equaler<K>, keyEqualer?: Equaler<K>): Map<K, T> | HashMap<K, T> {
+        return fn.toMap(GetSource(this), keySelector, elementSelector as (element: T) => T, keyEqualer!);
     }
 
     /**
      * Creates a `Lookup` for the elements of the [[Query]].
      *
      * @param keySelector A callback used to select a key for each element.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Scalar
      */
-    toLookup<K>(keySelector: (element: T) => K): Lookup<K, T>;
+    toLookup<K>(keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Lookup<K, T>;
     /**
      * Creates a `Lookup` for the elements of the [[Query]].
      *
      * @param keySelector A callback used to select a key for each element.
      * @param elementSelector A callback that selects a value for each element.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Scalar
      */
-    toLookup<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V): Lookup<K, V>;
-    toLookup<K, V>(keySelector: (element: T) => K, elementSelector?: (element: T) => V): Lookup<K, V> {
-        return fn.toLookup(GetSource(this), keySelector, elementSelector!);
+    toLookup<K, V>(keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer?: Equaler<K>): Lookup<K, V>;
+    toLookup<K, V>(keySelector: (element: T) => K, elementSelector?: ((element: T) => V) | Equaler<K>, keyEqualer?: Equaler<K>): Lookup<K, V> {
+        return fn.toLookup(GetSource(this), keySelector, elementSelector as (element: T) => V, keyEqualer!);
     }
 
     /**
@@ -2135,23 +2209,26 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    intersect<UNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>): HierarchyQuery<TNode | UNode, U>;
+    intersect<UNode, U extends UNode & T>(right: HierarchyIterable<UNode, U>, equaler?: Equaler<T>): HierarchyQuery<TNode | UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    intersect<U extends T>(right: Queryable<U>): HierarchyQuery<TNode, U>;
+    intersect<U extends T>(right: Queryable<U>, equaler?: Equaler<T>): HierarchyQuery<TNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]].
      *
      * @param right A [[Queryable]] object.
+     * @param equaler An [[Equaler]] object used to compare equality.
      * @category Subquery
      */
-    intersect(right: Queryable<T>): HierarchyQuery<TNode, T>;
+    intersect(right: Queryable<T>, equaler?: Equaler<T>): HierarchyQuery<TNode, T>;
 
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
@@ -2159,27 +2236,30 @@ export interface HierarchyQuery<TNode, T extends TNode = TNode> {
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    intersectBy<UNode, U extends UNode & T, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K): HierarchyQuery<TNode | UNode, U>;
+    intersectBy<UNode, U extends UNode & T, K>(right: HierarchyIterable<UNode, U>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyQuery<TNode | UNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
      *
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    intersectBy<U extends T, K>(right: Queryable<U>, keySelector: (element: T) => K): HierarchyQuery<TNode, U>;
+    intersectBy<U extends T, K>(right: Queryable<U>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyQuery<TNode, U>;
     /**
      * Creates a subquery for the set intersection of this [[Query]] and another [[Queryable]], where set identity is determined by the selected key.
      *
      * @param right A [[Queryable]] object.
      * @param keySelector A callback used to select the key for each element.
      * @param keySelector.element An element from which to select a key.
+     * @param keyEqualer An [[Equaler]] object used to compare key equality.
      * @category Subquery
      */
-    intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K): HierarchyQuery<TNode, T>;
+    intersectBy<K>(right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyQuery<TNode, T>;
     // #endregion
 }
 
@@ -2199,28 +2279,28 @@ export class OrderedQuery<T> extends Query<T> implements OrderedIterable<T> {
      * Creates a subsequent ordered subquery whose elements are sorted in ascending order by the provided key.
      *
      * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
+     * @param comparer An optional callback used to compare two keys.
      * @category Order
      */
-    thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T> {
-        return from(fn.thenBy(GetSource(this), keySelector, comparison));
+    thenBy<K>(keySelector: (element: T) => K, comparer?: Comparison<K> | Comparer<K>): OrderedQuery<T> {
+        return from(fn.thenBy(GetSource(this), keySelector, comparer));
     }
 
     /**
      * Creates a subsequent ordered subquery whose elements are sorted in descending order by the provided key.
      *
      * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
+     * @param comparer An optional callback used to compare two keys.
      * @category Order
      */
-    thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedQuery<T> {
-        return from(fn.thenByDescending(GetSource(this), keySelector, comparison));
+    thenByDescending<K>(keySelector: (element: T) => K, comparer?: Comparison<K> | Comparer<K>): OrderedQuery<T> {
+        return from(fn.thenByDescending(GetSource(this), keySelector, comparer));
     }
 
     // #endregion Order
 
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T> {
-        return ThenBy(GetSource(this), keySelector, comparison, descending);
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): OrderedIterable<T> {
+        return ThenBy(GetSource(this), keySelector, comparer, descending);
     }
 }
 
@@ -2249,7 +2329,7 @@ export class OrderedHierarchyQuery<TNode, T extends TNode = TNode> extends Hiera
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    thenBy<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T> {
+    thenBy<K>(keySelector: (element: T) => K, comparison?: Comparison<K> | Comparer<K>): OrderedHierarchyQuery<TNode, T> {
         return from(fn.thenBy(GetSource(this), keySelector, comparison));
     }
 
@@ -2260,13 +2340,13 @@ export class OrderedHierarchyQuery<TNode, T extends TNode = TNode> extends Hiera
      * @param comparison An optional callback used to compare two keys.
      * @category Order
      */
-    thenByDescending<K>(keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyQuery<TNode, T> {
+    thenByDescending<K>(keySelector: (element: T) => K, comparison?: Comparison<K> | Comparer<K>): OrderedHierarchyQuery<TNode, T> {
         return from(fn.thenByDescending(GetSource(this), keySelector, comparison));
     }
 
     // #endregion Order
 
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedHierarchyIterable<TNode, T> {
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: Comparison<K> | Comparer<K>, descending: boolean): OrderedHierarchyIterable<TNode, T> {
         return ThenBy(GetSource(this), keySelector, comparison, descending);
     }
 }

@@ -18,6 +18,8 @@
 import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
+import { Equaler } from 'equatable';
+import { HashSet, HashMap } from 'equatable/collections';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects, where set identity is determined by the selected key.
@@ -27,9 +29,10 @@ import { Set } from "../collections";
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function symmetricDifferenceBy<TNode, T extends TNode, K>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, keySelector: (element: T) => K): HierarchyIterable<TNode, T>;
+export function symmetricDifferenceBy<TNode, T extends TNode, K>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects, where set identity is determined by the selected key.
  * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
@@ -38,9 +41,10 @@ export function symmetricDifferenceBy<TNode, T extends TNode, K>(left: Hierarchy
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function symmetricDifferenceBy<TNode, T extends TNode, K>(left: Queryable<T>, right: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): HierarchyIterable<TNode, T>;
+export function symmetricDifferenceBy<TNode, T extends TNode, K>(left: Queryable<T>, right: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects, where set identity is determined by the selected key.
  * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
@@ -49,14 +53,16 @@ export function symmetricDifferenceBy<TNode, T extends TNode, K>(left: Queryable
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function symmetricDifferenceBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K): Iterable<T>;
-export function symmetricDifferenceBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K): Iterable<T> {
+export function symmetricDifferenceBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Iterable<T>;
+export function symmetricDifferenceBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
     assert.mustBeFunction(keySelector, "keySelector");
-    return FlowHierarchy(new SymmetricDifferenceByIterable(ToIterable(left), ToIterable(right), keySelector), left, right);
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+    return FlowHierarchy(new SymmetricDifferenceByIterable(ToIterable(left), ToIterable(right), keySelector, keyEqualer), left, right);
 }
 
 @ToStringTag("SymmetricDifferenceByIterable")
@@ -64,24 +70,26 @@ class SymmetricDifferenceByIterable<T, K> implements Iterable<T> {
     private _left: Iterable<T>;
     private _right: Iterable<T>;
     private _keySelector: (element: T) => K;
+    private _keyEqualer?: Equaler<K>;
 
-    constructor(left: Iterable<T>, right: Iterable<T>, keySelector: (element: T) => K) {
+    constructor(left: Iterable<T>, right: Iterable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>) {
         this._left = left;
         this._right = right;
         this._keySelector = keySelector;
+        this._keyEqualer = keyEqualer;
     }
 
     *[Symbol.iterator](): Iterator<T> {
         const keySelector = this._keySelector;
-        const rightKeys = new Set<K>();
-        const right = new Map<K, T>();
+        const rightKeys = this._keyEqualer ? new HashSet<K>(this._keyEqualer) : new Set<K>();
+        const right = this._keyEqualer ? new HashMap<K, T>(this._keyEqualer) : new Map<K, T>();
         for (const element of this._right) {
             const key = keySelector(element);
             if (TryAdd(rightKeys, key)) {
                 right.set(key, element);
             }
         }
-        const set = new Set<K>();
+        const set = this._keyEqualer ? new HashSet<K>(this._keyEqualer) : new Set<K>();
         for (const element of this._left) {
             const key = keySelector(element);
             if (TryAdd(set, key) && !right.has(key)) {

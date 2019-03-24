@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetIterator, IteratorClose, ToIterable} from "../internal";
+import { assert, GetIterator, IteratorClose, ToIterable} from "../internal";
 import { Queryable } from "../types";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of this Query start
@@ -24,23 +25,25 @@ import { Queryable } from "../types";
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function startsWith<T>(left: Queryable<T>, right: Queryable<T>): boolean;
+export function startsWith<T>(left: Queryable<T>, right: Queryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
 /**
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
- * @param equalityComparison A callback used to compare the equality of two elements.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function startsWith<T, U>(left: Queryable<T>, right: Queryable<U>, equalityComparison: (left: T, right: U) => boolean): boolean;
-export function startsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
+export function startsWith<T, U>(left: Queryable<T>, right: Queryable<U>, equaler: (left: T, right: U) => boolean): boolean;
+export function startsWith<T>(left: Queryable<T>, right: Queryable<T>, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): boolean {
+    if (typeof equaler === "function") equaler = Equaler.create(equaler);
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeEqualer(equaler, "equaler");
     const leftIterator = GetIterator(ToIterable(left));
     let leftDone = false;
     let leftValue: T;
@@ -53,7 +56,7 @@ export function startsWith<T>(left: Queryable<T>, right: Queryable<T>, equalityC
                 ({ done: leftDone, value: leftValue } = leftIterator.next());
                 ({ done: rightDone, value: rightValue } = rightIterator.next());
                 if (rightDone) return true;
-                if (leftDone || !equalityComparison(leftValue, rightValue)) return false;
+                if (leftDone || !equaler.equals(leftValue, rightValue)) return false;
             }
         }
         finally {

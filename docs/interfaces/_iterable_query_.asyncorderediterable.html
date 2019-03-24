@@ -136,7 +136,7 @@
 					<div class="tsd-signature tsd-kind-icon">then<wbr>ByAsync<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol.for(&quot;AsyncOrderedIterable.thenByAsync&quot;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L209">types.ts:209</a></li>
+							<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L198">types.ts:198</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -147,13 +147,13 @@
 					<a name="_asyncorderediterable_thenbyasync_" class="tsd-anchor"></a>
 					<h3>[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]&lt;K&gt;<span class="tsd-signature-symbol">(</span>keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, comparison<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, descending<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iterable_query_.asyncorderediterable.html"  class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">[<wbr>Async<wbr>Ordered<wbr>Iterable.then<wbr>ByAsync]&lt;K&gt;<span class="tsd-signature-symbol">(</span>keySelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, comparer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Comparison</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Comparer</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span>, descending<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iterable_query_.asyncorderediterable.html"  class="tsd-signature-type">AsyncOrderedIterable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L205">types.ts:205</a></li>
+									<li>Defined in <a href="https://github.com/rbuckton/iterable-query/blob/master/src/lib/types.ts#L194">types.ts:194</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -195,32 +195,12 @@
 									</ul>
 								</li>
 								<li>
-									comparison: <span class="tsd-signature-type">function</span>                        &mdash;
+									comparer: <span class="tsd-signature-type">Comparison</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Comparer</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span>                        &mdash;
 									<div class="tsd-comment tsd-typography" style="display: inline-block">
-										<p>An optional callback used to compare two keys.</p>
+										<div class="lead">
+											<p>An optional callback used to compare two keys.</p>
+										</div>
 									</div>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter-siganture">
-											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">K</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-											</ul>
-											<ul class="tsd-descriptions">
-												<li class="tsd-description">
-													<div class="tsd-comment tsd-typography">
-														<p>An optional callback used to compare two keys.</p>
-													</div>
-													<h4 class="tsd-parameters-title">Parameters</h4>
-													<ul class="tsd-parameters">
-														<li>
-														x: <span class="tsd-signature-type">K</span>                            </li>
-														<li>
-														y: <span class="tsd-signature-type">K</span>                            </li>
-													</ul>
-													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-												</li>
-											</ul>
-										</li>
-									</ul>
 								</li>
 								<li>
 									descending: <span class="tsd-signature-type">boolean</span>                        &mdash;
@@ -246,7 +226,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from AsyncIterable.[Symbol.asyncIterator]</p>
 								<ul>
-									<li>Defined in C:/dev/iterable-query/node_modules/typescript/lib/lib.esnext.asynciterable.d.ts:39</li>
+									<li>Defined in C:/dev/iterable-query/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts:39</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="https://tc39.github.io/ecma262/#sec-symbol.asyncIterator" target="external" class="tsd-signature-type">AsyncIterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -260,6 +240,9 @@
 				<ul>
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_internal_assert_.html">"internal/assert"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_iterable_query_.html">"iterable-<wbr>query"</a>

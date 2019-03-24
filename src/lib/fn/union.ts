@@ -19,33 +19,38 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { unionBy } from './unionBy';
 import { identity } from './common';
+import { Equaler } from 'equatable';
 
 /**
  * Creates a subquery for the set union of two [[Queryable]] objects.
  *
  * @param left A [[Queryable]] value.
  * @param right A Queryable value.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function union<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
+export function union<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, equaler?: Equaler<T>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the set union of two [[Queryable]] objects.
  *
  * @param left A [[Queryable]] value.
  * @param right A [[Queryable]] value.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function union<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
+export function union<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>, equaler?: Equaler<T>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the set union of two [[Queryable]] objects.
  *
  * @param left A [[Queryable]] value.
  * @param right A [[Queryable]] value.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-export function union<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
+export function union<T>(left: Queryable<T>, right: Queryable<T>, equaler?: Equaler<T>): Iterable<T>;
+export function union<T>(left: Queryable<T>, right: Queryable<T>, equaler?: Equaler<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return unionBy(left, right, identity);
+    assert.mustBeEqualerOrUndefined(equaler, "equaler");
+    return unionBy(left, right, identity, equaler);
 }

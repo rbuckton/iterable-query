@@ -236,7 +236,9 @@ class AsyncOrderedHierarchyIterableImpl<TNode, T extends TNode> extends AsyncHie
 }
 
 /** @internal */ export function ToGroupingWithFlow<K, V>(key: K, elements: Iterable<V>, source?: AsyncQueryable<V>): Grouping<K, V> {
-    return IsPossiblyAsyncHierarchyIterable(source) 
+    return IsPossiblyAsyncHierarchyIterable(source)
+        // TODO: fixme vvv
+        // @ts-ignore
         ? CreateHierarchyGrouping(key, FlowHierarchy(elements, source)) 
         : CreateGrouping(key, elements);
 }

@@ -18,6 +18,7 @@
 /// <reference lib="es2015.iterable" />
 /// <reference lib="esnext.asynciterable" />
 import "./compat";
+import { Comparison, Comparer } from 'equatable';
 
 /**
  * Typed key-value pairs derived from the properties of an `object`.
@@ -63,20 +64,8 @@ export namespace Hierarchical {
 
 // Comparables
 
-/** Describes an object that is comparable to another object. */
-export interface Comparable<T> {
-    /**
-     * Compares this object with another object:
-     * - A negative value indicates this value is lesser.
-     * - A positive value indicates this value is greater.
-     * - A zero value indicates this value is the same.
-     */
-    [Comparable.compareTo](other: T): number;
-}
-
-export namespace Comparable {
-    export const compareTo = Symbol("Comparable.compareTo");
-}
+export { Comparable } from "equatable";
+export { Equatable } from "equatable";
 
 // Grouping
 
@@ -165,10 +154,10 @@ export interface OrderedIterable<T> extends Iterable<T> {
     /**
      * Creates a subsequent `OrderedIterable` whose elements are also ordered by the provided key.
      * @param keySelector A callback used to select the key for an element.
-     * @param comparison A callback used to compare two keys.
+     * @param comparer A callback used to compare two keys.
      * @param descending A value indicating whether to sort in descending (`true`) or ascending (`false`) order.
      */
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T>;
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): OrderedIterable<T>;
 }
 
 export namespace OrderedIterable {
@@ -199,10 +188,10 @@ export interface AsyncOrderedIterable<T> extends AsyncIterable<T> {
     /**
      * Creates a subsequent `AsyncOrderedIterable` whose elements are also ordered by the provided key.
      * @param keySelector A callback used to select the key for an element.
-     * @param comparison An optional callback used to compare two keys.
+     * @param comparer An optional callback used to compare two keys.
      * @param descending A value indicating whether to sort in descending (`true`) or ascending (`false`) order.
      */
-    [AsyncOrderedIterable.thenByAsync]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T>;
+    [AsyncOrderedIterable.thenByAsync]<K>(keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): AsyncOrderedIterable<T>;
 }
 
 export namespace AsyncOrderedIterable {

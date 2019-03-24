@@ -18,7 +18,7 @@
 import { assert, FlowHierarchy, ToIterable, ThenBy, ToStringTag} from "../internal";
 import { Queryable, OrderedIterable, HierarchyIterable, OrderedHierarchyIterable } from "../types";
 import { toArray } from "./toArray";
-import { compare } from "./common";
+import { Comparison, Comparer } from 'equatable';
 
 /**
  * Creates an [[OrderedHierarchyIterable]] whose elements are sorted in ascending order by the provided key.
@@ -28,21 +28,22 @@ import { compare } from "./common";
  * @param comparison An optional callback used to compare two keys.
  * @category Order
  */
-export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
+export function orderBy<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedHierarchyIterable<TNode, T>;
 /**
  * Creates an [[OrderedIterable]] whose elements are sorted in ascending order by the provided key.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): OrderedIterable<T> {
+export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedIterable<T>;
+export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyComparer: Comparison<K> | Comparer<K> = Comparer.defaultComparer): OrderedIterable<T> {
+    if (typeof keyComparer === "function") keyComparer = Comparer.create(keyComparer);
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
-    assert.mustBeFunction(comparison, "comparison");
-    return FlowHierarchy(new OrderByIterable(ToIterable(source), keySelector, comparison, /*descending*/ false), source);
+    assert.mustBeComparer(keyComparer, "keyComparer");
+    return FlowHierarchy(new OrderByIterable(ToIterable(source), keySelector, keyComparer, /*descending*/ false), source);
 }
 
 /**
@@ -50,24 +51,25 @@ export function orderBy<T, K>(source: Queryable<T>, keySelector: (element: T) =>
  *
  * @param source A [[HierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
+export function orderByDescending<TNode, T extends TNode, K>(source: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedHierarchyIterable<TNode, T>;
 /**
  * Creates an [[OrderedIterable]] whose elements are sorted in descending order by the provided key.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): OrderedIterable<T> {
+export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedIterable<T>;
+export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyComparer: Comparison<K> | Comparer<K> = Comparer.defaultComparer): OrderedIterable<T> {
+    if (typeof keyComparer === "function") keyComparer = Comparer.create(keyComparer);
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
-    assert.mustBeFunction(comparison, "comparison");
-    return FlowHierarchy(new OrderByIterable(ToIterable(source), keySelector, comparison, /*descending*/ true), source);
+    assert.mustBeComparer(keyComparer, "keyComparer");
+    return FlowHierarchy(new OrderByIterable(ToIterable(source), keySelector, keyComparer, /*descending*/ true), source);
 }
 
 /**
@@ -75,24 +77,25 @@ export function orderByDescending<T, K>(source: Queryable<T>, keySelector: (elem
  *
  * @param source An [[OrderedHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
+export function thenBy<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedHierarchyIterable<TNode, T>;
 /**
  * Creates a subsequent [[OrderedIterable]] whose elements are also sorted in ascending order by the provided key.
  *
  * @param source An [[OrderedIterable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): OrderedIterable<T> {
+export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedIterable<T>;
+export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, keyComparer: Comparison<K> | Comparer<K> = Comparer.defaultComparer): OrderedIterable<T> {
+    if (typeof keyComparer === "function") keyComparer = Comparer.create(keyComparer);
     assert.mustBeOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
-    assert.mustBeFunction(comparison, "comparison");
-    return FlowHierarchy(ThenBy(source, keySelector, comparison, /*descending*/ false), source);
+    assert.mustBeComparer(keyComparer, "keyComparer");
+    return FlowHierarchy(ThenBy(source, keySelector, keyComparer, /*descending*/ false), source);
 }
 
 /**
@@ -100,38 +103,39 @@ export function thenBy<T, K>(source: OrderedIterable<T>, keySelector: (element: 
  *
  * @param source An [[OrderedHierarchyIterable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedHierarchyIterable<TNode, T>;
+export function thenByDescending<TNode, T extends TNode, K>(source: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedHierarchyIterable<TNode, T>;
 /**
  * Creates a subsequent [[OrderedIterable]] whose elements are also sorted in descending order by the provided key.
  *
  * @param source An [[OrderedIterable]] object.
  * @param keySelector A callback used to select the key for an element.
- * @param comparison An optional callback used to compare two keys.
+ * @param keyComparer An optional callback used to compare two keys.
  * @category Order
  */
-export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison?: (x: K, y: K) => number): OrderedIterable<T>;
-export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number = compare): OrderedIterable<T> {
+export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, keyComparer?: Comparison<K> | Comparer<K>): OrderedIterable<T>;
+export function thenByDescending<T, K>(source: OrderedIterable<T>, keySelector: (element: T) => K, keyComparer: Comparison<K> | Comparer<K> = Comparer.defaultComparer): OrderedIterable<T> {
+    if (typeof keyComparer === "function") keyComparer = Comparer.create(keyComparer);
     assert.mustBeOrderedIterable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
-    assert.mustBeFunction(comparison, "comparison");
-    return FlowHierarchy(ThenBy(source, keySelector, comparison, /*descending*/ true), source);
+    assert.mustBeComparer(keyComparer, "keyComparer");
+    return FlowHierarchy(ThenBy(source, keySelector, keyComparer, /*descending*/ true), source);
 }
 
 @ToStringTag("OrderByIterable")
 class OrderByIterable<T, K> implements OrderedIterable<T> {
     private _source: Iterable<T>;
     private _keySelector: (element: T) => K;
-    private _comparison: (x: K, y: K) => number;
+    private _keyComparer: Comparer<K>;
     private _descending: boolean;
     private _parent?: OrderByIterable<T, any>;
 
-    constructor(source: Iterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean, parent?: OrderByIterable<T, any>) {
+    constructor(source: Iterable<T>, keySelector: (element: T) => K, keyComparer: Comparer<K>, descending: boolean, parent?: OrderByIterable<T, any>) {
         this._source = source;
         this._keySelector = keySelector;
-        this._comparison = comparison;
+        this._keyComparer = keyComparer;
         this._descending = descending;
         this._parent = parent;
     }
@@ -151,21 +155,22 @@ class OrderByIterable<T, K> implements OrderedIterable<T> {
         }
     }
 
-    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T> {
+    [OrderedIterable.thenBy]<K>(keySelector: (element: T) => K, keyComparer: Comparison<K> | Comparer<K>, descending: boolean): OrderedIterable<T> {
+        if (typeof keyComparer === "function") keyComparer = Comparer.create(keyComparer);
         assert.mustBeFunction(keySelector, "keySelector");
-        assert.mustBeFunction(comparison, "comparison");
+        assert.mustBeComparer(keyComparer, "keyComparer");
         assert.mustBeBoolean(descending, "descending");
-        return new OrderByIterable(this._source, keySelector, comparison, descending, this);
+        return new OrderByIterable(this._source, keySelector, keyComparer, descending, this);
     }
 
     private _getSorter(elements: T[], next?: (x: number, y: number) => number): (x: number, y: number) => number {
         const keySelector = this._keySelector;
-        const comparison = this._comparison;
+        const comparer = this._keyComparer;
         const descending = this._descending;
         const parent = this._parent;
         const keys = elements.map(keySelector);
         const sorter = (x: number, y: number): number => {
-            const result = comparison(keys[x], keys[y]);
+            const result = comparer.compare(keys[x], keys[y]);
             if (result === 0) {
                 return next ? next(x, y) : x - y;
             }

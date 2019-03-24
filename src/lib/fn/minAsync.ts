@@ -17,18 +17,20 @@
 
 import { assert } from "../internal";
 import { AsyncQueryable } from "../types";
-import { compare, identity } from "./common";
+import { identity } from "./common";
 import { minByAsync } from './minByAsync';
+import { Comparison, Comparer } from 'equatable';
 
 /**
  * Gets the minimum element of an [[AsyncQueryable]], optionally comparing elements using the supplied callback.
  *
  * @param source An [[AsyncQueryable]] object.
- * @param comparison An optional callback used to compare two elements.
+ * @param comparer An optional callback used to compare two elements.
  * @category Scalar
  */
-export async function minAsync<T>(source: AsyncQueryable<T>, comparison: (x: T, y: T) => number = compare): Promise<T | undefined> {
+export async function minAsync<T>(source: AsyncQueryable<T>, comparer: Comparison<T> | Comparer<T> = Comparer.defaultComparer): Promise<T | undefined> {
+    if (typeof comparer === "function") comparer = Comparer.create(comparer);
     assert.mustBeAsyncQueryable<T>(source, "source");
-    assert.mustBeFunction(comparison, "comparison");
-    return minByAsync(source, identity, comparison);
+    assert.mustBeComparer(comparer, "comparer");
+    return minByAsync(source, identity, comparer);
 }

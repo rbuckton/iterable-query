@@ -15,31 +15,39 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, CreateGroupings} from "../internal";
+import { assert, CreateGroupings, IsEqualer} from "../internal";
 import { Queryable } from "../types";
 import { Lookup } from "../lookup";
 import { identity } from "./common";
+import { Equaler } from 'equatable';
 
 /**
  * Creates a Lookup for the elements of the Query.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select a key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Scalar
  */
-export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K): Lookup<K, T>;
+export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Lookup<K, T>;
 /**
  * Creates a Lookup for the elements of the Query.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Scalar
  */
-export function toLookup<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Lookup<K, V>;
-export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = identity): Lookup<K, T> {
+export function toLookup<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer?: Equaler<K>): Lookup<K, V>;
+export function toLookup<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: ((element: T) => T) | Equaler<K> = identity, keyEqualer?: Equaler<K>): Lookup<K, T> {
+    if (IsEqualer(elementSelector)) {
+        keyEqualer = elementSelector;
+        elementSelector = identity;
+    }
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
-    return new Lookup(CreateGroupings(source, keySelector, elementSelector));
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+    return new Lookup(CreateGroupings(source, keySelector, elementSelector, keyEqualer), keyEqualer);
 }

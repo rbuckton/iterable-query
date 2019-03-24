@@ -22,6 +22,7 @@ import { union } from "../fn/union";
 import { map } from "../fn/map";
 import { defaultIfEmpty } from "../fn/defaultIfEmpty";
 import { identity } from "./common";
+import { Equaler } from 'equatable';
 
 /**
  * Creates an [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner
@@ -32,15 +33,17 @@ import { identity } from "./common";
  * @param outerKeySelector A callback used to select the key for an element in `outer`.
  * @param innerKeySelector A callback used to select the key for an element in `inner`.
  * @param resultSelector A callback used to select the result for the correlated elements.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Join
  */
-export function fullJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>): AsyncIterable<R> {
+export function fullJoinAsync<O, I, K, R>(outer: AsyncQueryable<O>, inner: AsyncQueryable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>, keyEqualer?: Equaler<K>): AsyncIterable<R> {
     assert.mustBeAsyncQueryable<O>(outer, "outer");
     assert.mustBeAsyncQueryable<I>(inner, "inner");
     assert.mustBeFunction(outerKeySelector, "outerKeySelector");
     assert.mustBeFunction(innerKeySelector, "innerKeySelector");
     assert.mustBeFunction(resultSelector, "resultSelector");
-    return new AsyncFullJoinIterable(ToPossiblyAsyncIterable(outer), ToPossiblyAsyncIterable(inner), outerKeySelector, innerKeySelector, resultSelector);
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+    return new AsyncFullJoinIterable(ToPossiblyAsyncIterable(outer), ToPossiblyAsyncIterable(inner), outerKeySelector, innerKeySelector, resultSelector, keyEqualer);
 }
 
 @ToStringTag("AsyncFullJoinIterable")
@@ -50,20 +53,22 @@ class AsyncFullJoinIterable<O, I, K, R> implements AsyncIterable<R> {
     private _outerKeySelector: (element: O) => K;
     private _innerKeySelector: (element: I) => K;
     private _resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>;
+    private _keyEqualer?: Equaler<K>
 
-    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>) {
+    constructor(outer: PossiblyAsyncIterable<O>, inner: PossiblyAsyncIterable<I>, outerKeySelector: (element: O) => K, innerKeySelector: (element: I) => K, resultSelector: (outer: O | undefined, inner: I | undefined) => R | PromiseLike<R>, keyEqualer?: Equaler<K>) {
         this._outer = outer;
         this._inner = inner;
         this._outerKeySelector = outerKeySelector;
         this._innerKeySelector = innerKeySelector;
         this._resultSelector = resultSelector;
+        this._keyEqualer = keyEqualer;
     }
 
     async *[Symbol.asyncIterator](): AsyncIterator<R> {
         const resultSelector = this._resultSelector;
-        const outerLookup = new Lookup(await CreateGroupingsAsync(this._outer, this._outerKeySelector, identity));
-        const innerLookup = new Lookup(await CreateGroupingsAsync(this._inner, this._innerKeySelector, identity));
-        const keys = union(map(outerLookup, SelectGroupingKey), map(innerLookup, SelectGroupingKey));
+        const outerLookup = new Lookup(await CreateGroupingsAsync(this._outer, this._outerKeySelector, identity, this._keyEqualer));
+        const innerLookup = new Lookup(await CreateGroupingsAsync(this._inner, this._innerKeySelector, identity, this._keyEqualer));
+        const keys = union(map(outerLookup, SelectGroupingKey), map(innerLookup, SelectGroupingKey), this._keyEqualer);
         for (const key of keys) {
             const outer = defaultIfEmpty<O | undefined>(outerLookup.get(key), undefined);
             const inner = defaultIfEmpty<I | undefined>(innerLookup.get(key), undefined);

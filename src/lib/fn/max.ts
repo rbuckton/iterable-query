@@ -17,18 +17,20 @@
 
 import { assert } from "../internal";
 import { Queryable } from "../types";
-import { compare, identity } from "./common";
+import { identity } from "./common";
 import { maxBy } from './maxBy';
+import { Comparison, Comparer } from 'equatable';
 
 /**
  * Gets the maximum element of a [[Queryable]], optionally comparing elements using the supplied callback.
  *
  * @param source A [[Queryable]] object.
- * @param comparison An optional callback used to compare two elements.
+ * @param comparer An optional callback used to compare two elements.
  * @category Scalar
  */
-export function max<T>(source: Queryable<T>, comparison: (x: T, y: T) => number = compare): T | undefined {
+export function max<T>(source: Queryable<T>, comparer: Comparison<T> | Comparer<T> = Comparer.defaultComparer): T | undefined {
+    if (typeof comparer === "function") comparer = Comparer.create(comparer);
     assert.mustBeQueryable(source, "source");
-    assert.mustBeFunction(comparison, "comparison");
-    return maxBy(source, identity, comparison);
+    assert.mustBeComparer(comparer, "comparer");
+    return maxBy(source, identity, comparer);
 }

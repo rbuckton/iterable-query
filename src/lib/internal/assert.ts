@@ -19,7 +19,8 @@ import { IsObject, SameValue, IsArrayLike, IsIterable, IsOrderedIterable, IsHier
 import { Queryable, HierarchyProvider, AsyncOrderedIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncOrderedIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { OrderedIterable, HierarchyIterable } from "../types";
 import { QuerySource, AsyncQuerySource } from "./types";
-import { IsQuerySource, IsAsyncQuerySource, IsAsyncHierarchyIterable } from "./guards";
+import { IsQuerySource, IsAsyncQuerySource, IsAsyncHierarchyIterable, IsEqualer, IsComparer } from "./guards";
+import { Equaler, Comparer } from 'equatable';
 
 /** @internal */
 export function fail(ErrorType: new (message?: string) => Error, paramName: string | undefined, message: string | undefined, stackCrawlMark: Function = fail): never {
@@ -34,6 +35,20 @@ function assertType(condition: boolean, paramName: string | undefined, message: 
 
 function assertRange(condition: boolean, paramName: string | undefined, message: string | undefined, stackCrawlMark: Function = assertRange) {
     if (!condition) fail(RangeError, paramName, message, stackCrawlMark)
+}
+
+function mayBeUndefined<T>(mustBe: (value: T, paramName?: string, message?: string, stackCrawlMark?: Function) => void) {
+    return function mayBeUndefined(value: T | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mayBeUndefined) {
+        if (value === undefined) return;
+        mustBe(value, paramName, message, stackCrawlMark);
+    }
+}
+
+function mayBeNull<T>(mustBe: (value: T, paramName?: string, message?: string, stackCrawlMark?: Function) => void) {
+    return function mayBeNull(value: T | null, paramName?: string, message?: string, stackCrawlMark: Function = mayBeNull) {
+        if (value === null) return;
+        mustBe(value, paramName, message, stackCrawlMark);
+    }
 }
 
 /** @internal */
@@ -52,9 +67,7 @@ export function mustBeObject(value: any, paramName?: string, message: string = "
 }
 
 /** @internal */
-export function mustBeObjectOrNull(value: any, paramName?: string, message?: string, stackCrawlMark: Function = mustBeObjectOrNull) {
-    assertType(IsObject(value) || value === null, paramName, message, stackCrawlMark);
-}
+export const mustBeObjectOrNull = mayBeNull(mustBeObject);
 
 /** @internal */
 export function mustBeFunction(value: Function, paramName?: string, message?: string, stackCrawlMark: Function = mustBeFunction) {
@@ -62,9 +75,7 @@ export function mustBeFunction(value: Function, paramName?: string, message?: st
 }
 
 /** @internal */
-export function mustBeFunctionOrUndefined(value: Function | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mustBeFunctionOrUndefined) {
-    assertType(typeof value === "function" || value === undefined, paramName, message, stackCrawlMark);
-}
+export const mustBeFunctionOrUndefined = mayBeUndefined(mustBeFunction);
 
 /** @internal */
 export function mustBeFiniteNumber(value: number, paramName?: string, message?: string, stackCrawlMark: Function = mustBeFiniteNumber) {
@@ -111,17 +122,16 @@ export function mustBeQueryable<T>(value: Queryable<T>, paramName?: string, mess
 }
 
 /** @internal */
+export const mustBeQueryableOrUndefined = mayBeUndefined(mustBeQueryable);
+
+/** @internal */
 export function mustBeAsyncIterable<T>(value: AsyncIterable<T>, paramName?: string, message: string = "AsyncIterable object expected", stackCrawlMark: Function = mustBeQueryable) {
     mustBeObject(value, paramName, message, stackCrawlMark);
     assertType(IsAsyncIterable(value), paramName, message, stackCrawlMark);
 }
 
 /** @internal */
-export function mustBeAsyncIterableOrUndefined<T>(value: AsyncIterable<T> | undefined, paramName?: string, message: string = "AsyncIterable object expected", stackCrawlMark: Function = mustBeQueryable) {
-    if (value === undefined) return;
-    mustBeObject(value, paramName, message, stackCrawlMark);
-    assertType(IsAsyncIterable(value), paramName, message, stackCrawlMark);
-}
+export const mustBeAsyncIterableOrUndefined = mayBeUndefined(mustBeAsyncIterable);
 
 /** @internal */
 export function mustBePossiblyAsyncQueryable<T>(value: Queryable<T> | AsyncIterable<T>, paramName?: string, message: string = "AsyncIterable or Iterable or Array-like object expected", stackCrawlMark: Function = mustBeQueryable) {
@@ -130,10 +140,16 @@ export function mustBePossiblyAsyncQueryable<T>(value: Queryable<T> | AsyncItera
 }
 
 /** @internal */
+export const mustBePossiblyAsyncQueryableOrUndefined = mayBeUndefined(mustBePossiblyAsyncQueryable);
+
+/** @internal */
 export function mustBeAsyncQueryable<T>(value: AsyncQueryable<T>, paramName?: string, message: string = "AsyncIterable or Iterable or Array-like object expected", stackCrawlMark: Function = mustBeQueryable) {
     mustBeObject(value, paramName, message, stackCrawlMark);
     assertType(IsArrayLike(value) || IsIterable(value) || IsAsyncIterable(value), paramName, message, stackCrawlMark);
 }
+
+/** @internal */
+export const mustBeAsyncQueryableOrUndefined = mayBeUndefined(mustBeAsyncQueryable);
 
 /** @internal */
 export function mustBeArrayLike<T>(value: ArrayLike<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeArrayLike) {
@@ -145,27 +161,6 @@ export function mustBeArrayLike<T>(value: ArrayLike<T>, paramName?: string, mess
 export function mustBeIterable<T>(value: Iterable<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeArrayLike) {
     mustBeObject(value, paramName, message, stackCrawlMark);
     assertType(IsIterable(value), paramName, message, stackCrawlMark);
-}
-
-/** @internal */
-export function mustBeQueryableOrUndefined<T>(value: Queryable<T> | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mustBeQueryableOrUndefined) {
-    if (value === undefined) return;
-    mustBeObject(value, paramName, message, stackCrawlMark);
-    assertType(IsArrayLike(value) || IsIterable(value), paramName, message, stackCrawlMark);
-}
-
-/** @internal */
-export function mustBePossiblyAsyncQueryableOrUndefined<T>(value: Queryable<T> | AsyncIterable<T> | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mustBeQueryableOrUndefined) {
-    if (value === undefined) return;
-    mustBeObject(value, paramName, message, stackCrawlMark);
-    assertType(IsArrayLike(value) || IsIterable(value) || IsAsyncIterable(value), paramName, message, stackCrawlMark);
-}
-
-/** @internal */
-export function mustBeAsyncQueryableOrUndefined<T>(value: AsyncQueryable<T> | undefined, paramName?: string, message?: string, stackCrawlMark: Function = mustBeQueryableOrUndefined) {
-    if (value === undefined) return;
-    mustBeObject(value, paramName, message, stackCrawlMark);
-    assertType(IsArrayLike(value) || IsIterable(value) || IsAsyncIterable(value), paramName, message, stackCrawlMark);
 }
 
 /** @internal */
@@ -221,3 +216,21 @@ export function mustBeAsyncQuerySource<T>(value: AsyncQuerySource<T>, paramName?
     mustBeObject(value, paramName, message, stackCrawlMark);
     assertType(IsAsyncQuerySource(value), paramName, message, stackCrawlMark);
 }
+
+/** @internal */
+export function mustBeEqualer<T>(value: Equaler<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeEqualer) {
+    mustBeObject(value, paramName, message, stackCrawlMark);
+    assertType(IsEqualer(value), paramName, message, stackCrawlMark);
+}
+
+/** @internal */
+export const mustBeEqualerOrUndefined = mayBeUndefined(mustBeEqualer);
+
+/** @internal */
+export function mustBeComparer<T>(value: Comparer<T>, paramName?: string, message?: string, stackCrawlMark: Function = mustBeComparer) {
+    mustBeObject(value, paramName, message, stackCrawlMark);
+    assertType(IsComparer(value), paramName, message, stackCrawlMark);
+}
+
+/** @internal */
+export const mustBeComparerOrUndefined = mayBeUndefined(mustBeComparer);

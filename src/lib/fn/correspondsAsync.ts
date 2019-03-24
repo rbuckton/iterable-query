@@ -15,10 +15,11 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue } from "../internal";
+import { assert } from "../internal";
 import { AsyncQueryable } from "../types";
 import { correspondsByAsync } from './correspondsByAsync';
 import { identity } from './common';
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
@@ -26,22 +27,23 @@ import { identity } from './common';
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An optional callback used to compare the equality of two elements.
  * @category Scalar
  */
-export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
+export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): Promise<boolean>;
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element
  * in `right` at the same position.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
+ * @param equaler An optional callback used to compare the equality of two elements.
  * @category Scalar
  */
-export async function correspondsAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
-export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equalityComparison: (left: T, right: T) => boolean = SameValue): Promise<boolean> {
+export async function correspondsAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equaler: (left: T, right: U) => boolean): Promise<boolean>;
+export async function correspondsAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): Promise<boolean> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
-    return await correspondsByAsync(left, right, identity, identity, equalityComparison);
+    assert.mustBeObject(equaler, "equality");
+    return await correspondsByAsync(left, right, identity, identity, equaler);
 }

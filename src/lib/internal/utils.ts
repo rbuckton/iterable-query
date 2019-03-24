@@ -19,6 +19,8 @@ import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
 import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
 import { QuerySource, AsyncQuerySource } from "./types";
+import { Comparison, Comparer, Equaler } from 'equatable';
+import { HashSet, HashMap } from 'equatable/collections';
 
 /** @internal */
 export function GetIterator<T>(source: Iterable<T>): Iterator<T> {
@@ -129,22 +131,22 @@ export function AsyncIteratorClose<T>(iterator: AsyncIterator<T> | undefined | n
     }
 }
 
-/** @internal */ export function ThenBy<TNode, T extends TNode, K>(value: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedHierarchyIterable<TNode, T>;
-/** @internal */ export function ThenBy<T, K>(value: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T>;
-/** @internal */ export function ThenBy<T, K>(value: OrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): OrderedIterable<T> {
+/** @internal */ export function ThenBy<TNode, T extends TNode, K>(value: OrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): OrderedHierarchyIterable<TNode, T>;
+/** @internal */ export function ThenBy<T, K>(value: OrderedIterable<T>, keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): OrderedIterable<T>;
+/** @internal */ export function ThenBy<T, K>(value: OrderedIterable<T>, keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): OrderedIterable<T> {
     const thenBy = value[OrderedIterable.thenBy];
     if (typeof thenBy === "function") {
-        return thenBy.call(value, keySelector, comparison as (x: {}, y: {}) => number, descending);
+        return thenBy.call(value, keySelector, comparer as Comparison<{}> | Comparer<{}>, descending);
     }
     throw new TypeError();
 }
 
-/** @internal */ export function ThenByAsync<TNode, T extends TNode, K>(value: AsyncOrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedHierarchyIterable<TNode, T>;
-/** @internal */ export function ThenByAsync<T, K>(value: AsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T>;
-/** @internal */ export function ThenByAsync<T, K>(value: AsyncOrderedIterable<T>, keySelector: (element: T) => K, comparison: (x: K, y: K) => number, descending: boolean): AsyncOrderedIterable<T> {
+/** @internal */ export function ThenByAsync<TNode, T extends TNode, K>(value: AsyncOrderedHierarchyIterable<TNode, T>, keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): AsyncOrderedHierarchyIterable<TNode, T>;
+/** @internal */ export function ThenByAsync<T, K>(value: AsyncOrderedIterable<T>, keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): AsyncOrderedIterable<T>;
+/** @internal */ export function ThenByAsync<T, K>(value: AsyncOrderedIterable<T>, keySelector: (element: T) => K, comparer: Comparison<K> | Comparer<K>, descending: boolean): AsyncOrderedIterable<T> {
     const thenBy = value[AsyncOrderedIterable.thenByAsync];
     if (typeof thenBy === "function") {
-        return thenBy.call(value, keySelector, comparison as (x: {}, y: {}) => number, descending);
+        return thenBy.call(value, keySelector, comparer as Comparison<{}> | Comparer<{}>, descending);
     }
     throw new TypeError();
 }
@@ -170,8 +172,8 @@ export function SameValueZero(x: any, y: any): boolean {
 }
 
 /** @internal */
-export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V[]> {
-    const map = new Map<K, V[]>();
+export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer?: Equaler<K>): Map<K, V[]> | HashMap<K, V[]> {
+    const map = keyEqualer ? new HashMap<K, V[]>(keyEqualer) : new Map<K, V[]>();
     for (const item of ToIterable(source)) {
         let key = keySelector(item);
         let element = elementSelector(item);
@@ -185,8 +187,8 @@ export function CreateGroupings<T, K, V>(source: Queryable<T>, keySelector: (ele
     return map;
 }
 
-/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>): Promise<Map<K, V[]>> {
-    const map = new Map<K, V[]>();
+/** @internal */ export async function CreateGroupingsAsync<T, K, V>(source: AsyncQueryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V | PromiseLike<V>, keyEqualer?: Equaler<K>): Promise<Map<K, V[]> | HashMap<K, V[]>> {
+    const map = keyEqualer ? new HashMap<K, V[]>(keyEqualer) : new Map<K, V[]>();
     for await (const item of ToPossiblyAsyncIterable(source)) {
         let key = keySelector(item);
         let element = await elementSelector(item);
@@ -206,7 +208,7 @@ export function SelectGroupingKey<K, V>(grouping: Grouping<K, V>) {
 }
 
 /** @internal */
-export function TryAdd<T>(set: Set<T>, value: T): boolean {
+export function TryAdd<T>(set: Set<T> | HashSet<T>, value: T): boolean {
     const size = set.size;
     set.add(value);
     return set.size > size;

@@ -17,18 +17,20 @@
 
 import { assert } from "../internal";
 import { Queryable } from "../types";
-import { compare, identity } from "./common";
+import { identity } from "./common";
 import { minBy } from './minBy';
+import { Comparison, Comparer } from 'equatable';
 
 /**
  * Gets the minimum element of a [[Queryable]], optionally comparing elements using the supplied callback.
  *
  * @param source A [[Queryable]] object.
- * @param comparison An optional callback used to compare two elements.
+ * @param comparer An optional callback used to compare two elements.
  * @category Scalar
  */
-export function min<T>(source: Queryable<T>, comparison: (x: T, y: T) => number = compare): T | undefined {
+export function min<T>(source: Queryable<T>, comparer: Comparison<T> | Comparer<T> = Comparer.defaultComparer): T | undefined {
+    if (typeof comparer === "function") comparer = Comparer.create(comparer);
     assert.mustBeQueryable(source, "source");
-    assert.mustBeFunction(comparison, "comparison");
-    return minBy(source, identity, comparison);
+    assert.mustBeComparer(comparer, "comparer");
+    return minBy(source, identity, comparer);
 }

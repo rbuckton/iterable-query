@@ -4,7 +4,7 @@ const del = require('del');
 const minimist = require("minimist");
 const typedoc = require("./scripts/typedoc");
 const coverage = require("./scripts/coverage");
-const { build } = require("./scripts/build");
+const { buildProject } = require("./scripts/projects");
 const { mocha } = require("./scripts/mocha");
 
 const options = /** @type {minimist.ParsedArgs & Options} */ (minimist(process.argv.slice(2), {
@@ -16,11 +16,11 @@ const options = /** @type {minimist.ParsedArgs & Options} */ (minimist(process.a
 let useDebug = process.env.npm_lifecycle_event !== "prepublishOnly";
 let watching = false;
 
-gulp.task("typedoc", build("src/typedoc/plugin"));
-gulp.task("build:lib", build("src/lib/tsconfig.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
-gulp.task("build:es2015", build("src/lib/tsconfig.es2015.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
-gulp.task("build:es5", build("src/lib/tsconfig.es5.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
-gulp.task("build:tests", ["build:lib", "build:es2015", "build:es5"], build("src/tests/tsconfig.json", { force: options.force, verbose: options.verbose, debug: useDebug }));
+gulp.task("typedoc", () => buildProject("src/typedoc/plugin/tsconfig.json"));
+gulp.task("build:lib", () => buildProject("src/lib/tsconfig.json", { force: options.force }));
+gulp.task("build:es2015", () => buildProject("src/lib/tsconfig.es2015.json", { force: options.force }));
+gulp.task("build:es5", () => buildProject("src/lib/tsconfig.es5.json", { force: options.force }));
+gulp.task("build:tests", ["build:lib", "build:es2015", "build:es5"], () => buildProject("src/tests/tsconfig.json", { force: options.force }));
 gulp.task("build", ["build:lib", "build:es2015", "build:es5", "build:tests"]);
 gulp.task("clean:dist", () => del("dist"));
 gulp.task("clean:docs", () => del("docs"));

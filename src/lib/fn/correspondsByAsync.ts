@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValueZero, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable } from "../internal";
+import { assert, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the key for every element in `left` corresponds to a matching key
@@ -36,14 +37,17 @@ export async function correspondsByAsync<T, K>(left: AsyncQueryable<T>, right: A
  * @param right An [[AsyncQueryable]] object.
  * @param leftKeySelector A callback used to select the key for each element in `left`.
  * @param rightKeySelector A callback used to select the key for each element in `right`.
- * @param equalityComparison An optional callback used to compare the equality of two keys.
+ * @param keyEqualer An optional callback used to compare the equality of two keys.
  * @category Scalar
  */
-export async function correspondsByAsync<T, U, K>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, equalityComparison?: (left: K, right: K) => boolean): Promise<boolean>;
-export async function correspondsByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, leftKeySelector: (element: T) => K, rightKeySelector: (element: T) => K = leftKeySelector, equalityComparison: (left: K, right: K) => boolean = SameValueZero): Promise<boolean> {
+export async function correspondsByAsync<T, U, K>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, keyEqualer?: EqualityComparison<K> | Equaler<K>): Promise<boolean>;
+export async function correspondsByAsync<T, K>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, leftKeySelector: (element: T) => K, rightKeySelector: (element: T) => K = leftKeySelector, keyEqualer: EqualityComparison<K> | Equaler<K> = Equaler.defaultEqualer): Promise<boolean> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeFunction(leftKeySelector, "leftKeySelector");
+    assert.mustBeFunction(rightKeySelector, "rightKeySelector");
+    assert.mustBeObject(keyEqualer, "keyEqualer");
+    if (typeof keyEqualer === "function") keyEqualer = Equaler.create(keyEqualer);
     const leftIterator = GetAsyncIterator(ToPossiblyAsyncIterable(left));
     let leftDone = false;
     let leftValue: T;
@@ -56,7 +60,7 @@ export async function correspondsByAsync<T, K>(left: AsyncQueryable<T>, right: A
                 ({ done: leftDone, value: leftValue } = await leftIterator.next());
                 ({ done: rightDone, value: rightValue } = await rightIterator.next());
                 if (leftDone && rightDone) return true;
-                if (Boolean(leftDone) !== Boolean(rightDone) || !equalityComparison(leftKeySelector(leftValue), rightKeySelector(rightValue))) return false;
+                if (Boolean(leftDone) !== Boolean(rightDone) || !keyEqualer.equals(leftKeySelector(leftValue), rightKeySelector(rightValue))) return false;
             }
         }
         finally {

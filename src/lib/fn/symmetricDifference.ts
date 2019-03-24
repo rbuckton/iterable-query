@@ -19,6 +19,7 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { symmetricDifferenceBy } from './symmetricDifferenceBy';
 import { identity } from './common';
+import { Equaler } from 'equatable';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
@@ -27,9 +28,10 @@ import { identity } from './common';
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function symmetricDifference<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
+export function symmetricDifference<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, equaler?: Equaler<T>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
  * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
@@ -37,9 +39,10 @@ export function symmetricDifference<TNode, T extends TNode>(left: HierarchyItera
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>): HierarchyIterable<TNode, T>;
+export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, right: HierarchyIterable<TNode, T>, equaler?: Equaler<T>): HierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
  * The result is an [[Iterable]] containings the elements that exist in only left or right, but not 
@@ -47,11 +50,13 @@ export function symmetricDifference<TNode, T extends TNode>(left: Queryable<T>, 
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
+export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>, equaler?: Equaler<T>): Iterable<T>;
+export function symmetricDifference<T>(left: Queryable<T>, right: Queryable<T>, equaler?: Equaler<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return symmetricDifferenceBy(left, right, identity);
+    assert.mustBeEqualerOrUndefined(equaler, "equaler");
+    return symmetricDifferenceBy(left, right, identity, equaler);
 }

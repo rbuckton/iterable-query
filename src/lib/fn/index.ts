@@ -55,6 +55,8 @@ export * from "./defaultIfEmpty";
 export * from "./defaultIfEmptyAsync";
 export * from "./distinct";
 export * from "./distinctAsync";
+export * from "./distinctBy";
+export * from "./distinctByAsync";
 export * from "./do";
 export * from "./doAsync";
 export * from "./tap";

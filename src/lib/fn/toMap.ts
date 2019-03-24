@@ -15,10 +15,12 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable } from "../internal";
+import { assert, ToIterable, IsEqualer } from "../internal";
 import { Queryable } from "../types";
 import { Map } from "../collections";
 import { identity } from "./common";
+import { Equaler } from 'equatable';
+import { HashMap } from 'equatable/collections';
 
 /**
  * Creates a Map for the elements of the Query.
@@ -33,15 +35,39 @@ export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to select a key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
+ * @category Scalar
+ */
+export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, keyEqualer: Equaler<K>): HashMap<K, T>;
+/**
+ * Creates a Map for the elements of the Query.
+ *
+ * @param source A [[Queryable]] object.
+ * @param keySelector A callback used to select a key for each element.
  * @param elementSelector A callback that selects a value for each element.
  * @category Scalar
  */
 export function toMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V): Map<K, V>;
-export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => T = identity): Map<K, T> {
+/**
+ * Creates a Map for the elements of the Query.
+ *
+ * @param source A [[Queryable]] object.
+ * @param keySelector A callback used to select a key for each element.
+ * @param elementSelector A callback that selects a value for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
+ * @category Scalar
+ */
+export function toMap<T, K, V>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: (element: T) => V, keyEqualer: Equaler<K>): HashMap<K, V>;
+export function toMap<T, K>(source: Queryable<T>, keySelector: (element: T) => K, elementSelector: ((element: T) => T) | Equaler<K> = identity, keyEqualer?: Equaler<K>): Map<K, T> | HashMap<K, T> {
+    if (IsEqualer(elementSelector)) {
+        keyEqualer = elementSelector;
+        elementSelector = identity;
+    }
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
     assert.mustBeFunction(elementSelector, "elementSelector");
-    const map = new Map<K, T>();
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+    const map = keyEqualer ? new HashMap<K, T>(keyEqualer) : new Map<K, T>();
     for (const item of ToIterable(source)) {
         const key = keySelector(item);
         const element = elementSelector(item);

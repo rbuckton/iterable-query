@@ -18,6 +18,7 @@
 import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { toSet } from "./toSet";
+import { Equaler } from 'equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] object and a [[Queryable]] object, where set identity is determined by the selected key.
@@ -25,31 +26,35 @@ import { toSet } from "./toSet";
  * @param left A [[HierarchyIterable]] object.
  * @param right A [[Queryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function intersectBy<TNode, T extends TNode, K>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, keySelector: (element: T) => K): HierarchyIterable<TNode, T>;
+export function intersectBy<TNode, T extends TNode, K>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyIterable<TNode, T>;
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[Queryable]] object and a [[HierarchyIterable]] object, where set identity is determined by the selected key.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[HierarchyIterable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function intersectBy<TNode, T extends TNode, K>(left: Queryable<T>, right: HierarchyIterable<TNode, T>, keySelector: (element: T) => K): HierarchyIterable<TNode, T>;
+export function intersectBy<TNode, T extends TNode, K>(left: Queryable<T>, right: HierarchyIterable<TNode, T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): HierarchyIterable<TNode, T>;
 /**
  * Creates an [[Iterable]] for the set intersection of two [[Queryable]] objects, where set identity is determined by the selected key.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
  * @param keySelector A callback used to select the key for each element.
+ * @param keyEqualer An [[Equaler]] object used to compare key equality.
  * @category Subquery
  */
-export function intersectBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K): Iterable<T>;
-export function intersectBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K): Iterable<T> {
+export function intersectBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Iterable<T>;
+export function intersectBy<T, K>(left: Queryable<T>, right: Queryable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
     assert.mustBeFunction(keySelector, "keySelector");
+    assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
     return FlowHierarchy(new IntersectByIterable(ToIterable(left), ToIterable(right), keySelector), left, right);
 }
 
@@ -58,16 +63,18 @@ class IntersectByIterable<T, K> implements Iterable<T> {
     private _left: Iterable<T>;
     private _right: Iterable<T>;
     private _keySelector: (element: T) => K;
+    private _keyEqualer?: Equaler<K>;
 
-    constructor(left: Iterable<T>, right: Iterable<T>, keySelector: (element: T) => K) {
+    constructor(left: Iterable<T>, right: Iterable<T>, keySelector: (element: T) => K, keyEqualer?: Equaler<K>) {
         this._left = left;
         this._right = right;
         this._keySelector = keySelector;
+        this._keyEqualer = keyEqualer;
     }
 
     *[Symbol.iterator](): Iterator<T> {
         const keySelector = this._keySelector;
-        const set = toSet(this._right, keySelector);
+        const set = toSet(this._right, keySelector, this._keyEqualer!);
         if (set.size <= 0) {
             return;
         }

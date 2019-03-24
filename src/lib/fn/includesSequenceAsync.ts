@@ -15,9 +15,10 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, ToPossiblyAsyncIterable } from "../internal";
+import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of `left` include
@@ -25,23 +26,25 @@ import { toArrayAsync } from "./toArrayAsync";
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
+export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): Promise<boolean>;
 /**
  * Computes a scalar value indicating whether the elements of `left` include
  * an exact sequence of elements from `right`.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
- * @param equalityComparison A callback used to compare the equality of two elements.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
-export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean = SameValue): Promise<boolean> {
+export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equaler: (left: T, right: U) => boolean): Promise<boolean>;
+export async function includesSequenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): Promise<boolean> {
+    if (typeof equaler === "function") equaler = Equaler.create(equaler);
     assert.mustBeAsyncQueryable<T>(left, "source");
-    assert.mustBeAsyncQueryable<U>(right, "other");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeAsyncQueryable<T>(right, "other");
+    assert.mustBeEqualer(equaler, "equaler");
     const rightArray = await toArrayAsync(right);
     const numRightElements = rightArray.length;
     if (numRightElements <= 0) {
@@ -51,7 +54,7 @@ export async function includesSequenceAsync<T, U>(left: AsyncQueryable<T>, right
     for await (const leftValue of ToPossiblyAsyncIterable(left)) {
         for (;;) {
             const rightValue = rightArray[span.length];
-            if (equalityComparison(leftValue, rightValue)) {
+            if (equaler.equals(leftValue, rightValue)) {
                 if (span.length + 1 >= numRightElements) {
                     return true;
                 }

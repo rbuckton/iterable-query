@@ -16,9 +16,8 @@
 /** @module "iterable-query/fn" */
 
 import "../compat";
-import { IsComparable } from "../internal/guards";
-import { Comparable } from "../types";
 import { Lazy } from "../lazy";
+import { Comparer, Equaler } from 'equatable';
 
 /** A function that returns the provided value. */
 export function identity<T>(value: T): T {
@@ -53,18 +52,14 @@ export function decrementer(start = 0) {
     return () => start--;
 }
 
+/** Equate two values. */
+export function equate<T>(x: T, y: T): boolean {
+    return Equaler.defaultEqualer.equals(x, y);
+}
+
 /** Compares two values. */
 export function compare<T>(x: T, y: T): number {
-    if (IsComparable(x) && IsComparable(y)) {
-        return x[Comparable.compareTo](y);
-    }
-    if (x < y) {
-        return -1;
-    }
-    else if (x > y) {
-        return +1;
-    }
-    return 0;
+    return Comparer.defaultComparer.compare(x, y);
 }
 
 /** Compose one function with another (i.e. `compose(g, f)` is `x => g(f(x))`) */

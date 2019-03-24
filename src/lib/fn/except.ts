@@ -19,25 +19,29 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { exceptBy } from './exceptBy';
 import { identity } from './common';
+import { Equaler } from 'equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set difference between a [[HierarchyIterable]] and a [[Queryable]] object.
  *
  * @param left A [[HierarchyIterable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function except<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>): HierarchyIterable<TNode, T>;
+export function except<TNode, T extends TNode>(left: HierarchyIterable<TNode, T>, right: Queryable<T>, equaler?: Equaler<T>): HierarchyIterable<TNode, T>;
 /**
  * Creates an [[Iterable]] for the set difference between two [[Queryable]] objects.
  *
  * @param left A [[Queryable]] object.
  * @param right A [[Queryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T>;
-export function except<T>(left: Queryable<T>, right: Queryable<T>): Iterable<T> {
+export function except<T>(left: Queryable<T>, right: Queryable<T>, equaler?: Equaler<T>): Iterable<T>;
+export function except<T>(left: Queryable<T>, right: Queryable<T>, equaler?: Equaler<T>): Iterable<T> {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
-    return exceptBy(left, right, identity);
+    assert.mustBeEqualerOrUndefined(equaler, "equaler");
+    return exceptBy(left, right, identity, equaler);
 }

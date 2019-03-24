@@ -17,20 +17,21 @@
 
 import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
-import { compare } from "./common";
+import { Comparison, Comparer } from 'equatable';
 
 /**
  * Gets the minimum element of a [[Queryable]], optionally comparing the keys of each element using the supplied callback.
  *
  * @param source A [[Queryable]] object.
  * @param keySelector A callback used to choose the key to compare.
- * @param keyComparison An optional callback used to compare the keys.
+ * @param keyComparer An optional callback used to compare the keys.
  * @category Scalar
  */
-export function minBy<T, K>(source: Queryable<T>, keySelector: (value: T) => K, keyComparison: (x: K, y: K) => number = compare): T | undefined {
+export function minBy<T, K>(source: Queryable<T>, keySelector: (value: T) => K, keyComparer: Comparison<K> | Comparer<K> = Comparer.defaultComparer): T | undefined {
+    if (typeof keyComparer === "function") keyComparer = Comparer.create(keyComparer);
     assert.mustBeQueryable(source, "source");
     assert.mustBeFunction(keySelector, "keySelector");
-    assert.mustBeFunction(keyComparison, "keyComparison");
+    assert.mustBeComparer(keyComparer, "keyComparer");
     let hasResult = false;
     let result: T | undefined;
     let resultKey: K | undefined;
@@ -41,7 +42,7 @@ export function minBy<T, K>(source: Queryable<T>, keySelector: (value: T) => K, 
             resultKey = key;
             hasResult = true;
         }
-        else if (keyComparison(key, resultKey!) < 0) {
+        else if (keyComparer.compare(key, resultKey!) < 0) {
             result = element;
             resultKey = key;
         }

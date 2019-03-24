@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValueZero, GetIterator, ToIterable, IteratorClose} from "../internal";
+import { assert, GetIterator, ToIterable, IteratorClose} from "../internal";
 import { Queryable } from "../types";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the key for every element in `left` corresponds to a matching key
@@ -36,15 +37,17 @@ export function correspondsBy<T, K>(left: Queryable<T>, right: Queryable<T>, key
  * @param right A [[Queryable]] object.
  * @param leftKeySelector A callback used to select the key for each element in `left`.
  * @param rightKeySelector A callback used to select the key for each element in `right`.
- * @param equalityComparison An optional callback used to compare the equality of two keys.
+ * @param keyEqualer An optional callback used to compare the equality of two keys.
  * @category Scalar
  */
-export function correspondsBy<T, U, K>(left: Queryable<T>, right: Queryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, equalityComparison?: (left: K, right: K) => boolean): boolean;
-export function correspondsBy<T, K>(left: Queryable<T>, right: Queryable<T>, leftKeySelector: (element: T) => K, rightKeySelector: (element: T) => K = leftKeySelector, equalityComparison: (left: K, right: K) => boolean = SameValueZero): boolean {
+export function correspondsBy<T, U, K>(left: Queryable<T>, right: Queryable<U>, leftKeySelector: (element: T) => K, rightKeySelector: (element: U) => K, keyEqualer?: EqualityComparison<K> | Equaler<K>): boolean;
+export function correspondsBy<T, K>(left: Queryable<T>, right: Queryable<T>, leftKeySelector: (element: T) => K, rightKeySelector: (element: T) => K = leftKeySelector, keyEqualer: EqualityComparison<K> | Equaler<K> = Equaler.defaultEqualer): boolean {
     assert.mustBeQueryable(left, "left");
     assert.mustBeQueryable(right, "right");
     assert.mustBeFunction(leftKeySelector, "leftKeySelector");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeFunction(rightKeySelector, "rightKeySelector");
+    assert.mustBeObject(keyEqualer, "keyEqualer");
+    if (typeof keyEqualer === "function") keyEqualer = Equaler.create(keyEqualer);
     const leftIterator = GetIterator(ToIterable(left));
     let leftDone = false;
     let leftValue: T;
@@ -57,7 +60,7 @@ export function correspondsBy<T, K>(left: Queryable<T>, right: Queryable<T>, lef
                 ({ done: leftDone, value: leftValue } = leftIterator.next());
                 ({ done: rightDone, value: rightValue } = rightIterator.next());
                 if (leftDone && rightDone) return true;
-                if (Boolean(leftDone) !== Boolean(rightDone) || !equalityComparison(leftKeySelector(leftValue), rightKeySelector(rightValue))) return false;
+                if (Boolean(leftDone) !== Boolean(rightDone) || !keyEqualer.equals(leftKeySelector(leftValue), rightKeySelector(rightValue))) return false;
             }
         }
         finally {

@@ -15,8 +15,9 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, SameValue, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable } from "../internal";
+import { assert, GetAsyncIterator, AsyncIteratorClose, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of this Query start
@@ -24,36 +25,38 @@ import { AsyncQueryable } from "../types";
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export async function startsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): Promise<boolean>;
+export async function startsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: EqualityComparison<T> | Equaler<T>): Promise<boolean>;
 /**
  * Computes a scalar value indicating whether the elements of this Query start
  * with the same sequence of elements in another Queryable.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
- * @param equalityComparison A callback used to compare the equality of two elements.
+ * @param equaler A callback used to compare the equality of two elements.
  * @category Scalar
  */
-export async function startsWithAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean): Promise<boolean>;
-export async function startsWithAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equalityComparison: (left: T, right: U) => boolean = SameValue): Promise<boolean> {
+export async function startsWithAsync<T, U>(left: AsyncQueryable<T>, right: AsyncQueryable<U>, equaler: (left: T, right: U) => boolean): Promise<boolean>;
+export async function startsWithAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): Promise<boolean> {
+    if (typeof equaler === "function") equaler = Equaler.create(equaler);
     assert.mustBeAsyncQueryable<T>(left, "left");
-    assert.mustBeAsyncQueryable<U>(right, "right");
-    assert.mustBeFunction(equalityComparison, "equalityComparison");
+    assert.mustBeAsyncQueryable<T>(right, "right");
+    assert.mustBeEqualer(equaler, "equaler");
     const leftIterator = GetAsyncIterator(ToPossiblyAsyncIterable(left));
     let leftDone = false;
     let leftValue: T;
     try {
         const rightIterator = GetAsyncIterator(ToPossiblyAsyncIterable(right));
         let rightDone = false;
-        let rightValue: U;
+        let rightValue: T;
         try {
             for (;;) {
                 ({ done: leftDone, value: leftValue } = await leftIterator.next());
                 ({ done: rightDone, value: rightValue } = await rightIterator.next());
                 if (rightDone) return true;
-                if (leftDone || !equalityComparison(leftValue, rightValue)) return false;
+                if (leftDone || !equaler.equals(leftValue, rightValue)) return false;
             }
         }
         finally {

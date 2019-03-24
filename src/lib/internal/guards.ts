@@ -16,6 +16,7 @@
 
 import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncOrderedHierarchyIterable, Comparable } from "../types";
 import { QuerySource, AsyncQuerySource } from "./types";
+import { Equaler, Comparer } from 'equatable';
 
 type Primitive = string | number | boolean | symbol;
 type Other = Primitive | object | null | undefined;
@@ -160,7 +161,21 @@ export function IsAsyncQuerySource<T>(value: AsyncQuerySource<T> | Other): value
 }
 
 /** @internal */
-export function IsComparable(x: any): x is Comparable<any> {
-    return IsObject(x)
-        && Comparable.compareTo in x;
+export function IsComparable(x: any): x is Comparable {
+    return Comparable.isComparable(x);
+}
+
+/** @internal */
+export function IsEqualer(x: any): x is Equaler<any> {
+    return typeof x === "object"
+        && x !== null
+        && "equals" in x && typeof x.equals === "function"
+        && "hash" in x && typeof x.hash === "function";
+}
+
+/** @internal */
+export function IsComparer(x: any): x is Comparer<any> {
+    return typeof x === "object"
+        && x !== null
+        && "compare" in x && typeof x.compare === "function";
 }

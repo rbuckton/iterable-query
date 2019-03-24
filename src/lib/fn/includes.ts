@@ -15,30 +15,34 @@
  */
 /** @module "iterable-query/fn" */
 
-import { assert, ToIterable, SameValue} from "../internal";
+import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
+import { EqualityComparison, Equaler } from 'equatable';
 
 /**
  * Computes a scalar value indicating whether the provided value is included in a [[Queryable]].
  *
  * @param source A [[Queryable]] object.
  * @param value A value.
+ * @param equaler An optional callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function includes<T>(source: Queryable<T>, value: T): boolean;
+export function includes<T>(source: Queryable<T>, value: T, equaler?: EqualityComparison<T> | Equaler<T>): boolean;
 /**
  * Computes a scalar value indicating whether the provided value is included in a [[Queryable]].
  *
  * @param source A [[Queryable]] object.
  * @param value A value.
- * @param equalityComparison An optional callback used to compare the equality of two elements.
+ * @param equaler An optional callback used to compare the equality of two elements.
  * @category Scalar
  */
-export function includes<T, U>(source: Queryable<T>, value: U, equalityComparison: (left: T, right: U) => boolean): boolean;
-export function includes<T>(source: Queryable<T>, value: T, equalityComparison: (left: T, right: T) => boolean = SameValue): boolean {
+export function includes<T, U>(source: Queryable<T>, value: U, equaler: (left: T, right: U) => boolean): boolean;
+export function includes<T>(source: Queryable<T>, value: T, equaler: EqualityComparison<T> | Equaler<T> = Equaler.defaultEqualer): boolean {
+  if (typeof equaler === "function") equaler = Equaler.create(equaler);
     assert.mustBeQueryable(source, "source");
+    assert.mustBeEqualer(equaler, "equaler");
     for (const element of ToIterable(source)) {
-        if (equalityComparison(value, element)) {
+        if (equaler.equals(value, element)) {
             return true;
         }
     }

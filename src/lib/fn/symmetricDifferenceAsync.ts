@@ -19,6 +19,7 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
 import { symmetricDifferenceByAsync } from './symmetricDifferenceByAsync';
 import { identity } from './common';
+import { Equaler } from 'equatable';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
@@ -27,9 +28,10 @@ import { identity } from './common';
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
+export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
  * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
@@ -37,9 +39,10 @@ export function symmetricDifferenceAsync<TNode, T extends TNode>(left: PossiblyA
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
+export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>, equaler?: Equaler<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.
  * The result is an [[AsyncIterable]] containings the elements that exist in only left or right, but not
@@ -47,11 +50,13 @@ export function symmetricDifferenceAsync<TNode, T extends TNode>(left: AsyncQuer
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
-export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncIterable<T>;
+export function symmetricDifferenceAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable<T>(left, "left");
     assert.mustBeAsyncQueryable<T>(right, "right");
-    return symmetricDifferenceByAsync(left, right, identity);
+    assert.mustBeEqualerOrUndefined(equaler, "equaler");
+    return symmetricDifferenceByAsync(left, right, identity, equaler);
 }

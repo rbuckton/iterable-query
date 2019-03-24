@@ -19,9 +19,11 @@ import { assert, ToIterable, GetIterator, CreateGrouping } from "./internal";
 import { Queryable, Grouping } from "./types";
 import { empty } from "./fn";
 import { Map } from "./collections";
+import { Equaler } from 'equatable';
+import { HashMap } from 'equatable/collections';
 
 export class Lookup<K, V> implements Iterable<Grouping<K, V>> {
-    private _entries: Map<K, Queryable<V>>;
+    private _entries: Map<K, Queryable<V>> | HashMap<K, Queryable<V>>;
     private _source: Iterable<Grouping<K, V>>;
 
     /**
@@ -29,9 +31,10 @@ export class Lookup<K, V> implements Iterable<Grouping<K, V>> {
      *
      * @param entries A map containing the unique groups of values.
      */
-    constructor(entries: Queryable<[K, Queryable<V>]>) {
+    constructor(entries: Queryable<[K, Queryable<V>]>, keyEqualer?: Equaler<K>) {
         assert.mustBeQueryable(entries, "entries");
-        this._entries = new Map(ToIterable(entries));
+        assert.mustBeEqualerOrUndefined(keyEqualer, "keyEqualer");
+        this._entries = keyEqualer ? new HashMap(ToIterable(entries), keyEqualer) : new Map(ToIterable(entries));
         this._source = new LookupIterable(this._entries, CreateGrouping);
     }
 
@@ -76,10 +79,10 @@ export class Lookup<K, V> implements Iterable<Grouping<K, V>> {
 }
 
 class LookupIterable<K, V, R> implements Iterable<R> {
-    private _map: Map<K, Queryable<V>>;
+    private _map: ReadonlyMap<K, Queryable<V>>;
     private _selector: (key: K, elements: Queryable<V>) => R;
 
-    constructor(map: Map<K, Queryable<V>>, selector: (key: K, elements: Queryable<V>) => R) {
+    constructor(map: ReadonlyMap<K, Queryable<V>>, selector: (key: K, elements: Queryable<V>) => R) {
         this._map = map;
         this._selector = selector;
     }

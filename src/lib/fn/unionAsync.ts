@@ -19,33 +19,38 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { identity } from './common';
 import { unionByAsync } from './unionByAsync';
+import { Equaler } from 'equatable';
 
 /**
  * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>): AsyncHierarchyIterable<TNode, T>;
+export function unionAsync<TNode, T extends TNode>(left: PossiblyAsyncHierarchyIterable<TNode, T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function unionAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>): AsyncHierarchyIterable<TNode, T>;
+export function unionAsync<TNode, T extends TNode>(left: AsyncQueryable<T>, right: PossiblyAsyncHierarchyIterable<TNode, T>, equaler?: Equaler<T>): AsyncHierarchyIterable<TNode, T>;
 /**
  * Creates a subquery for the set union of two [[AsyncQueryable]] objects.
  *
  * @param left An [[AsyncQueryable]] object.
  * @param right An [[AsyncQueryable]] object.
+ * @param equaler An [[Equaler]] object used to compare equality.
  * @category Subquery
  */
-export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T>;
-export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>): AsyncIterable<T> {
+export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncIterable<T>;
+export function unionAsync<T>(left: AsyncQueryable<T>, right: AsyncQueryable<T>, equaler?: Equaler<T>): AsyncIterable<T> {
     assert.mustBeAsyncQueryable(left, "left");
     assert.mustBeAsyncQueryable(right, "right");
-    return unionByAsync(left, right, identity);
+    assert.mustBeEqualerOrUndefined(equaler, "equaler");
+    return unionByAsync(left, right, identity, equaler);
 }
