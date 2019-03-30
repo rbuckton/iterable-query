@@ -1,10 +1,11 @@
 {
   "name": "iterable-query",
-  "version": "1.0.0-pre.14",
+  "version": "1.0.0-pre.15",
   "description": "Query library for ECMAScript iterables.",
   "main": "index",
   "typings": "index",
   "dependencies": {
+    "collection-core": "^1.0.0",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
@@ -21,7 +22,7 @@
     "c8": "^3.2.1",
     "chai": "^4.1.2",
     "del": "^3.0.0",
-    "equatable": "^1.0.2",
+    "equatable": "^1.1.0",
     "foreground-child": "^1.5.6",
     "gulp": "^3.9.1",
     "gulp-if": "^2.0.2",

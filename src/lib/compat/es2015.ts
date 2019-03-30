@@ -291,7 +291,13 @@ function installShims(global: any) {
             return `${typeof target}(${target})`;
         }
 
-        class Map<K, V> {
+        type KeyedCollection<K, V> = import("collection-core").KeyedCollection<K, V>;
+        type Collection<T> = import("collection-core").Collection<T>;
+
+        // This needs to be loaded *after* the Symbol shim is installed
+        const { KeyedCollection, Collection } = require("collection-core") as typeof import("collection-core");
+
+        class Map<K, V> implements KeyedCollection<K, V> {
             private _keys = createHashMap<K>();
             private _values = createHashMap<V>();
             private _size = 0;
@@ -374,13 +380,22 @@ function installShims(global: any) {
             static readonly [Symbol.species]: MapConstructor;
             [Symbol.toStringTag]: "Map";
             [Symbol.iterator]: () => IterableIterator<[K, V]>;
+
+            get [KeyedCollection.size]() { return this.size; }
+            [KeyedCollection.has](key: K) { return this.has(key); }
+            [KeyedCollection.get](key: K) { return this.get(key); }
+            [KeyedCollection.set](key: K, value: V) { this.set(key, value); }
+            [KeyedCollection.delete](key: K) { return this.delete(key); }
+            [KeyedCollection.clear]() { this.clear(); }
+            [KeyedCollection.keys]() { return this.keys(); }
+            [KeyedCollection.values]() { return this.values(); }
         }
 
         Object.defineProperty(Map.prototype, Symbol.toStringTag, { configurable: true, value: "Map" });
         Object.defineProperty(Map.prototype, Symbol.iterator, { configurable: true, writable: true, value: Map.prototype.entries });
         Object.defineProperty(Map, Symbol.species, { configurable: true, get: function() { return this; }});
 
-        class Set<T> {
+        class Set<T> implements Collection<T> {
             private _values = createHashMap<T>();
             private _size: number = 0;
 
@@ -453,6 +468,12 @@ function installShims(global: any) {
             static readonly [Symbol.species]: SetConstructor;
             [Symbol.toStringTag]: "Set";
             [Symbol.iterator]: () => IterableIterator<T>;
+
+            get [Collection.size]() { return this.size; }
+            [Collection.has](value: T) { return this.has(value); }
+            [Collection.add](value: T) { this.add(value); }
+            [Collection.delete](value: T) { return this.delete(value); }
+            [Collection.clear]() { this.clear(); }
         }
 
         Object.defineProperty(Set.prototype, Symbol.toStringTag, { configurable: true, value: "Set" });
