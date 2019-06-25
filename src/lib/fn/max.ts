@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable } from "../types";
 import { identity } from "./common";
 import { maxBy } from './maxBy';
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Gets the maximum element of a [[Queryable]], optionally comparing elements using the supplied callback.

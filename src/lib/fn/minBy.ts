@@ -17,7 +17,7 @@
 
 import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Gets the minimum element of a [[Queryable]], optionally comparing the keys of each element using the supplied callback.

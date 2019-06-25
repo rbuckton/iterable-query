@@ -15,12 +15,12 @@
  */
 /** @module "iterable-query/fn" */
 
+import { HashSet } from '@esfx/collections-hashset';
+import { Equaler } from '@esfx/equatable';
 import { assert, ToPossiblyAsyncIterable, IsEqualer } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Set } from "../collections";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
-import { HashSet } from 'equatable/collections';
 
 /**
  * Creates a Set for the elements of the Query.

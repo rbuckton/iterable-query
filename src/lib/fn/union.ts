@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { unionBy } from './unionBy';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a subquery for the set union of two [[Queryable]] objects.

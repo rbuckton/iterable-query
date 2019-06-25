@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
 import { exceptByAsync } from './exceptByAsync';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the set difference between a [[HierarchyIterable]] or an [[AsyncHierarchyIterable]] and an [[AsyncQueryable]] object.

@@ -21,8 +21,9 @@ import { OrderedHierarchyIterable, HierarchyIterable, Queryable, HierarchyProvid
 import { Lookup } from "./lookup";
 import { ConsumeAsyncOptions } from "./fn";
 import { Query, from } from "./query";
-import { Comparison, Comparer, EqualityComparison, Equaler } from 'equatable';
-import { HashSet, HashMap } from 'equatable/collections';
+import { Comparison, Comparer, EqualityComparison, Equaler } from '@esfx/equatable';
+import { HashSet } from '@esfx/collections-hashset';
+import { HashMap } from '@esfx/collections-hashmap';
 
 /**
  * Flows the base type of a [[Query]] as an unordered query with a new iterated type.

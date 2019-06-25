@@ -18,8 +18,8 @@
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { AsyncHierarchyIterable, PossiblyAsyncHierarchyIterable, PossiblyAsyncIterable, AsyncQueryable } from "../types";
 import { Set } from "../collections";
-import { Equaler } from 'equatable';
-import { HashSet } from 'equatable/collections';
+import { Equaler } from '@esfx/equatable';
+import { HashSet } from '@esfx/collections-hashset';
 
 /**
  * Creates an [[AsyncHierarchyIterable]] for the distinct elements of `source`.

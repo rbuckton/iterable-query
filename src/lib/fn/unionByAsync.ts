@@ -15,11 +15,11 @@
  */
 /** @module "iterable-query/fn" */
 
+import { HashSet } from '@esfx/collections-hashset';
+import { Equaler } from '@esfx/equatable';
 import { assert, FlowHierarchy, ToPossiblyAsyncIterable, ToStringTag, TryAdd } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { Set } from "../collections";
-import { Equaler } from 'equatable';
-import { HashSet } from 'equatable/collections';
 
 /**
  * Creates a subquery for the set union of two [[AsyncQueryable]] objects, where set identity is determined by the selected key.

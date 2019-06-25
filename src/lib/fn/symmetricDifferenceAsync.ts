@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
 import { symmetricDifferenceByAsync } from './symmetricDifferenceByAsync';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.

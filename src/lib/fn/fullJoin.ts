@@ -22,7 +22,7 @@ import { map } from "./map";
 import { Lookup } from "../lookup";
 import { defaultIfEmpty } from "./defaultIfEmpty";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates an [[Iterable]] for the correlated elements between an outer [[Queryable]] object and an inner

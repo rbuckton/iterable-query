@@ -18,7 +18,7 @@
 import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 import { distinctBy } from './distinctBy';
 
 /**

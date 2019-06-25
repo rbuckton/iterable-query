@@ -17,7 +17,7 @@
 
 import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Gets the maximum element of an [[AsyncQueryable]], optionally comparing the keys of each element using the supplied callback.

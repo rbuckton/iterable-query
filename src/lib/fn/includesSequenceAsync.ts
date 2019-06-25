@@ -18,7 +18,7 @@
 import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
-import { EqualityComparison, Equaler } from 'equatable';
+import { EqualityComparison, Equaler } from '@esfx/equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of `left` include

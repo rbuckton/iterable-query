@@ -16,7 +16,7 @@
 
 import { Queryable, OrderedIterable, HierarchyProvider, HierarchyIterable, PossiblyAsyncIterable, PossiblyAsyncHierarchyIterable, OrderedHierarchyIterable, AsyncOrderedIterable, AsyncHierarchyIterable, AsyncOrderedHierarchyIterable, Hierarchical, PossiblyAsyncOrderedIterable, Grouping, PossiblyAsyncOrderedHierarchyIterable, Comparable } from "../types";
 import { QuerySource, AsyncQuerySource } from "./types";
-import { Equaler, Comparer } from 'equatable';
+import { Equaler, Comparer } from '@esfx/equatable';
 
 type Primitive = string | number | boolean | symbol;
 type Other = Primitive | object | null | undefined;

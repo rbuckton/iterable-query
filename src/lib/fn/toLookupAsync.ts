@@ -19,7 +19,7 @@ import { assert, CreateGroupingsAsync, IsEqualer } from "../internal";
 import { AsyncQueryable } from "../types";
 import { Lookup } from "../lookup";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a Lookup for the elements of the source.

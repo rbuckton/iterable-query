@@ -17,7 +17,7 @@
 
 import "../compat";
 import { Lazy } from "../lazy";
-import { Comparer, Equaler } from 'equatable';
+import { Comparer, Equaler } from '@esfx/equatable';
 
 /** A function that returns the provided value. */
 export function identity<T>(value: T): T {

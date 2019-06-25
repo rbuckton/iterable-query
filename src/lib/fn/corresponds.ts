@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable } from "../types";
 import { correspondsBy } from './correspondsBy';
 import { identity } from './common';
-import { EqualityComparison, Equaler } from 'equatable';
+import { EqualityComparison, Equaler } from '@esfx/equatable';
 
 /**
  * Computes a scalar value indicating whether every element in `left` corresponds to a matching element

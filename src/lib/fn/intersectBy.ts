@@ -18,7 +18,7 @@
 import { assert, ToIterable, FlowHierarchy, ToStringTag} from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { toSet } from "./toSet";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] object and a [[Queryable]] object, where set identity is determined by the selected key.

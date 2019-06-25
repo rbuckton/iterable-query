@@ -22,7 +22,7 @@ import { union } from "../fn/union";
 import { map } from "../fn/map";
 import { defaultIfEmpty } from "../fn/defaultIfEmpty";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates an [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner

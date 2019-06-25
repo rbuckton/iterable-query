@@ -19,8 +19,8 @@ import { assert, ToIterable, IsEqualer } from "../internal";
 import { Queryable } from "../types";
 import { Map } from "../collections";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
-import { HashMap } from 'equatable/collections';
+import { Equaler } from '@esfx/equatable';
+import { HashMap } from '@esfx/collections-hashmap';
 
 /**
  * Creates a Map for the elements of the Query.

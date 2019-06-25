@@ -17,7 +17,7 @@
 
 import { assert, GetIterator, ToIterable, IteratorClose} from "../internal";
 import { Queryable } from "../types";
-import { EqualityComparison, Equaler } from 'equatable';
+import { EqualityComparison, Equaler } from '@esfx/equatable';
 
 /**
  * Computes a scalar value indicating whether the key for every element in `left` corresponds to a matching key

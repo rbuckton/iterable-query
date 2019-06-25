@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable } from "../types";
 import { takeRight } from "./takeRight";
 import { toArray } from "./toArray";
-import { EqualityComparison, Equaler } from 'equatable';
+import { EqualityComparison, Equaler } from '@esfx/equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of `left` end

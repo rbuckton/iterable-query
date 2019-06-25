@@ -19,7 +19,7 @@ import { assert, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag } fr
 import { AsyncQueryable, PossiblyAsyncIterable } from "../types";
 import { empty } from "../fn/empty";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a grouped [[AsyncIterable]] for the correlated elements between an outer [[AsyncQueryable]] object and an inner [[AsyncQueryable]] object.

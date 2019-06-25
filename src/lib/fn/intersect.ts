@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { intersectBy } from './intersectBy';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] object and a [[Queryable]] object.

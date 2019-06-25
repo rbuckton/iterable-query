@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { symmetricDifferenceBy } from './symmetricDifferenceBy';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects.

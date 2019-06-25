@@ -18,7 +18,7 @@
 import { assert, ToIterable } from "../internal";
 import { Queryable } from "../types";
 import { toArray } from "./toArray";
-import { EqualityComparison, Equaler } from 'equatable';
+import { EqualityComparison, Equaler } from '@esfx/equatable';
 
 /**
  * Computes a scalar value indicating whether the elements of `left` include

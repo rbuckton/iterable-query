@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { exceptBy } from './exceptBy';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set difference between a [[HierarchyIterable]] and a [[Queryable]] object.

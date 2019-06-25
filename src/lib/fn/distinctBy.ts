@@ -18,8 +18,8 @@
 import { assert, ToIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
-import { Equaler } from 'equatable';
-import { HashSet } from 'equatable/collections';
+import { Equaler } from '@esfx/equatable';
+import { HashSet } from '@esfx/collections-hashset';
 
 /**
  * Creates a [[HierarchyIterable]] for the distinct elements of `source`.

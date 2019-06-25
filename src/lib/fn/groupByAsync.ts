@@ -18,7 +18,7 @@
 import { assert, CreateGrouping, ToPossiblyAsyncIterable, CreateGroupingsAsync, ToStringTag, FlowHierarchy, IsEqualer } from "../internal";
 import { AsyncQueryable, PossiblyAsyncIterable, Grouping, PossiblyAsyncHierarchyIterable, HierarchyGrouping } from "../types";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Groups each element of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] by its key.

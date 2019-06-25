@@ -18,8 +18,9 @@
 import { assert, ToIterable, FlowHierarchy, ToStringTag, TryAdd } from "../internal";
 import { Queryable, HierarchyIterable } from "../types";
 import { Set } from "../collections";
-import { Equaler } from 'equatable';
-import { HashSet, HashMap } from 'equatable/collections';
+import { Equaler } from '@esfx/equatable';
+import { HashSet } from '@esfx/collections-hashset';
+import { HashMap } from '@esfx/collections-hashmap';
 
 /**
  * Creates a subquery for the symmetric difference between two [[Queryable]] objects, where set identity is determined by the selected key.

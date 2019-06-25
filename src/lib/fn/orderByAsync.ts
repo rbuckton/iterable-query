@@ -18,7 +18,7 @@
 import { assert, FlowHierarchy, ThenByAsync, ToAsyncOrderedIterable, ToPossiblyAsyncIterable, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncOrderedHierarchyIterable, AsyncQueryable, AsyncOrderedIterable, PossiblyAsyncOrderedHierarchyIterable, PossiblyAsyncOrderedIterable, PossiblyAsyncIterable } from "../types";
 import { toArrayAsync } from "./toArrayAsync";
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Creates an [[AsyncOrderedHierarchyIterable]] whose elements are sorted in ascending order by the provided key.

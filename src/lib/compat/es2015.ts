@@ -291,11 +291,11 @@ function installShims(global: any) {
             return `${typeof target}(${target})`;
         }
 
-        type KeyedCollection<K, V> = import("collection-core").KeyedCollection<K, V>;
-        type Collection<T> = import("collection-core").Collection<T>;
+        type KeyedCollection<K, V> = import("@esfx/collection-core").KeyedCollection<K, V>;
+        type Collection<T> = import("@esfx/collection-core").Collection<T>;
 
         // This needs to be loaded *after* the Symbol shim is installed
-        const { KeyedCollection, Collection } = require("collection-core") as typeof import("collection-core");
+        const { KeyedCollection, Collection } = require("@esfx/collection-core") as typeof import("@esfx/collection-core");
 
         class Map<K, V> implements KeyedCollection<K, V> {
             private _keys = createHashMap<K>();

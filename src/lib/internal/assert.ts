@@ -20,7 +20,7 @@ import { Queryable, HierarchyProvider, AsyncOrderedIterable, PossiblyAsyncHierar
 import { OrderedIterable, HierarchyIterable } from "../types";
 import { QuerySource, AsyncQuerySource } from "./types";
 import { IsQuerySource, IsAsyncQuerySource, IsAsyncHierarchyIterable, IsEqualer, IsComparer } from "./guards";
-import { Equaler, Comparer } from 'equatable';
+import { Equaler, Comparer } from '@esfx/equatable';
 
 /** @internal */
 export function fail(ErrorType: new (message?: string) => Error, paramName: string | undefined, message: string | undefined, stackCrawlMark: Function = fail): never {

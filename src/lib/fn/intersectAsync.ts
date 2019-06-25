@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable } from "../types";
 import { intersectByAsync } from './intersectByAsync';
 import { identity } from './common';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object and an [[AsyncQueryable]] object.

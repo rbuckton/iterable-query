@@ -16,12 +16,13 @@
 /** @module "iterable-query" */
 
 import * as fn from "./fn";
+import { Comparison, Comparer, EqualityComparison, Equaler } from '@esfx/equatable';
+import { HashMap } from '@esfx/collections-hashmap';
+import { HashSet } from '@esfx/collections-hashset';
 import { assert, IsHierarchyIterable, ToIterable, IsOrderedIterable, IsOrderedHierarchyIterable, GetHierarchy, ThenBy, MakeHierarchyIterable, GetSource, GetIterator, QuerySource, IsEqualer } from "./internal";
 import { OrderedHierarchyIterable, HierarchyIterable, OrderedIterable, Queryable, HierarchyProvider, Hierarchical, Grouping, KeyValuePair, Page, Choice, QueriedType, WritableArrayLike } from "./types";
 import { Lookup } from "./lookup";
 import { ConsumeOptions } from "./fn";
-import { Comparison, Comparer, EqualityComparison, Equaler } from 'equatable';
-import { HashSet, HashMap } from 'equatable/collections';
 
 /**
  * Flows the base type of a [[Query]] as an unordered query with a new iterated type.

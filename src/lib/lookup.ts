@@ -15,12 +15,12 @@
  */
 /** @module "iterable-query" */
 
+import { HashMap } from '@esfx/collections-hashmap';
+import { Equaler } from '@esfx/equatable';
 import { assert, ToIterable, GetIterator, CreateGrouping } from "./internal";
 import { Queryable, Grouping } from "./types";
 import { empty } from "./fn";
 import { Map } from "./collections";
-import { Equaler } from 'equatable';
-import { HashMap } from 'equatable/collections';
 
 export class Lookup<K, V> implements Iterable<Grouping<K, V>> {
     private _entries: Map<K, Queryable<V>> | HashMap<K, Queryable<V>>;

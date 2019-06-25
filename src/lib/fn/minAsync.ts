@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { AsyncQueryable } from "../types";
 import { identity } from "./common";
 import { minByAsync } from './minByAsync';
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Gets the minimum element of an [[AsyncQueryable]], optionally comparing elements using the supplied callback.

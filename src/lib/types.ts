@@ -18,7 +18,7 @@
 /// <reference lib="es2015.iterable" />
 /// <reference lib="esnext.asynciterable" />
 import "./compat";
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Typed key-value pairs derived from the properties of an `object`.
@@ -64,8 +64,8 @@ export namespace Hierarchical {
 
 // Comparables
 
-export { Comparable } from "equatable";
-export { Equatable } from "equatable";
+export { Comparable } from "@esfx/equatable";
+export { Equatable } from "@esfx/equatable";
 
 // Grouping
 

@@ -17,7 +17,7 @@
 
 import { assert, ToPossiblyAsyncIterable } from "../internal";
 import { AsyncQueryable } from "../types";
-import { EqualityComparison, Equaler } from 'equatable';
+import { EqualityComparison, Equaler } from '@esfx/equatable';
 
 /**
  * Computes a scalar value indicating whether the provided value is included in an [[AsyncQueryable]].

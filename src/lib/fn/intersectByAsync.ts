@@ -18,7 +18,7 @@
 import { assert, ToPossiblyAsyncIterable, FlowHierarchy, ToStringTag } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncQueryable, AsyncHierarchyIterable, PossiblyAsyncIterable } from "../types";
 import { toSetAsync } from "./toSetAsync";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a [[HierarchyIterable]] for the set intersection of a [[HierarchyIterable]] or [[AsyncHierarchyIterable]] object and an [[AsyncQueryable]] object, where set identity is determined by the selected key.

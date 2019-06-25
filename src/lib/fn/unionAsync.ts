@@ -19,7 +19,7 @@ import { assert } from "../internal";
 import { PossiblyAsyncHierarchyIterable, AsyncHierarchyIterable, AsyncQueryable } from "../types";
 import { identity } from './common';
 import { unionByAsync } from './unionByAsync';
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates a subquery for the set union of two [[AsyncQueryable]] objects.

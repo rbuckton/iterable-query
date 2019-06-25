@@ -18,7 +18,7 @@
 import { assert, FlowHierarchy, ToIterable, ThenBy, ToStringTag} from "../internal";
 import { Queryable, OrderedIterable, HierarchyIterable, OrderedHierarchyIterable } from "../types";
 import { toArray } from "./toArray";
-import { Comparison, Comparer } from 'equatable';
+import { Comparison, Comparer } from '@esfx/equatable';
 
 /**
  * Creates an [[OrderedHierarchyIterable]] whose elements are sorted in ascending order by the provided key.

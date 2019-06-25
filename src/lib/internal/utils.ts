@@ -19,8 +19,9 @@ import { ToPossiblyAsyncIterable, ToIterable } from "./conversion";
 import { IsAsyncIterable, IsIterable, IsQuerySource, IsAsyncQuerySource } from "./guards";
 import { ToStringTag } from "./decorators";
 import { QuerySource, AsyncQuerySource } from "./types";
-import { Comparison, Comparer, Equaler } from 'equatable';
-import { HashSet, HashMap } from 'equatable/collections';
+import { Comparison, Comparer, Equaler } from '@esfx/equatable';
+import { HashSet } from '@esfx/collections-hashset';
+import { HashMap } from '@esfx/collections-hashmap';
 
 /** @internal */
 export function GetIterator<T>(source: Iterable<T>): Iterator<T> {

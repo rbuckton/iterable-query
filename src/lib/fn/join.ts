@@ -18,7 +18,7 @@
 import { assert, ToIterable, CreateGroupings, ToStringTag} from "../internal";
 import { Queryable } from "../types";
 import { identity } from "./common";
-import { Equaler } from 'equatable';
+import { Equaler } from '@esfx/equatable';
 
 /**
  * Creates an [[Iterable]] for the correlated elements of two [[Queryable]] objects.
